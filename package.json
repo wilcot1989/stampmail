@@ -1,5 +1,5 @@
 {
-  "name": "stampmail",
+  "name": "neatstamp",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -7,7 +7,7 @@
     "build": "next build",
     "build:cf": "npx @cloudflare/next-on-pages",
     "preview": "npx wrangler pages dev .vercel/output/static",
-    "deploy": "npx wrangler pages deploy .vercel/output/static --project-name=stampmail",
+    "deploy": "npx wrangler pages deploy .vercel/output/static --project-name=neatstamp",
     "start": "next start",
     "lint": "eslint"
   },
