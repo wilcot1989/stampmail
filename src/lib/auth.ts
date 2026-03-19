@@ -42,5 +42,19 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   session: {
     strategy: "jwt",
   },
+  cookies: {
+    sessionToken: {
+      name: "__Secure-next-auth.session-token",
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: true,
+        // Share cookie across main domain and app subdomain
+        domain: process.env.NODE_ENV === "production" ? ".neatstamp.com" : undefined,
+      },
+    },
+  },
+  trustHost: true,
   secret: process.env.NEXTAUTH_SECRET,
 });
