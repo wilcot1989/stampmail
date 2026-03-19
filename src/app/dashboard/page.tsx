@@ -387,12 +387,12 @@ function SignaturesTab({
             Create new signature
           </button>
         ) : (
-          <Link
-            href="/editor"
+          <button
+            onClick={onCreateNew}
             className="text-xs text-primary underline"
           >
             Edit in editor
-          </Link>
+          </button>
         )}
       </div>
 
@@ -409,12 +409,12 @@ function SignaturesTab({
               title="No signature yet"
               description="Create your first email signature in the editor."
               cta={
-                <Link
-                  href="/editor"
+                <button
+                  onClick={onCreateNew}
                   className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-dark transition-colors"
                 >
                   Create signature
-                </Link>
+                </button>
               }
             />
           ) : (
@@ -908,8 +908,14 @@ function DashboardContent() {
   };
 
   const handleCopySignature = (sig: Signature) => {
-    // Navigate to editor pre-filled, or copy the HTML directly
-    router.push(`/editor?sigId=${sig.id}`);
+    // Open in dashboard editor
+    try {
+      const parsed = typeof sig.data === "string" ? JSON.parse(sig.data) : sig.data;
+      setEditorData({ ...DEFAULT_SIGNATURE_DATA, ...parsed });
+    } catch {
+      setEditorData(DEFAULT_SIGNATURE_DATA);
+    }
+    setActiveTab("editor");
   };
 
   if (status === "loading" || planLoading) {
@@ -1004,7 +1010,15 @@ function DashboardContent() {
               plan={plan}
               loading={sigsLoading}
               onCreateNew={() => { setEditorData(DEFAULT_SIGNATURE_DATA); setEditorBlocks(getDefaultBlocks()); setActiveTab("editor"); }}
-              onEdit={(sig) => { if (sig.data) setEditorData(sig.data); setActiveTab("editor"); }}
+              onEdit={(sig) => {
+                try {
+                  const parsed = typeof sig.data === "string" ? JSON.parse(sig.data) : sig.data;
+                  setEditorData({ ...DEFAULT_SIGNATURE_DATA, ...parsed });
+                } catch {
+                  setEditorData(DEFAULT_SIGNATURE_DATA);
+                }
+                setActiveTab("editor");
+              }}
               onCopy={handleCopySignature}
               onDelete={handleDeleteSignature}
               onUpgrade={() => handleUpgrade("monthly")}
