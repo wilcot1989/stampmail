@@ -33,13 +33,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ sent: true });
     }
 
-    // Check if user exists with a password
+    // Check if user exists (any auth method — they can set/reset a password)
     const user = await db.prepare(
-      "SELECT id, password_hash FROM users WHERE email = ?"
-    ).bind(email).first<{ id: string; password_hash: string | null }>();
+      "SELECT id FROM users WHERE email = ?"
+    ).bind(email).first<{ id: string }>();
 
-    if (!user || !user.password_hash) {
-      // User doesn't exist or uses Google — still return success (prevent enumeration)
+    if (!user) {
+      // User doesn't exist — still return success (prevent enumeration)
       return NextResponse.json({ sent: true });
     }
 
