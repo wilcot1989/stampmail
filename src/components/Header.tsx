@@ -16,55 +16,55 @@ export default function Header() {
         </a>
 
         <div className="hidden items-center gap-1 md:flex">
-          <Link
-            href="/editor"
+          <a
+            href="https://app.neatstamp.com/editor"
             className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors"
           >
             Create Signature
-          </Link>
-          <Link
-            href="/templates"
+          </a>
+          <a
+            href="https://neatstamp.com/templates"
             className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors"
           >
             Templates
-          </Link>
-          <Link
-            href="/examples"
+          </a>
+          <a
+            href="https://neatstamp.com/examples"
             className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors"
           >
             Examples
-          </Link>
-          <Link
-            href="/pricing"
+          </a>
+          <a
+            href="https://neatstamp.com/pricing"
             className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors"
           >
             Pricing
-          </Link>
+          </a>
           <div className="ml-3 pl-3 border-l border-slate-200">
             {session ? (
-              <Link
-                href="/dashboard"
+              <a
+                href="https://app.neatstamp.com/dashboard"
                 className="inline-flex items-center gap-2 rounded-full bg-blue-600 px-5 py-2 text-sm font-semibold text-white shadow-sm shadow-blue-600/25 hover:bg-blue-700 transition-colors"
               >
                 {session.user?.image && (
                   <img src={session.user.image} alt="" className="h-5 w-5 rounded-full" />
                 )}
                 Dashboard
-              </Link>
+              </a>
             ) : (
               <>
-                <Link
-                  href="/login"
+                <a
+                  href="https://app.neatstamp.com/login"
                   className="rounded-full px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors"
                 >
                   Sign in
-                </Link>
-                <Link
-                  href="/editor"
+                </a>
+                <a
+                  href="https://app.neatstamp.com/editor"
                   className="inline-flex items-center rounded-full bg-blue-600 px-5 py-2 text-sm font-semibold text-white shadow-sm shadow-blue-600/25 hover:bg-blue-700 transition-colors"
                 >
                   Get Started — Free
-                </Link>
+                </a>
               </>
             )}
           </div>
@@ -95,45 +95,45 @@ export default function Header() {
         <div className="border-t border-slate-100 md:hidden bg-white">
           <div className="flex flex-col gap-1 px-4 py-4">
             {[
-              { href: "/editor", label: "Create Signature" },
-              { href: "/templates", label: "Templates" },
-              { href: "/examples", label: "Examples" },
-              { href: "/pricing", label: "Pricing" },
+              { href: "https://app.neatstamp.com/editor", label: "Create Signature" },
+              { href: "https://neatstamp.com/templates", label: "Templates" },
+              { href: "https://neatstamp.com/examples", label: "Examples" },
+              { href: "https://neatstamp.com/pricing", label: "Pricing" },
             ].map((item) => (
-              <Link
+              <a
                 key={item.href}
                 href={item.href}
                 className="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {item.label}
-              </Link>
+              </a>
             ))}
             {!session && (
-              <Link
-                href="/login"
+              <a
+                href="https://app.neatstamp.com/login"
                 className="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Sign in
-              </Link>
+              </a>
             )}
             {session && (
-              <Link
-                href="/dashboard"
+              <a
+                href="https://app.neatstamp.com/dashboard"
                 className="rounded-lg px-3 py-2.5 text-sm font-medium text-blue-600 hover:bg-blue-50"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Dashboard
-              </Link>
+              </a>
             )}
-            <Link
-              href="/editor"
+            <a
+              href="https://app.neatstamp.com/editor"
               className="mt-2 rounded-full bg-blue-600 px-4 py-2.5 text-center text-sm font-semibold text-white"
               onClick={() => setMobileMenuOpen(false)}
             >
               Get Started — Free
-            </Link>
+            </a>
           </div>
         </div>
       )}
