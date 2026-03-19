@@ -339,8 +339,41 @@ function LivePreview({
   const html = blockHtml;
 
   const handleCopy = async () => {
-    // Copy the template-based output (what actually goes in the email)
-    const ok = await copySignatureToClipboard(templateHtml);
+    let finalHtml = templateHtml;
+
+    // If photo is base64, upload to R2 first so it works in email clients
+    if (data.photoUrl && data.photoUrl.startsWith("data:")) {
+      try {
+        // Save signature data to D1 first
+        await fetch("/api/signatures/free", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: sigId, data, template: data.template }),
+        });
+
+        // Convert base64 to blob and upload
+        const res = await fetch(data.photoUrl);
+        const blob = await res.blob();
+        const formData = new FormData();
+        formData.append("file", blob, "photo.jpg");
+        formData.append("signature_id", sigId);
+
+        const uploadRes = await fetch("/api/images/upload", { method: "POST", body: formData });
+        const uploadData = await uploadRes.json() as { url?: string };
+
+        if (uploadData.url) {
+          // Replace base64 with hosted URL in the copy HTML
+          finalHtml = finalHtml.replace(
+            /src="data:image[^"]*"/g,
+            `src="${uploadData.url}"`
+          );
+        }
+      } catch {
+        // Continue with base64 if upload fails
+      }
+    }
+
+    const ok = await copySignatureToClipboard(finalHtml);
     if (ok) {
       setCopyState("copied");
       setTimeout(() => setCopyState("idle"), 3000);

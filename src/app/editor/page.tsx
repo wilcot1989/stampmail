@@ -812,23 +812,28 @@ export default function EditorPage() {
       )}
       {isPro && <div className="mb-8" />}
 
-      {/* Your details form */}
-      <div className="mb-8">
-        <h2 className="mb-4 text-lg font-semibold text-foreground">Your Details</h2>
-        <ProSignatureForm data={data} onChange={setData} isPro={isPro} />
-      </div>
+      {/* Two-column layout: form left, editor + preview right */}
+      <div className="grid gap-8 lg:grid-cols-5">
+        {/* Left: Your details form (narrower) */}
+        <div className="lg:col-span-2">
+          <div className="sticky top-20">
+            <h2 className="mb-4 text-lg font-semibold text-foreground">Your Details</h2>
+            <ProSignatureForm data={data} onChange={setData} isPro={isPro} />
+          </div>
+        </div>
 
-      {/* Signature editor with drag & drop + live preview + copy */}
-      <div>
-        <h2 className="text-lg font-semibold text-slate-900 mb-2">Customize Layout & Preview</h2>
-        <p className="text-sm text-slate-500 mb-4">Drag blocks to rearrange. Click the gear icon for settings. Copy your signature from the preview.</p>
-        <BlockEditor
-          blocks={blocks}
-          onBlocksChange={setBlocks}
-          data={data}
-          onDataChange={setData}
-          plan={userPlan}
-        />
+        {/* Right: Drag & drop layout + live preview + copy */}
+        <div className="lg:col-span-3">
+          <h2 className="text-lg font-semibold text-slate-900 mb-2">Layout & Preview</h2>
+          <p className="text-sm text-slate-500 mb-4">Drag blocks to rearrange. Copy your signature from the preview.</p>
+          <BlockEditor
+            blocks={blocks}
+            onBlocksChange={setBlocks}
+            data={data}
+            onDataChange={setData}
+            plan={userPlan}
+          />
+        </div>
       </div>
 
       {/* Why sign up — only for free users */}
