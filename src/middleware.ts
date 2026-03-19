@@ -17,7 +17,7 @@ const securityHeaders: Record<string, string> = {
 // For production: use Cloudflare Rate Limiting rules instead
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
-const RATE_LIMIT_MAX = 30; // 30 requests per minute per IP for API routes
+const RATE_LIMIT_MAX = 120; // 120 requests per minute per IP for API routes
 
 function checkRateLimit(ip: string): boolean {
   const now = Date.now();

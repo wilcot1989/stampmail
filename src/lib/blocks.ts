@@ -195,11 +195,9 @@ function renderPhoto(block: Block, data: SignatureData, options?: GenerateOption
   const borderRadius =
     shape === "circle" ? "50%" : shape === "rounded" ? "8px" : "0px";
 
-  const isPro = options?.plan === "pro" || options?.plan === "team";
-  let src = esc(data.photoUrl);
-  if (!isPro && options?.signatureId && !data.photoUrl.startsWith("https://neatstamp.com")) {
-    src = `https://neatstamp.com/api/images/${esc(options.signatureId)}/photo`;
-  }
+  // Always use the actual photo URL for preview (base64 or external URL)
+  // The hosted URL replacement only happens in generateCopyHtml, not here
+  const src = esc(data.photoUrl);
 
   const align = alignment === "center" ? "center" : "left";
 
