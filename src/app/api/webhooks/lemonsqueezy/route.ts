@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getRequestContext } from "@cloudflare/next-on-pages";
 
 export const runtime = "edge";
 
@@ -52,43 +53,48 @@ export async function POST(request: NextRequest) {
 
   const subscriptionData = payload.data.attributes;
 
-  switch (eventName) {
-    case "subscription_created":
-      console.log(`[Webhook] Subscription created for user ${userId}`, {
-        subscriptionId: payload.data.id,
-        status: subscriptionData.status,
-        variantId: subscriptionData.variant_id,
-      });
-      // TODO: Update user plan in D1 database
-      break;
+  // Update D1 database
+  try {
+    const { env } = getRequestContext();
+    const db = env.DB as D1Database;
 
-    case "subscription_updated":
-      console.log(`[Webhook] Subscription updated for user ${userId}`, {
-        subscriptionId: payload.data.id,
-        status: subscriptionData.status,
-      });
-      break;
+    switch (eventName) {
+      case "subscription_created":
+      case "subscription_updated":
+        await db.prepare(
+          "UPDATE users SET plan = 'pro', lemon_customer_id = ?, lemon_subscription_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?"
+        ).bind(
+          String(subscriptionData.customer_id),
+          String(payload.data.id),
+          userId
+        ).run();
+        console.log(`[Webhook] ${eventName} for user ${userId} → plan=pro`);
+        break;
 
-    case "subscription_cancelled":
-      console.log(`[Webhook] Subscription cancelled for user ${userId}`, {
-        subscriptionId: payload.data.id,
-        endsAt: subscriptionData.ends_at,
-      });
-      break;
+      case "subscription_cancelled":
+        await db.prepare(
+          "UPDATE users SET plan = 'free', updated_at = CURRENT_TIMESTAMP WHERE id = ?"
+        ).bind(userId).run();
+        console.log(`[Webhook] Cancelled for user ${userId} → plan=free`);
+        break;
 
-    case "subscription_payment_failed":
-      console.log(`[Webhook] Payment failed for user ${userId}`);
-      break;
+      case "subscription_payment_failed":
+        console.log(`[Webhook] Payment failed for user ${userId}`);
+        break;
 
-    case "order_created":
-      console.log(`[Webhook] Order created for user ${userId}`, {
-        orderId: payload.data.id,
-        total: subscriptionData.total_formatted,
-      });
-      break;
+      case "order_created":
+        // Lifetime deal
+        await db.prepare(
+          "UPDATE users SET plan = 'pro', lemon_customer_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?"
+        ).bind(String(subscriptionData.customer_id), userId).run();
+        console.log(`[Webhook] Order (lifetime) for user ${userId} → plan=pro`);
+        break;
 
-    default:
-      console.log(`[Webhook] Unhandled event: ${eventName}`);
+      default:
+        console.log(`[Webhook] Unhandled event: ${eventName}`);
+    }
+  } catch (err) {
+    console.error("[Webhook] D1 error:", err);
   }
 
   return NextResponse.json({ received: true });

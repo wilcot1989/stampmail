@@ -100,9 +100,9 @@ function DashboardContent() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ variant }),
       });
-      const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url;
+      const result = await res.json() as { url?: string };
+      if (result.url) {
+        window.location.href = result.url;
       }
     } catch (error) {
       console.error("Checkout error:", error);

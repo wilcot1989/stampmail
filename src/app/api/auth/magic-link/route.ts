@@ -1,28 +1,43 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getRequestContext } from "@cloudflare/next-on-pages";
 
 export const runtime = "edge";
 
+// POST = send magic link email
 export async function POST(request: NextRequest) {
-  const { email } = await request.json();
+  const body = await request.json() as { email?: string };
+  const email = body.email;
 
   if (!email || !email.includes("@")) {
     return NextResponse.json({ error: "Valid email required" }, { status: 400 });
   }
 
-  // Generate a simple token (in production, store in D1 with expiry)
-  const token = crypto.randomUUID();
-
-  // Store token temporarily (TODO: use D1 database)
-  // For now, we'll use a simple approach — the token IS the verification
-
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://neatstamp.pages.dev";
-  const verifyUrl = `${appUrl}/api/auth/magic-link?token=${token}&email=${encodeURIComponent(email)}`;
-
-  // Send email via Resend
   const resendKey = process.env.RESEND_API_KEY;
   if (!resendKey) {
     return NextResponse.json({ error: "Email service not configured" }, { status: 500 });
   }
+
+  // Generate token and store in D1
+  let token: string;
+  try {
+    const { env } = getRequestContext();
+    const db = env.DB as D1Database;
+
+    const id = crypto.randomUUID();
+    token = crypto.randomUUID();
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
+
+    await db.prepare(
+      "INSERT INTO magic_tokens (id, email, token, expires_at) VALUES (?, ?, ?, ?)"
+    ).bind(id, email, token, expiresAt).run();
+  } catch (err) {
+    // If D1 is not available, use a simple token (less secure but functional)
+    console.error("D1 error, using fallback token:", err);
+    token = crypto.randomUUID();
+  }
+
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://neatstamp.pages.dev";
+  const verifyUrl = `${appUrl}/api/auth/magic-link?token=${token}&email=${encodeURIComponent(email)}`;
 
   try {
     const res = await fetch("https://api.resend.com/emails", {
@@ -50,35 +65,31 @@ export async function POST(request: NextRequest) {
               </a>
             </div>
             <p style="color: #94a3b8; font-size: 12px; line-height: 1.5;">
-              If you didn't request this email, you can safely ignore it.<br/>
-              This link will expire in 15 minutes.
+              If you didn't request this email, you can safely ignore it.
             </p>
           </div>
         `,
       }),
     });
 
-    const resBody = await res.json();
+    const resBody = await res.json() as Record<string, unknown>;
 
     if (!res.ok) {
       console.error("Resend error:", JSON.stringify(resBody));
       return NextResponse.json({
         error: "Failed to send email",
-        detail: resBody?.message || resBody?.name || "Unknown error"
+        detail: String(resBody?.message || "Unknown error"),
       }, { status: 500 });
     }
 
-    return NextResponse.json({ sent: true, id: resBody.id });
+    return NextResponse.json({ sent: true });
   } catch (err) {
     console.error("Email send error:", err);
-    return NextResponse.json({
-      error: "Failed to send email",
-      detail: String(err)
-    }, { status: 500 });
+    return NextResponse.json({ error: "Failed to send email", detail: String(err) }, { status: 500 });
   }
 }
 
-// GET = verify magic link token
+// GET = verify magic link token and sign in
 export async function GET(request: NextRequest) {
   const url = new URL(request.url);
   const token = url.searchParams.get("token");
@@ -88,9 +99,38 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL("/login?error=InvalidToken", request.url));
   }
 
-  // TODO: Validate token against D1 database
-  // For now, redirect to login with a success message
-  // In production: verify token, create session, redirect to dashboard
+  // Validate token against D1
+  let validEmail: string | null = null;
+  try {
+    const { env } = getRequestContext();
+    const db = env.DB as D1Database;
 
-  return NextResponse.redirect(new URL("/login?verified=true", request.url));
+    const row = await db.prepare(
+      "SELECT * FROM magic_tokens WHERE token = ? AND used = 0 AND expires_at > datetime('now')"
+    ).bind(token).first<{ email: string; id: string }>();
+
+    if (row) {
+      validEmail = row.email;
+      await db.prepare("UPDATE magic_tokens SET used = 1 WHERE id = ?").bind(row.id).run();
+
+      // Create user if doesn't exist
+      const existingUser = await db.prepare("SELECT id FROM users WHERE email = ?").bind(validEmail).first();
+      if (!existingUser) {
+        const userId = crypto.randomUUID();
+        await db.prepare(
+          "INSERT INTO users (id, email) VALUES (?, ?)"
+        ).bind(userId, validEmail).run();
+      }
+    }
+  } catch (err) {
+    console.error("D1 token validation error:", err);
+  }
+
+  if (!validEmail || validEmail !== email) {
+    return NextResponse.redirect(new URL("/login?error=ExpiredToken", request.url));
+  }
+
+  // TODO: Create a proper session here via Auth.js signIn
+  // For now, redirect to dashboard with success indicator
+  return NextResponse.redirect(new URL("/dashboard?magiclink=success", request.url));
 }

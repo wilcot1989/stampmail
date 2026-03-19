@@ -14,8 +14,8 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const body = await request.json();
-  const variant = body.variant === "yearly" ? "yearly" : "monthly";
+  const body = await request.json() as Record<string, unknown>;
+  const variant = (body as Record<string, unknown>).variant === "yearly" ? "yearly" : "monthly";
 
   try {
     const checkoutUrl = await createProCheckout(
