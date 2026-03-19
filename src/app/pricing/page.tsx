@@ -45,7 +45,7 @@ const plans = [
     yearlyPrice: "$39/year (save 35%)",
     description: "For professionals who want more templates and features.",
     cta: "Try Pro Free for 7 Days",
-    ctaLink: "/editor",
+    ctaLink: "/login",
     highlighted: true,
     features: [
       "Everything in Free, plus:",
@@ -66,7 +66,7 @@ const plans = [
     period: "/user/month",
     description: "Consistent email branding for your entire team.",
     cta: "Start Team Trial",
-    ctaLink: "/editor",
+    ctaLink: "/login",
     highlighted: false,
     features: [
       "Everything in Pro, plus:",
