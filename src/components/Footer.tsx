@@ -4,7 +4,7 @@ export default function Footer() {
 
   return (
     <footer className="border-t border-border bg-slate-900 text-slate-300">
-      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-screen-2xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
           <div>
             <h3 className="text-sm font-semibold text-white tracking-wide uppercase">Product</h3>

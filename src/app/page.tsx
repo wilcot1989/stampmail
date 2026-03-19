@@ -77,7 +77,7 @@ export default function HomePage() {
         <div className="absolute top-0 right-0 w-1/2 h-full opacity-[0.03]" style={{
           backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")"
         }} />
-        <div className="relative mx-auto max-w-7xl px-4 py-24 sm:px-6 sm:py-32 lg:px-8 lg:py-40">
+        <div className="relative mx-auto max-w-screen-2xl px-4 py-24 sm:px-6 sm:py-32 lg:px-8 lg:py-40">
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <div>
               <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-emerald-50 border border-emerald-200 px-4 py-1.5 text-sm font-medium text-emerald-700">
@@ -227,7 +227,7 @@ export default function HomePage() {
 
       {/* TRUSTED BY / EMAIL CLIENTS */}
       <section className="border-y border-slate-100 bg-white py-12">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-screen-2xl px-4 sm:px-6 lg:px-8">
           <p className="text-center text-sm font-medium text-slate-400 uppercase tracking-widest mb-8">
             Works perfectly in every email client
           </p>
@@ -237,7 +237,7 @@ export default function HomePage() {
 
       {/* HOW IT WORKS */}
       <section className="py-24 bg-white">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-screen-2xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-20">
             <p className="text-sm font-semibold text-blue-600 uppercase tracking-widest mb-3">How it works</p>
             <h2 className="text-3xl font-extrabold text-slate-900 sm:text-4xl">
@@ -335,7 +335,7 @@ export default function HomePage() {
 
       {/* WHY NEATSTAMP — with photo */}
       <section className="py-24 bg-slate-50">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-screen-2xl px-4 sm:px-6 lg:px-8">
           <div className="grid items-center gap-16 lg:grid-cols-2">
             <div>
               <p className="text-sm font-semibold text-blue-600 uppercase tracking-widest mb-3">Why NeatStamp</p>
@@ -453,7 +453,7 @@ export default function HomePage() {
 
       {/* TESTIMONIALS */}
       <section className="py-24 bg-slate-50">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-screen-2xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <p className="text-sm font-semibold text-blue-600 uppercase tracking-widest mb-3">Testimonials</p>
             <h2 className="text-3xl font-extrabold text-slate-900 sm:text-4xl">
