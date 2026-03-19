@@ -12,21 +12,26 @@ export function middleware(request: NextRequest) {
 
   const isAppSubdomain = hostname.startsWith("app.");
 
-  // Handle CORS preflight for cross-subdomain requests
-  if (request.method === "OPTIONS") {
-    const response = new NextResponse(null, { status: 200 });
-    response.headers.set("Access-Control-Allow-Origin", "https://app.neatstamp.com");
-    response.headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-    response.headers.set("Access-Control-Allow-Headers", "Content-Type, RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch, Next-URL");
-    return response;
+  // CORS headers for cross-subdomain requests
+  const origin = request.headers.get("origin") || "";
+  const isNeatStampOrigin = origin.includes("neatstamp.com");
+  const corsHeaders: Record<string, string> = isNeatStampOrigin
+    ? {
+        "Access-Control-Allow-Origin": origin,
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch, Next-URL",
+        "Access-Control-Allow-Credentials": "true",
+      }
+    : {};
+
+  // Handle CORS preflight
+  if (request.method === "OPTIONS" && isNeatStampOrigin) {
+    return new NextResponse(null, { status: 204, headers: corsHeaders });
   }
 
-  // Add CORS headers to all responses for cross-subdomain requests
-  const origin = request.headers.get("origin");
   const addCorsHeaders = (response: NextResponse) => {
-    if (origin && (origin.includes("neatstamp.com"))) {
-      response.headers.set("Access-Control-Allow-Origin", origin);
-      response.headers.set("Access-Control-Allow-Credentials", "true");
+    for (const [key, value] of Object.entries(corsHeaders)) {
+      response.headers.set(key, value);
     }
     return response;
   };
