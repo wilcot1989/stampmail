@@ -162,6 +162,15 @@ function LoginForm() {
           </button>
         </form>
 
+        {/* Forgot password */}
+        {mode === "login" && (
+          <p className="mt-2 text-center">
+            <Link href="/auth/reset-password" className="text-sm text-slate-400 hover:text-blue-600 transition-colors">
+              Forgot your password?
+            </Link>
+          </p>
+        )}
+
         {/* Toggle login/register */}
         <p className="mt-4 text-center text-sm text-slate-500">
           {mode === "login" ? (
