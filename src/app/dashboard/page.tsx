@@ -1013,9 +1013,12 @@ function DashboardContent() {
               onEdit={(sig) => {
                 try {
                   const parsed = typeof sig.data === "string" ? JSON.parse(sig.data) : sig.data;
-                  setEditorData({ ...DEFAULT_SIGNATURE_DATA, ...parsed });
+                  const { _blocks, ...rest } = parsed;
+                  setEditorData({ ...DEFAULT_SIGNATURE_DATA, ...rest });
+                  setEditorBlocks(_blocks && Array.isArray(_blocks) ? _blocks : getDefaultBlocks());
                 } catch {
                   setEditorData(DEFAULT_SIGNATURE_DATA);
+                  setEditorBlocks(getDefaultBlocks());
                 }
                 setActiveTab("editor");
               }}
@@ -1031,6 +1034,8 @@ function DashboardContent() {
                 <button
                   onClick={async () => {
                     try {
+                      // Save both signature data AND block layout
+                      const saveData = { ...editorData, _blocks: editorBlocks };
                       const res = await fetch("/api/signatures", {
                         method: signatures.length > 0 ? "PUT" : "POST",
                         headers: { "Content-Type": "application/json" },
@@ -1038,7 +1043,7 @@ function DashboardContent() {
                           id: signatures.length > 0 ? signatures[0].id : undefined,
                           name: editorData.fullName ? `${editorData.fullName}'s Signature` : "My Signature",
                           template: editorData.template,
-                          data: editorData,
+                          data: saveData,
                         }),
                       });
                       if (res.ok) {
