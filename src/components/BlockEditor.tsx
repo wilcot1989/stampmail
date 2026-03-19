@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Block, BlockType, BlockConfig, BLOCK_CONFIGS, generateHtmlFromBlocks } from "@/lib/blocks";
 import { SignatureData } from "@/lib/types";
 import { GenerateOptions } from "@/lib/generateSignature";
@@ -31,10 +31,12 @@ function makeBlock(type: BlockType): Block {
 // ---------------------------------------------------------------------------
 // Drag handle icon
 // ---------------------------------------------------------------------------
-function DragHandle() {
+function DragHandle({ onMouseDown, onTouchStart }: { onMouseDown: (e: React.MouseEvent) => void; onTouchStart: (e: React.TouchEvent) => void }) {
   return (
     <span
-      className="cursor-grab active:cursor-grabbing text-slate-400 hover:text-slate-600 select-none pr-1"
+      onMouseDown={onMouseDown}
+      onTouchStart={onTouchStart}
+      className="cursor-grab active:cursor-grabbing text-slate-400 hover:text-slate-600 select-none pr-1 touch-none"
       aria-label="Drag to reorder"
       title="Drag to reorder"
     >
@@ -62,16 +64,15 @@ interface BlockCardProps {
   expanded: boolean;
   data: SignatureData;
   plan: "free" | "pro" | "team";
-  draggingIndex: number | null;
-  dropTargetIndex: number | null;
+  isDragging: boolean;
+  dropLineIndex: number | null;
+  totalBlocks: number;
   onToggleExpand: () => void;
   onToggleVisible: () => void;
   onDelete: () => void;
   onSettingsChange: (settings: Record<string, unknown>) => void;
-  onDragStart: (index: number) => void;
-  onDragOver: (e: React.DragEvent, index: number) => void;
-  onDrop: (index: number) => void;
-  onDragEnd: () => void;
+  onDragHandleMouseDown: (e: React.MouseEvent, index: number) => void;
+  onDragHandleTouchStart: (e: React.TouchEvent, index: number) => void;
 }
 
 function BlockCard({
@@ -82,42 +83,42 @@ function BlockCard({
   expanded,
   data,
   plan,
-  draggingIndex,
-  dropTargetIndex,
+  isDragging,
+  dropLineIndex,
+  totalBlocks,
   onToggleExpand,
   onToggleVisible,
   onDelete,
   onSettingsChange,
-  onDragStart,
-  onDragOver,
-  onDrop,
-  onDragEnd,
+  onDragHandleMouseDown,
+  onDragHandleTouchStart,
 }: BlockCardProps) {
-  const isDragging = draggingIndex === index;
-  const showDropBefore = dropTargetIndex === index && draggingIndex !== null && draggingIndex !== index;
+  // Show drop line above this card when dropLineIndex === index
+  const showDropLineBefore = dropLineIndex === index;
+  // Show drop line after last card
+  const showDropLineAfter = dropLineIndex === totalBlocks && index === totalBlocks - 1;
 
   return (
     <div className="relative">
       {/* Drop indicator line above */}
-      {showDropBefore && (
-        <div className="absolute -top-0.5 left-0 right-0 z-10 h-0.5 bg-blue-500 rounded-full animate-pulse" />
+      {showDropLineBefore && (
+        <div className="absolute -top-px left-0 right-0 z-10 h-0.5 bg-blue-500 rounded-full shadow-sm" style={{ boxShadow: "0 0 4px rgba(59,130,246,0.6)" }} />
       )}
 
       <div
-        draggable
-        onDragStart={() => onDragStart(index)}
-        onDragOver={(e) => onDragOver(e, index)}
-        onDrop={() => onDrop(index)}
-        onDragEnd={onDragEnd}
         className={`rounded-xl border bg-white transition-all duration-150 ${
           isDragging
-            ? "opacity-40 scale-[0.98] border-blue-300 shadow-lg"
+            ? "opacity-30 scale-[0.98] border-blue-200"
             : "border-slate-200 shadow-sm hover:border-slate-300 hover:shadow"
         } ${!block.visible ? "opacity-60" : ""}`}
+        style={{ transition: "transform 0.2s ease, opacity 0.15s ease" }}
       >
         {/* Card header */}
         <div className="flex items-center gap-2 px-3 py-2.5">
-          <DragHandle />
+          <DragHandle
+            onMouseDown={(e) => onDragHandleMouseDown(e, index)}
+            onTouchStart={(e) => onDragHandleTouchStart(e, index)}
+          />
 
           <span className="text-base leading-none select-none" aria-hidden>
             {config.icon}
@@ -195,6 +196,11 @@ function BlockCard({
           />
         )}
       </div>
+
+      {/* Drop indicator line after last item */}
+      {showDropLineAfter && (
+        <div className="absolute -bottom-px left-0 right-0 z-10 h-0.5 bg-blue-500 rounded-full shadow-sm" style={{ boxShadow: "0 0 4px rgba(59,130,246,0.6)" }} />
+      )}
     </div>
   );
 }
@@ -205,9 +211,11 @@ function BlockCard({
 
 function AddBlockMenu({
   isPro,
+  hasPhoto,
   onAdd,
 }: {
   isPro: boolean;
+  hasPhoto: boolean;
   onAdd: (type: BlockType) => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -232,42 +240,67 @@ function AddBlockMenu({
           {/* Backdrop */}
           <div className="fixed inset-0 z-20" onClick={() => setOpen(false)} />
           <div className="absolute bottom-full mb-2 left-0 right-0 z-30 rounded-xl border border-slate-200 bg-white shadow-xl overflow-hidden">
-            {blockTypes.map((cfg) => {
-              const locked = cfg.proOnly && !isPro;
-              return (
+            {/* Photo suggestion at top if no photo block */}
+            {!hasPhoto && (
+              <>
                 <button
-                  key={cfg.type}
                   type="button"
                   onClick={() => {
-                    if (!locked) {
-                      onAdd(cfg.type);
-                      setOpen(false);
-                    }
+                    onAdd("photo");
+                    setOpen(false);
                   }}
-                  className={`flex items-center gap-3 w-full px-4 py-2.5 text-left hover:bg-slate-50 transition-colors ${
-                    locked ? "opacity-60 cursor-not-allowed" : ""
-                  }`}
+                  className="flex items-center gap-3 w-full px-4 py-3 text-left bg-blue-50 hover:bg-blue-100 transition-colors border-b border-blue-100"
                 >
-                  <span className="text-base">{cfg.icon}</span>
+                  <span className="text-base">📷</span>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-slate-800">{cfg.label}</span>
-                      {locked && (
-                        <span className="inline-flex items-center rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-700">
-                          PRO
-                        </span>
-                      )}
+                      <span className="text-sm font-semibold text-blue-700">Add photo</span>
+                      <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-bold text-blue-600 ring-1 ring-blue-200">Suggested</span>
                     </div>
-                    <p className="text-xs text-slate-500 truncate">{cfg.description}</p>
+                    <p className="text-xs text-blue-500 truncate">Profile photo or company logo</p>
                   </div>
-                  {locked && (
-                    <svg className="h-3.5 w-3.5 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-                    </svg>
-                  )}
                 </button>
-              );
-            })}
+                <div className="border-b border-slate-100" />
+              </>
+            )}
+            {blockTypes
+              .filter((cfg) => hasPhoto || cfg.type !== "photo") // hide photo entry if already shown above or photo exists
+              .map((cfg) => {
+                const locked = cfg.proOnly && !isPro;
+                return (
+                  <button
+                    key={cfg.type}
+                    type="button"
+                    onClick={() => {
+                      if (!locked) {
+                        onAdd(cfg.type);
+                        setOpen(false);
+                      }
+                    }}
+                    className={`flex items-center gap-3 w-full px-4 py-2.5 text-left hover:bg-slate-50 transition-colors ${
+                      locked ? "opacity-60 cursor-not-allowed" : ""
+                    }`}
+                  >
+                    <span className="text-base">{cfg.icon}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-slate-800">{cfg.label}</span>
+                        {locked && (
+                          <span className="inline-flex items-center rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-700">
+                            PRO
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-slate-500 truncate">{cfg.description}</p>
+                    </div>
+                    {locked && (
+                      <svg className="h-3.5 w-3.5 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                      </svg>
+                    )}
+                  </button>
+                );
+              })}
           </div>
         </>
       )}
@@ -409,6 +442,44 @@ function LivePreview({
 }
 
 // ---------------------------------------------------------------------------
+// Ghost element shown while dragging
+// ---------------------------------------------------------------------------
+
+interface GhostProps {
+  label: string;
+  icon: string;
+  x: number;
+  y: number;
+}
+
+function DragGhost({ label, icon, x, y }: GhostProps) {
+  return (
+    <div
+      style={{
+        position: "fixed",
+        left: x + 12,
+        top: y - 18,
+        zIndex: 9999,
+        pointerEvents: "none",
+        opacity: 0.92,
+      }}
+      className="flex items-center gap-2 rounded-xl border border-blue-300 bg-white shadow-2xl px-3 py-2.5 cursor-grabbing select-none"
+    >
+      <svg width="10" height="16" viewBox="0 0 10 16" fill="currentColor" className="text-blue-400 shrink-0">
+        <circle cx="2" cy="2" r="1.5" />
+        <circle cx="8" cy="2" r="1.5" />
+        <circle cx="2" cy="8" r="1.5" />
+        <circle cx="8" cy="8" r="1.5" />
+        <circle cx="2" cy="14" r="1.5" />
+        <circle cx="8" cy="14" r="1.5" />
+      </svg>
+      <span className="text-base leading-none select-none">{icon}</span>
+      <span className="text-sm font-medium text-slate-800 whitespace-nowrap">{label}</span>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Main BlockEditor component
 // ---------------------------------------------------------------------------
 
@@ -419,54 +490,150 @@ export default function BlockEditor({
   plan,
 }: BlockEditorProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  // Drag state
   const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
-  const [dropTargetIndex, setDropTargetIndex] = useState<number | null>(null);
+  const [dropLineIndex, setDropLineIndex] = useState<number | null>(null);
+  const [ghostPos, setGhostPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+
+  const listRef = useRef<HTMLDivElement>(null);
+  const dragIndexRef = useRef<number | null>(null);
 
   const isPro = plan === "pro" || plan === "team";
 
   // ---------------------------------------------------------------------------
-  // Drag & drop handlers
+  // Mouse-based drag & drop
   // ---------------------------------------------------------------------------
 
-  const handleDragStart = useCallback((index: number) => {
-    setDraggingIndex(index);
-  }, []);
-
-  const handleDragOver = useCallback(
-    (e: React.DragEvent, index: number) => {
-      e.preventDefault();
-      e.dataTransfer.dropEffect = "move";
-      if (index !== draggingIndex) {
-        setDropTargetIndex(index);
+  const getDropIndex = useCallback(
+    (clientY: number): number => {
+      if (!listRef.current) return blocks.length;
+      const items = Array.from(listRef.current.children) as HTMLElement[];
+      for (let i = 0; i < items.length; i++) {
+        const rect = items[i].getBoundingClientRect();
+        const mid = rect.top + rect.height / 2;
+        if (clientY < mid) return i;
       }
+      return blocks.length;
     },
-    [draggingIndex]
+    [blocks.length]
   );
 
-  const handleDrop = useCallback(
-    (dropIndex: number) => {
-      if (draggingIndex === null || draggingIndex === dropIndex) {
-        setDraggingIndex(null);
-        setDropTargetIndex(null);
-        return;
+  const startDrag = useCallback(
+    (index: number, clientX: number, clientY: number) => {
+      dragIndexRef.current = index;
+      setDraggingIndex(index);
+      setGhostPos({ x: clientX, y: clientY });
+      setDropLineIndex(index);
+      // Prevent text selection during drag
+      document.body.style.userSelect = "none";
+      document.body.style.cursor = "grabbing";
+    },
+    []
+  );
+
+  const handleMouseMove = useCallback(
+    (e: MouseEvent) => {
+      if (dragIndexRef.current === null) return;
+      setGhostPos({ x: e.clientX, y: e.clientY });
+      const di = getDropIndex(e.clientY);
+      setDropLineIndex(di);
+    },
+    [getDropIndex]
+  );
+
+  const handleMouseUp = useCallback(
+    (e: MouseEvent) => {
+      if (dragIndexRef.current === null) return;
+      const from = dragIndexRef.current;
+      const to = getDropIndex(e.clientY);
+
+      if (to !== from && to !== from + 1) {
+        const next = [...blocks];
+        const [moved] = next.splice(from, 1);
+        const insertAt = to > from ? to - 1 : to;
+        next.splice(insertAt, 0, moved);
+        onBlocksChange(next);
       }
 
-      const next = [...blocks];
-      const [moved] = next.splice(draggingIndex, 1);
-      // Adjust for splice
-      const target = dropIndex > draggingIndex ? dropIndex - 1 : dropIndex;
-      next.splice(target, 0, moved);
-      onBlocksChange(next);
+      dragIndexRef.current = null;
       setDraggingIndex(null);
-      setDropTargetIndex(null);
+      setDropLineIndex(null);
+      document.body.style.userSelect = "";
+      document.body.style.cursor = "";
     },
-    [draggingIndex, blocks, onBlocksChange]
+    [blocks, onBlocksChange, getDropIndex]
   );
 
-  const handleDragEnd = useCallback(() => {
-    setDraggingIndex(null);
-    setDropTargetIndex(null);
-  }, []);
+  // Touch handlers
+  const handleTouchMove = useCallback(
+    (e: TouchEvent) => {
+      if (dragIndexRef.current === null) return;
+      e.preventDefault();
+      const touch = e.touches[0];
+      setGhostPos({ x: touch.clientX, y: touch.clientY });
+      const di = getDropIndex(touch.clientY);
+      setDropLineIndex(di);
+    },
+    [getDropIndex]
+  );
+
+  const handleTouchEnd = useCallback(
+    (e: TouchEvent) => {
+      if (dragIndexRef.current === null) return;
+      const touch = e.changedTouches[0];
+      const from = dragIndexRef.current;
+      const to = getDropIndex(touch.clientY);
+
+      if (to !== from && to !== from + 1) {
+        const next = [...blocks];
+        const [moved] = next.splice(from, 1);
+        const insertAt = to > from ? to - 1 : to;
+        next.splice(insertAt, 0, moved);
+        onBlocksChange(next);
+      }
+
+      dragIndexRef.current = null;
+      setDraggingIndex(null);
+      setDropLineIndex(null);
+      document.body.style.userSelect = "";
+      document.body.style.cursor = "";
+    },
+    [blocks, onBlocksChange, getDropIndex]
+  );
+
+  // Attach / detach global listeners during drag
+  useEffect(() => {
+    if (draggingIndex === null) return;
+
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+    window.addEventListener("touchmove", handleTouchMove, { passive: false });
+    window.addEventListener("touchend", handleTouchEnd);
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("touchend", handleTouchEnd);
+    };
+  }, [draggingIndex, handleMouseMove, handleMouseUp, handleTouchMove, handleTouchEnd]);
+
+  const handleDragHandleMouseDown = useCallback(
+    (e: React.MouseEvent, index: number) => {
+      e.preventDefault();
+      startDrag(index, e.clientX, e.clientY);
+    },
+    [startDrag]
+  );
+
+  const handleDragHandleTouchStart = useCallback(
+    (e: React.TouchEvent, index: number) => {
+      const touch = e.touches[0];
+      startDrag(index, touch.clientX, touch.clientY);
+    },
+    [startDrag]
+  );
 
   // ---------------------------------------------------------------------------
   // Block mutations
@@ -495,6 +662,12 @@ export default function BlockEditor({
     setExpandedId(nb.id);
   };
 
+  const hasPhoto = blocks.some((b) => b.type === "photo");
+
+  // Ghost block config (for the floating element during drag)
+  const ghostBlock = draggingIndex !== null ? blocks[draggingIndex] : null;
+  const ghostConfig = ghostBlock ? BLOCK_CONFIGS[ghostBlock.type] : null;
+
   // ---------------------------------------------------------------------------
   // Render
   // ---------------------------------------------------------------------------
@@ -509,20 +682,7 @@ export default function BlockEditor({
         </div>
 
         {/* Block list */}
-        <div
-          className="space-y-2"
-          onDragOver={(e) => {
-            e.preventDefault();
-            // Allow drop on the container itself (end of list)
-            if (draggingIndex !== null) {
-              setDropTargetIndex(blocks.length);
-            }
-          }}
-          onDrop={(e) => {
-            e.preventDefault();
-            handleDrop(blocks.length);
-          }}
-        >
+        <div ref={listRef} className="space-y-2">
           {blocks.map((block, index) => {
             const config = BLOCK_CONFIGS[block.type];
             return (
@@ -535,18 +695,17 @@ export default function BlockEditor({
                 expanded={expandedId === block.id}
                 data={data}
                 plan={plan}
-                draggingIndex={draggingIndex}
-                dropTargetIndex={dropTargetIndex}
+                isDragging={draggingIndex === index}
+                dropLineIndex={dropLineIndex}
+                totalBlocks={blocks.length}
                 onToggleExpand={() =>
                   setExpandedId(expandedId === block.id ? null : block.id)
                 }
                 onToggleVisible={() => toggleVisible(block.id)}
                 onDelete={() => deleteBlock(block.id)}
                 onSettingsChange={(s) => updateSettings(block.id, s)}
-                onDragStart={handleDragStart}
-                onDragOver={handleDragOver}
-                onDrop={handleDrop}
-                onDragEnd={handleDragEnd}
+                onDragHandleMouseDown={handleDragHandleMouseDown}
+                onDragHandleTouchStart={handleDragHandleTouchStart}
               />
             );
           })}
@@ -559,7 +718,7 @@ export default function BlockEditor({
         </div>
 
         {/* Add block button */}
-        <AddBlockMenu isPro={isPro} onAdd={addBlock} />
+        <AddBlockMenu isPro={isPro} hasPhoto={hasPhoto} onAdd={addBlock} />
       </div>
 
       {/* RIGHT COLUMN — live preview */}
@@ -570,6 +729,16 @@ export default function BlockEditor({
           <LivePreview blocks={blocks} data={data} plan={plan} />
         </div>
       </div>
+
+      {/* Floating ghost element while dragging */}
+      {draggingIndex !== null && ghostConfig && (
+        <DragGhost
+          label={ghostConfig.label}
+          icon={ghostConfig.icon}
+          x={ghostPos.x}
+          y={ghostPos.y}
+        />
+      )}
     </div>
   );
 }

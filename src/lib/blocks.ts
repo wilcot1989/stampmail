@@ -149,7 +149,6 @@ function makeBlock(type: BlockType, overrides?: Partial<Block>): Block {
 
 export function getDefaultBlocks(): Block[] {
   return [
-    makeBlock("photo"),
     makeBlock("name"),
     makeBlock("divider"),
     makeBlock("contact"),

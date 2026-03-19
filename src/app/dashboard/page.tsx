@@ -7,6 +7,7 @@ import Link from "next/link";
 import { SignatureData, DEFAULT_SIGNATURE_DATA, TemplateName } from "@/lib/types";
 import { Block, getDefaultBlocks } from "@/lib/blocks";
 import BlockEditor from "@/components/BlockEditor";
+import { generateSignatureHtml } from "@/lib/generateSignature";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -1049,32 +1050,60 @@ function DashboardContent() {
               {/* Template selector */}
               <div>
                 <h3 className="text-sm font-semibold text-foreground mb-3">Choose a template</h3>
-                <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {(["minimal", "modern", "corporate", "creative", "bold", "elegant", "startup", "compact"] as const).map((t) => {
                     const isSelected = editorData.template === t;
                     const isLocked = !isPro && !["minimal", "modern"].includes(t);
+                    const previewHtml = generateSignatureHtml({ ...DEFAULT_SIGNATURE_DATA, template: t });
                     return (
                       <button
                         key={t}
                         onClick={() => {
                           if (!isLocked) setEditorData({ ...editorData, template: t });
                         }}
-                        className={`relative rounded-lg border-2 px-2 py-2 text-xs font-medium capitalize transition-all ${
+                        className={`relative rounded-xl border-2 overflow-hidden text-left transition-all ${
                           isSelected
-                            ? "border-primary bg-blue-50 text-primary"
+                            ? "border-primary shadow-md"
                             : isLocked
-                              ? "border-border bg-slate-50 text-slate-400 cursor-not-allowed"
-                              : "border-border bg-white text-foreground hover:border-primary/50"
+                              ? "border-border bg-slate-50 cursor-not-allowed opacity-70"
+                              : "border-border bg-white hover:border-primary/50 hover:shadow-sm"
                         }`}
                       >
-                        {t}
-                        {isLocked && (
-                          <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-amber-400 text-[8px] text-white">
-                            <svg className="h-2.5 w-2.5" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-                            </svg>
+                        {/* Mini preview */}
+                        <div className="relative h-[70px] overflow-hidden bg-white">
+                          <div
+                            style={{
+                              transform: "scale(0.3)",
+                              transformOrigin: "top left",
+                              width: "333%",
+                              pointerEvents: "none",
+                              userSelect: "none",
+                            }}
+                            dangerouslySetInnerHTML={{ __html: previewHtml }}
+                          />
+                          {/* Locked overlay */}
+                          {isLocked && (
+                            <div className="absolute inset-0 bg-slate-100/70 flex items-center justify-center">
+                              <svg className="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                              </svg>
+                            </div>
+                          )}
+                        </div>
+                        {/* Template name */}
+                        <div className={`px-2 py-1.5 border-t flex items-center justify-between ${isSelected ? "border-primary/20 bg-blue-50" : "border-border"}`}>
+                          <span className={`text-xs font-medium capitalize ${isSelected ? "text-primary" : isLocked ? "text-slate-400" : "text-slate-700"}`}>
+                            {t}
                           </span>
-                        )}
+                          {isLocked && (
+                            <span className="inline-flex items-center rounded-full bg-amber-100 px-1.5 py-0.5 text-[9px] font-bold text-amber-700">PRO</span>
+                          )}
+                          {isSelected && (
+                            <svg className="h-3.5 w-3.5 text-primary" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" />
+                            </svg>
+                          )}
+                        </div>
                       </button>
                     );
                   })}
