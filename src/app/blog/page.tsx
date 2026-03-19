@@ -11,48 +11,219 @@ export const metadata: Metadata = {
 const ARTICLES = [
   {
     slug: "email-signature-best-practices",
-    title: "Email Signature Best Practices — The Only Guide You Need (2026)",
+    title: "Email Signature Best Practices — The Only Guide (2026)",
     description:
-      "What to include and what to leave out, font choices that work across every client, color theory for signatures, image sizing, mobile considerations, and the mistakes that make even expensive signatures look amateurish.",
+      "What to include, what to leave out, fonts, colors, image sizing, mobile tips, and common mistakes. The complete email signature best practices guide.",
     category: "Best Practices",
     date: "March 2026",
     readTime: "14 min read",
   },
   {
-    slug: "email-signature-size",
-    title: "Email Signature Size Guide — Dimensions, Image Sizes & Limits (2026)",
+    slug: "what-to-include-email-signature",
+    title: "What to Include in Your Email Signature (2026)",
     description:
-      "Exact specs for every element: 600px max width, logo dimensions, headshot sizes, banner dimensions, file size limits for Gmail and Outlook, and a quick reference table you can bookmark.",
-    category: "Technical",
+      "The definitive checklist for email signatures: must-haves, should-haves, nice-to-haves, and what to leave out entirely. Includes per-industry recommendations.",
+    category: "Best Practices",
     date: "March 2026",
-    readTime: "12 min read",
+    readTime: "10 min read",
   },
   {
     slug: "outlook-signature-not-working",
     title: "Outlook Signature Not Working? Here's How to Fix It (2026)",
     description:
-      "The most complete troubleshooting guide for Outlook signature problems: disappeared signatures, images as attachments, broken formatting, new Outlook vs. classic, admin policies, roaming signature conflicts, and registry fixes.",
+      "Complete troubleshooting guide: signature disappeared, images as attachments, formatting stripped, new Outlook vs classic, admin policies, registry fixes, and more.",
     category: "Troubleshooting",
     date: "March 2026",
     readTime: "18 min read",
   },
   {
+    slug: "email-signature-not-showing-outlook",
+    title: "Email Signature Not Showing in Outlook — 10 Fixes",
+    description:
+      "Your email signature not showing in Outlook? I've fixed this exact issue dozens of times. Here are all 10 causes — and exactly how to fix each one.",
+    category: "Troubleshooting",
+    date: "March 2026",
+    readTime: "13 min read",
+  },
+  {
+    slug: "gmail-signature-not-working",
+    title: "Gmail Signature Not Working? 8 Fixes (2026)",
+    description:
+      "Gmail signature not saving, not showing on replies, or losing its formatting? I've fixed every version of this problem. Here are 8 actual causes with exact steps to fix each one.",
+    category: "Troubleshooting",
+    date: "March 2026",
+    readTime: "11 min read",
+  },
+  {
+    slug: "email-signature-images-not-displaying",
+    title: "Email Signature Images Not Showing? Fix Guide",
+    description:
+      "Logo not showing in your email signature? Photo missing? I've diagnosed every cause — recipient blocks, broken URLs, wrong DPI, dark mode, and more. Here are the fixes.",
+    category: "Troubleshooting",
+    date: "March 2026",
+    readTime: "12 min read",
+  },
+  {
+    slug: "email-signature-keeps-disappearing",
+    title: "Email Signature Keeps Disappearing? Stop It Now",
+    description:
+      "Your email signature keeps disappearing, changing, or deleting itself? I've tracked down every cause — Outlook roaming signatures, Gmail cache, Apple Mail font settings, and more.",
+    category: "Troubleshooting",
+    date: "March 2026",
+    readTime: "10 min read",
+  },
+  {
+    slug: "email-signature-size",
+    title: "Email Signature Size Guide — Dimensions & Limits (2026)",
+    description:
+      "Exact email signature size specs: max width 600px, image sizes for Gmail and Outlook, logo dimensions, file size limits, and what breaks when you exceed them.",
+    category: "Technical",
+    date: "March 2026",
+    readTime: "12 min read",
+  },
+  {
+    slug: "email-signature-generator-comparison",
+    title: "I Tested 8 Email Signature Generators — Here's What I Found",
+    description:
+      "Honest comparison of NeatStamp, WiseStamp, MySignature, HubSpot, Canva, Signaturely, Newoldstamp, and Mail-signatures. Pricing, Outlook compatibility, and verdict.",
+    category: "Review",
+    date: "March 2026",
+    readTime: "16 min read",
+  },
+  {
     slug: "how-to-add-social-media-icons-email-signature",
     title: "How to Add Social Media Icons to Your Email Signature (2026)",
     description:
-      "Which icons to include (LinkedIn always, Instagram for creatives, X only if you're active), image vs. text links, exact sizing specs, and the mistakes that make signatures look cluttered.",
+      "Which social icons to include, how to add them in NeatStamp, image vs text links, correct icon sizing, and common mistakes like broken links and too many icons.",
     category: "Guide",
     date: "March 2026",
     readTime: "11 min read",
   },
   {
-    slug: "email-signature-generator-comparison",
-    title: "I Tested 8 Email Signature Generators — Here's What I Found (2026)",
+    slug: "best-email-sign-offs",
+    title: "Best Email Sign-Offs — 50+ Professional Options (2026)",
     description:
-      "An honest review of NeatStamp, WiseStamp, MySignature, HubSpot, Canva, Signaturely, Newoldstamp, and Mail-signatures — what's good, what's bad, pricing, and Outlook compatibility results.",
-    category: "Review",
+      "Formal, semi-formal, casual, and industry-specific sign-offs. Which to use, which to avoid, cultural differences, and a quick-reference table of 50+ options.",
+    category: "Guide",
     date: "March 2026",
-    readTime: "16 min read",
+    readTime: "9 min read",
+  },
+  {
+    slug: "email-signature-etiquette",
+    title: "Email Signature Etiquette — Unwritten Rules (2026)",
+    description:
+      "When to include your signature, how long is too long, reply chain etiquette, internal vs external, industry norms, and the phone number debate. Real examples included.",
+    category: "Best Practices",
+    date: "March 2026",
+    readTime: "10 min read",
+  },
+  {
+    slug: "email-signature-dark-mode",
+    title: "Email Signatures in Dark Mode — How to Make Them Work",
+    description:
+      "Dark mode breaks email signatures in predictable ways. Transparent PNGs go invisible, dark text disappears, Gmail auto-inverts. Here's exactly how to fix each problem.",
+    category: "Technical",
+    date: "March 2026",
+    readTime: "11 min read",
+  },
+  {
+    slug: "email-signature-on-phone",
+    title: "Email Signature on iPhone & Android — Setup Guide",
+    description:
+      "How to set up an email signature on iPhone and Android. Native apps, Gmail, Outlook, Samsung Mail. The honest truth about mobile HTML signature limitations and the best workarounds.",
+    category: "Guide",
+    date: "March 2026",
+    readTime: "10 min read",
+  },
+  {
+    slug: "email-signature-with-credentials",
+    title: "Email Signature with Credentials — MD, PhD, CPA",
+    description:
+      "How to list credentials correctly in your email signature. Ordering rules, real examples for medical, legal, financial, academic, and tech fields. Avoid the alphabet soup problem.",
+    category: "Guide",
+    date: "March 2026",
+    readTime: "9 min read",
+  },
+  {
+    slug: "email-signature-for-interns",
+    title: "Email Signature for Interns — First Impression",
+    description:
+      "Your first professional email signature as an intern. What to include, what to skip, real examples for summer, co-op, and graduate interns, and what hiring managers actually notice.",
+    category: "Guide",
+    date: "March 2026",
+    readTime: "8 min read",
+  },
+  {
+    slug: "email-signature-personal-email",
+    title: "Email Signature for Personal Email — Do You Need One?",
+    description:
+      "Honest take on personal email signatures. When you need one, when you don't, what to include, what to leave out, and examples for job seekers, freelancers, and networkers.",
+    category: "Guide",
+    date: "March 2026",
+    readTime: "8 min read",
+  },
+  {
+    slug: "email-signature-remote-workers",
+    title: "Email Signature for Remote Workers (2026)",
+    description:
+      "Time zone, video call link, availability hours, Slack handle — what remote workers actually need in their email signatures. Templates for fully remote, hybrid, and digital nomads.",
+    category: "Guide",
+    date: "March 2026",
+    readTime: "9 min read",
+  },
+  {
+    slug: "email-signature-marketing",
+    title: "Email Signature Marketing — Campaign Guide (2026)",
+    description:
+      "Your team sends thousands of emails a month. That's free advertising space most companies completely ignore. Here's how to turn email signatures into a real marketing channel.",
+    category: "Best Practices",
+    date: "March 2026",
+    readTime: "12 min read",
+  },
+  {
+    slug: "email-signature-banner-ideas",
+    title: "Email Signature Banner Ideas — 20+ Examples",
+    description:
+      "20+ email signature banner ideas organized by type: product launches, events, hiring, social proof, seasonal campaigns. Sizing guide, design tips, and how to track clicks.",
+    category: "Guide",
+    date: "March 2026",
+    readTime: "10 min read",
+  },
+  {
+    slug: "email-signature-animated-gif",
+    title: "Animated GIF in Email Signature — Worth It?",
+    description:
+      "The honest answer on animated GIFs in email signatures. Gmail, Outlook, and Apple Mail support compared. File size limits, accessibility concerns, and when they actually work.",
+    category: "Technical",
+    date: "March 2026",
+    readTime: "8 min read",
+  },
+  {
+    slug: "email-signature-when-leaving-job",
+    title: "Changing Your Email Signature When Leaving a Job",
+    description:
+      "What to update before you leave, what to put in your farewell signature, what to use between jobs, and when to switch to your new one. The transition nobody talks about.",
+    category: "Guide",
+    date: "March 2026",
+    readTime: "8 min read",
+  },
+  {
+    slug: "how-many-lines-email-signature",
+    title: "How Many Lines Should Your Email Signature Be?",
+    description:
+      "The definitive answer: 3–5 lines. Here's exactly what each line should say, why shorter is better, and when more is actually acceptable.",
+    category: "Best Practices",
+    date: "March 2026",
+    readTime: "7 min read",
+  },
+  {
+    slug: "email-signature-trends-2026",
+    title: "Email Signature Trends in 2026 — What's Changed",
+    description:
+      "What's actually trending in email signatures in 2026 — and what's fading out. Dark mode, minimal design, Calendly links, AI layouts, QR codes, and what to ditch.",
+    category: "Best Practices",
+    date: "March 2026",
+    readTime: "10 min read",
   },
 ];
 

@@ -8,6 +8,8 @@ import {
   WebsiteStructuredData,
   OrganizationStructuredData,
 } from "@/components/StructuredData";
+import CookieConsent from "@/components/CookieConsent";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -67,11 +69,13 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-white text-foreground">
         <AuthProvider>
+          <GoogleAnalytics />
           <WebsiteStructuredData />
           <OrganizationStructuredData />
           <Header />
           <main className="flex-1">{children}</main>
           <Footer />
+          <CookieConsent />
         </AuthProvider>
       </body>
     </html>
