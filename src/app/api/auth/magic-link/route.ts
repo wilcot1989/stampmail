@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET = verify magic link token and sign in
+// GET = redirect to verify page which triggers client-side signIn
 export async function GET(request: NextRequest) {
   const url = new URL(request.url);
   const token = url.searchParams.get("token");
@@ -99,38 +99,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL("/login?error=InvalidToken", request.url));
   }
 
-  // Validate token against D1
-  let validEmail: string | null = null;
-  try {
-    const { env } = getRequestContext();
-    const db = env.DB as D1Database;
-
-    const row = await db.prepare(
-      "SELECT * FROM magic_tokens WHERE token = ? AND used = 0 AND expires_at > datetime('now')"
-    ).bind(token).first<{ email: string; id: string }>();
-
-    if (row) {
-      validEmail = row.email;
-      await db.prepare("UPDATE magic_tokens SET used = 1 WHERE id = ?").bind(row.id).run();
-
-      // Create user if doesn't exist
-      const existingUser = await db.prepare("SELECT id FROM users WHERE email = ?").bind(validEmail).first();
-      if (!existingUser) {
-        const userId = crypto.randomUUID();
-        await db.prepare(
-          "INSERT INTO users (id, email) VALUES (?, ?)"
-        ).bind(userId, validEmail).run();
-      }
-    }
-  } catch (err) {
-    console.error("D1 token validation error:", err);
-  }
-
-  if (!validEmail || validEmail !== email) {
-    return NextResponse.redirect(new URL("/login?error=ExpiredToken", request.url));
-  }
-
-  // TODO: Create a proper session here via Auth.js signIn
-  // For now, redirect to dashboard with success indicator
-  return NextResponse.redirect(new URL("/dashboard?magiclink=success", request.url));
+  // Redirect to the verify page which will call signIn("magic-link") client-side
+  const verifyUrl = new URL("/auth/verify", request.url);
+  verifyUrl.searchParams.set("token", token);
+  verifyUrl.searchParams.set("email", email);
+  return NextResponse.redirect(verifyUrl);
 }
