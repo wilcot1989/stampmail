@@ -1,22 +1,40 @@
 import { NextRequest, NextResponse } from "next/server";
-import crypto from "crypto";
+
+export const runtime = "edge";
+
+// Verify HMAC signature using Web Crypto API (edge-compatible)
+async function verifySignature(
+  rawBody: string,
+  signature: string,
+  secret: string
+): Promise<boolean> {
+  const encoder = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    "raw",
+    encoder.encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"]
+  );
+  const signed = await crypto.subtle.sign("HMAC", key, encoder.encode(rawBody));
+  const digest = Array.from(new Uint8Array(signed))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+  return digest === signature;
+}
 
 // LemonSqueezy webhook handler
-// Processes subscription events: created, updated, cancelled, payment_failed
 export async function POST(request: NextRequest) {
   const rawBody = await request.text();
-  const secret = process.env.LEMONSQUEEZY_WEBHOOK_SECRET!;
+  const secret = process.env.LEMONSQUEEZY_WEBHOOK_SECRET || "";
 
-  // Verify webhook signature
   const signature = request.headers.get("x-signature");
   if (!signature) {
     return NextResponse.json({ error: "No signature" }, { status: 401 });
   }
 
-  const hmac = crypto.createHmac("sha256", secret);
-  const digest = hmac.update(rawBody).digest("hex");
-
-  if (digest !== signature) {
+  const valid = await verifySignature(rawBody, signature, secret);
+  if (!valid) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
   }
 
@@ -26,25 +44,25 @@ export async function POST(request: NextRequest) {
   const userId = customData?.user_id;
 
   if (!userId) {
-    return NextResponse.json({ error: "No user_id in custom data" }, { status: 400 });
+    return NextResponse.json(
+      { error: "No user_id in custom data" },
+      { status: 400 }
+    );
   }
 
   const subscriptionData = payload.data.attributes;
 
   switch (eventName) {
     case "subscription_created":
-      // User subscribed to Pro
-      // TODO: Update user plan in D1 database
       console.log(`[Webhook] Subscription created for user ${userId}`, {
         subscriptionId: payload.data.id,
         status: subscriptionData.status,
         variantId: subscriptionData.variant_id,
-        currentPeriodEnd: subscriptionData.renews_at,
       });
+      // TODO: Update user plan in D1 database
       break;
 
     case "subscription_updated":
-      // Plan changed or renewed
       console.log(`[Webhook] Subscription updated for user ${userId}`, {
         subscriptionId: payload.data.id,
         status: subscriptionData.status,
@@ -52,7 +70,6 @@ export async function POST(request: NextRequest) {
       break;
 
     case "subscription_cancelled":
-      // User cancelled — still active until period end
       console.log(`[Webhook] Subscription cancelled for user ${userId}`, {
         subscriptionId: payload.data.id,
         endsAt: subscriptionData.ends_at,
@@ -60,14 +77,10 @@ export async function POST(request: NextRequest) {
       break;
 
     case "subscription_payment_failed":
-      // Payment failed
-      console.log(`[Webhook] Payment failed for user ${userId}`, {
-        subscriptionId: payload.data.id,
-      });
+      console.log(`[Webhook] Payment failed for user ${userId}`);
       break;
 
     case "order_created":
-      // One-time purchase (lifetime deal)
       console.log(`[Webhook] Order created for user ${userId}`, {
         orderId: payload.data.id,
         total: subscriptionData.total_formatted,
