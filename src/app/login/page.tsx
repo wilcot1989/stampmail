@@ -165,7 +165,7 @@ function LoginForm() {
         {/* Forgot password */}
         {mode === "login" && (
           <p className="mt-2 text-center">
-            <Link href="/auth/reset-password" className="text-sm text-slate-400 hover:text-blue-600 transition-colors">
+            <Link href="https://app.neatstamp.com/auth/reset-password" className="text-sm text-slate-400 hover:text-blue-600 transition-colors">
               Forgot your password?
             </Link>
           </p>

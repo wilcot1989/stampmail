@@ -101,7 +101,7 @@ export default function EditorPage() {
                 <li>Get premium templates &amp; analytics</li>
               </ul>
               <Link
-                href="/login"
+                href="https://app.neatstamp.com/login"
                 className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-dark transition-colors"
               >
                 <svg className="h-4 w-4" viewBox="0 0 24 24">

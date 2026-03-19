@@ -9,9 +9,9 @@ export default function Footer() {
             <h3 className="text-sm font-semibold text-white tracking-wide uppercase">Product</h3>
             <ul className="mt-6 space-y-3">
               <li>
-                <Link href="/editor" className="text-sm text-slate-400 hover:text-white transition-colors">
+                <a href="https://app.neatstamp.com/editor" className="text-sm text-slate-400 hover:text-white transition-colors">
                   Create Signature
-                </Link>
+                </a>
               </li>
               <li>
                 <Link href="/templates" className="text-sm text-slate-400 hover:text-white transition-colors">

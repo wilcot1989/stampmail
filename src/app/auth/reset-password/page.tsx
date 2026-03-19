@@ -124,7 +124,7 @@ function ResetForm() {
               Your password has been reset. You can now sign in.
             </p>
             <Link
-              href="/login"
+              href="https://app.neatstamp.com/login"
               className="mt-4 inline-block rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white hover:bg-blue-700 transition-colors"
             >
               Go to sign in
@@ -185,7 +185,7 @@ function ResetForm() {
         )}
 
         <p className="mt-6 text-center text-sm text-slate-500">
-          <Link href="/login" className="text-blue-600 font-medium hover:underline">
+          <Link href="https://app.neatstamp.com/login" className="text-blue-600 font-medium hover:underline">
             Back to sign in
           </Link>
         </p>
