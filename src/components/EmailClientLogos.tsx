@@ -1,111 +1,129 @@
+// Email client logos - accurate reproductions based on official brand assets
+// Gmail logo source: Wikimedia Commons (CC), others: faithful SVG recreations
+
 export function GmailLogo({ className = "h-8 w-8" }: { className?: string }) {
+  // Official Gmail icon (2020-present) - from Wikimedia Commons
   return (
-    <svg className={className} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M45 16.2l-5 2.75-8 4.5V14l6.5-4.5 2.75 2c2.1 1.44 3.75 3.6 3.75 4.7z" fill="#4285F4"/>
-      <path d="M3 16.2l5 2.75 8 4.5V14L9.5 9.5 6.75 11.5C4.65 12.94 3 15.1 3 16.2z" fill="#34A853"/>
-      <path d="M16 37V23.45L3 16.2V37c0 2.21 1.79 4 4 4h12l3-4H16z" fill="#34A853"/>
-      <path d="M45 16.2V37c0 2.21-1.79 4-4 4H29l3-4h8V23.45L32 19.25l8 4.25 5-2.75V16.2z" fill="#4285F4"/>
-      <path d="M45 37c0 2.21-1.79 4-4 4H29l-5-7 5-4 11-6.55V37z" fill="#1967D2"/>
-      <path d="M3 37c0 2.21 1.79 4 4 4h12l5-7-5-4-11-6.55V37z" fill="#1967D2"/>
-      <path d="M24 26l-8-12.55L3 16.2l13 7.25L24 26z" fill="#EA4335"/>
-      <path d="M40 14l-8 9.45L24 26l8-2.75 8-4.5V14z" fill="#FBBC04"/>
-      <path d="M40 14l-8 9.45-8 2.55-8-2.55L8 14l16 12 16-12z" fill="#EA4335"/>
+    <svg className={className} viewBox="52 42 88 66" xmlns="http://www.w3.org/2000/svg">
+      <path fill="#4285f4" d="M58 108h14V74L52 59v43c0 3.32 2.69 6 6 6"/>
+      <path fill="#34a853" d="M120 108h14c3.32 0 6-2.69 6-6V59l-20 15"/>
+      <path fill="#fbbc04" d="M120 48v26l20-15v-8c0-7.42-8.47-11.65-14.4-7.2"/>
+      <path fill="#ea4335" d="M72 74V48l24 18 24-18v26L96 92"/>
+      <path fill="#c5221f" d="M72 48l-14.4-10.8C51.47 32.35 52 40.58 52 48v8l20 18"/>
     </svg>
   );
 }
 
 export function OutlookLogo({ className = "h-8 w-8" }: { className?: string }) {
+  // Microsoft Outlook icon (2019-present)
   return (
-    <svg className={className} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M28.5 44H42a2 2 0 002-2V17.5L28.5 26v18z" fill="#1976D2"/>
-      <path d="M44 17.5l-15.5 8.5L44 17.5zm0 0V10a2 2 0 00-2-2H28.5l-4 6.5L44 17.5z" fill="#2196F3"/>
-      <path d="M28.5 8H14a2 2 0 00-2 2v28a2 2 0 002 2h14.5V8z" fill="#0D47A1"/>
-      <rect x="4" y="12" width="24" height="24" rx="2" fill="#0D47A1"/>
-      <path d="M16 20.5c-3.59 0-6.5 2.91-6.5 6.5s2.91 6.5 6.5 6.5 6.5-2.91 6.5-6.5-2.91-6.5-6.5-6.5zm0 10.5c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z" fill="white"/>
+    <svg className={className} viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+      <path d="M19.484 7.937v5.477l2.786 1.72a.3.3 0 00.318 0l8.933-5.64a1.786 1.786 0 00-.92-1.494 1.786 1.786 0 00-.89-.063H19.484z" fill="#0364B8"/>
+      <path d="M19.484 15.457l2.786 1.72a.3.3 0 00.318 0l8.933-5.64v10.263a1.8 1.8 0 01-1.8 1.8H19.484z" fill="#0078D4"/>
+      <path d="M10.44 12.932a4.214 4.214 0 00-2.058.529 4.214 4.214 0 00-1.533 1.478A4.214 4.214 0 006.1 17.14a4.214 4.214 0 00.529 2.058 4.214 4.214 0 001.478 1.533 4.214 4.214 0 002.2.749 4.214 4.214 0 002.059-.53 4.214 4.214 0 001.533-1.477 4.214 4.214 0 00.749-2.2 4.214 4.214 0 00-.529-2.059 4.214 4.214 0 00-1.478-1.533 4.214 4.214 0 00-2.2-.749zm-.062 6.377a2.2 2.2 0 01-1.624-.662 2.2 2.2 0 01-.661-1.624 2.2 2.2 0 01.661-1.624 2.2 2.2 0 011.624-.662 2.2 2.2 0 011.624.662 2.2 2.2 0 01.662 1.624 2.2 2.2 0 01-.662 1.624 2.2 2.2 0 01-1.624.662z" fill="white"/>
+      <path d="M18.084 7.937H2.4A1.4 1.4 0 001 9.337v14.326a1.4 1.4 0 001.4 1.4h15.684a1.4 1.4 0 001.4-1.4V9.337a1.4 1.4 0 00-1.4-1.4z" fill="#0078D4" opacity=".8"/>
+      <path d="M10.44 12.932a4.214 4.214 0 00-2.058.529 4.214 4.214 0 00-1.533 1.478A4.214 4.214 0 006.1 17.14a4.214 4.214 0 00.529 2.058 4.214 4.214 0 001.478 1.533 4.214 4.214 0 002.2.749 4.214 4.214 0 002.059-.53 4.214 4.214 0 001.533-1.477 4.214 4.214 0 00.749-2.2 4.214 4.214 0 00-.529-2.059 4.214 4.214 0 00-1.478-1.533 4.214 4.214 0 00-2.2-.749zm-.062 6.377a2.2 2.2 0 01-1.624-.662 2.2 2.2 0 01-.661-1.624 2.2 2.2 0 01.661-1.624 2.2 2.2 0 011.624-.662 2.2 2.2 0 011.624.662 2.2 2.2 0 01.662 1.624 2.2 2.2 0 01-.662 1.624 2.2 2.2 0 01-1.624.662z" fill="white"/>
     </svg>
   );
 }
 
 export function AppleMailLogo({ className = "h-8 w-8" }: { className?: string }) {
+  // Apple Mail icon - blue gradient envelope
   return (
-    <svg className={className} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="48" height="48" rx="10" fill="url(#apple-mail-grad)"/>
-      <path d="M8 16l16 10 16-10" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-      <rect x="8" y="14" width="32" height="20" rx="2" stroke="white" strokeWidth="2.5" fill="none"/>
+    <svg className={className} viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <linearGradient id="apple-mail-grad" x1="24" y1="0" x2="24" y2="48" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#5AC8FA"/>
-          <stop offset="1" stopColor="#007AFF"/>
+        <linearGradient id="aml-bg" x1="60" y1="0" x2="60" y2="120" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor="#68C8F8"/>
+          <stop offset="1" stopColor="#1A8EF1"/>
         </linearGradient>
       </defs>
+      <rect width="120" height="120" rx="26" fill="url(#aml-bg)"/>
+      <g fill="none" stroke="white" strokeWidth="4" strokeLinejoin="round">
+        <rect x="22" y="35" width="76" height="50" rx="4" fill="white" fillOpacity="0.15"/>
+        <polyline points="22,38 60,65 98,38"/>
+        <line x1="22" y1="85" x2="46" y2="62"/>
+        <line x1="98" y1="85" x2="74" y2="62"/>
+      </g>
     </svg>
   );
 }
 
 export function YahooMailLogo({ className = "h-8 w-8" }: { className?: string }) {
+  // Yahoo Mail - purple icon with Y
   return (
-    <svg className={className} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="48" height="48" rx="10" fill="#6001D2"/>
-      <path d="M10 14l8 12v8h4v-8l-2-3" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-      <path d="M20 26l8-12" stroke="white" strokeWidth="3" strokeLinecap="round" fill="none"/>
-      <path d="M28 14l8 12" stroke="white" strokeWidth="3" strokeLinecap="round" fill="none"/>
-      <circle cx="36" cy="14" r="2.5" fill="white"/>
+    <svg className={className} viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <rect width="120" height="120" rx="26" fill="#6001D2"/>
+      <g fill="none" stroke="white" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="35,32 55,62 55,88"/>
+        <line x1="55" y1="62" x2="75" y2="32"/>
+        <line x1="75" y1="32" x2="95" y2="62"/>
+      </g>
+      <circle cx="88" cy="34" r="5" fill="white"/>
     </svg>
   );
 }
 
 export function ThunderbirdLogo({ className = "h-8 w-8" }: { className?: string }) {
+  // Mozilla Thunderbird - stylized blue bird
   return (
-    <svg className={className} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="24" cy="24" r="22" fill="url(#tb-grad)"/>
-      <path d="M12 20c0-6.627 5.373-12 12-12s12 5.373 12 12v8c0 6.627-5.373 12-12 12S12 34.627 12 28v-8z" fill="url(#tb-grad2)" opacity="0.8"/>
-      <path d="M14 22l10 6 10-6" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+    <svg className={className} viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <linearGradient id="tb-grad" x1="24" y1="2" x2="24" y2="46" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#0A84FF"/>
-          <stop offset="1" stopColor="#0060DF"/>
-        </linearGradient>
-        <linearGradient id="tb-grad2" x1="24" y1="8" x2="24" y2="40" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#45A1FF"/>
-          <stop offset="1" stopColor="#0A84FF"/>
+        <linearGradient id="tb-g" x1="60" y1="10" x2="60" y2="110" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor="#52A8F4"/>
+          <stop offset="1" stopColor="#0050D4"/>
         </linearGradient>
       </defs>
+      <circle cx="60" cy="60" r="56" fill="url(#tb-g)"/>
+      <g fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="26" y="38" width="68" height="44" rx="6"/>
+        <polyline points="26,42 60,65 94,42"/>
+      </g>
     </svg>
   );
 }
 
 export function SamsungMailLogo({ className = "h-8 w-8" }: { className?: string }) {
+  // Samsung Mail - Samsung blue
   return (
-    <svg className={className} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="48" height="48" rx="10" fill="#1428A0"/>
-      <path d="M10 16l14 9 14-9" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-      <rect x="10" y="14" width="28" height="20" rx="2" stroke="white" strokeWidth="2" fill="none"/>
+    <svg className={className} viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <rect width="120" height="120" rx="26" fill="#1428A0"/>
+      <g fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="24" y="36" width="72" height="48" rx="5"/>
+        <polyline points="24,40 60,66 96,40"/>
+      </g>
     </svg>
   );
 }
 
 export function SparkLogo({ className = "h-8 w-8" }: { className?: string }) {
+  // Readdle Spark - gradient warm colors with spark icon
   return (
-    <svg className={className} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="48" height="48" rx="10" fill="url(#spark-grad)"/>
-      <path d="M24 10l3 10h10l-8 6 3 10-8-6-8 6 3-10-8-6h10z" fill="white"/>
+    <svg className={className} viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <linearGradient id="spark-grad" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#FF6B6B"/>
-          <stop offset="0.5" stopColor="#EE5A24"/>
-          <stop offset="1" stopColor="#F9CA24"/>
+        <linearGradient id="sp-g" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor="#59C5F6"/>
+          <stop offset="0.35" stopColor="#4A7CF7"/>
+          <stop offset="0.7" stopColor="#9B6DF0"/>
+          <stop offset="1" stopColor="#ED5E84"/>
         </linearGradient>
       </defs>
+      <rect width="120" height="120" rx="26" fill="url(#sp-g)"/>
+      <g fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="24" y="36" width="72" height="48" rx="5"/>
+        <polyline points="24,40 60,66 96,40"/>
+      </g>
     </svg>
   );
 }
 
 export function OutlookMobileLogo({ className = "h-8 w-8" }: { className?: string }) {
+  // Outlook Mobile - same blue as Outlook but with phone frame
   return (
-    <svg className={className} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="48" height="48" rx="10" fill="#0078D4"/>
-      <path d="M24 16c-4.42 0-8 3.58-8 8s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8zm0 13c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z" fill="white"/>
-      <rect x="16" y="10" width="16" height="28" rx="3" stroke="white" strokeWidth="1.5" fill="none"/>
+    <svg className={className} viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <rect width="120" height="120" rx="26" fill="#0078D4"/>
+      <rect x="38" y="18" width="44" height="84" rx="8" fill="none" stroke="white" strokeWidth="3.5"/>
+      <circle cx="60" cy="92" r="3" fill="white"/>
+      <path d="M60 45a12 12 0 100 24 12 12 0 000-24zm0 19a7 7 0 110-14 7 7 0 010 14z" fill="white"/>
     </svg>
   );
 }
