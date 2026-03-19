@@ -77,10 +77,10 @@ export default function HomePage() {
                 Free forever — no credit card required
               </div>
               <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
-                Email signatures
+                Free email signature
                 <br />
                 <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                  that impress.
+                  generator.
                 </span>
               </h1>
               <p className="mt-6 max-w-lg text-lg leading-relaxed text-slate-600">
