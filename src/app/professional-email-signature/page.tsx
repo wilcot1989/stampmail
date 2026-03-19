@@ -6,7 +6,7 @@ import {
 } from "@/components/StructuredData";
 
 export const metadata: Metadata = {
-  title: "Professional Email Signature — What It Takes to Stand Out (2026) | NeatStamp",
+  title: "Professional Email Signature Guide (2026)",
   description:
     "Your email signature gets seen thousands of times a year. Learn what belongs in a professional signature, what to cut, and how to build one that works in every email client.",
   alternates: {

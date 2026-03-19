@@ -6,7 +6,7 @@ import {
 } from "@/components/StructuredData";
 
 export const metadata: Metadata = {
-  title: "Pronouns in Email Signatures — How, Why & Examples | NeatStamp",
+  title: "Pronouns in Email Signatures — Guide & Examples",
   description:
     "Should you add pronouns to your email signature? Where do they go, how should they look, and what do you do if your company requires it but you'd rather not? A practical, non-preachy guide.",
   alternates: {

@@ -6,7 +6,7 @@ import {
 } from "@/components/StructuredData";
 
 export const metadata: Metadata = {
-  title: "Email Signature for Consultants & Advisors (2026) | NeatStamp",
+  title: "Email Signature for Consultants (2026)",
   description:
     "How consultants should handle email signatures across multiple clients, Calendly booking links, credentials, and thought leadership. With examples.",
   alternates: { canonical: "https://neatstamp.com/email-signature-for-consultant" },

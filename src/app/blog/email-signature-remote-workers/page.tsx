@@ -6,7 +6,7 @@ import {
 } from "@/components/StructuredData";
 
 export const metadata: Metadata = {
-  title: "Email Signature for Remote Workers — What to Include | NeatStamp",
+  title: "Email Signature for Remote Workers (2026)",
   description:
     "Time zone, video call link, availability hours, Slack handle — what remote workers actually need in their email signatures. Templates for fully remote, hybrid, and digital nomads.",
   alternates: {

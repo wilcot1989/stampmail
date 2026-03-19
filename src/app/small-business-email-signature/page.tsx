@@ -6,7 +6,7 @@ import {
 } from "@/components/StructuredData";
 
 export const metadata: Metadata = {
-  title: "Email Signatures for Small Business — Free Guide (2026) | NeatStamp",
+  title: "Email Signatures for Small Business — Free",
   description:
     "Why small businesses need consistent signatures, how to roll out for free, template selection by industry, and when to upgrade to a team plan.",
   alternates: { canonical: "https://neatstamp.com/small-business-email-signature" },

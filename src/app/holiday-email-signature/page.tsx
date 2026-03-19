@@ -6,7 +6,7 @@ import {
 } from "@/components/StructuredData";
 
 export const metadata: Metadata = {
-  title: "Holiday Email Signature — Professional & Festive Ideas | NeatStamp",
+  title: "Holiday Email Signature — Professional Ideas",
   description:
     "Holiday email signatures for every season — inclusive greetings, office closure notices, seasonal banners, and how to handle the transition from Christmas through the New Year. Templates included.",
   alternates: {
