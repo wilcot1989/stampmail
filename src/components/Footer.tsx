@@ -4,7 +4,7 @@ export default function Footer() {
   return (
     <footer className="border-t border-border bg-surface">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
+        <div className="grid grid-cols-2 gap-8 md:grid-cols-5">
           <div>
             <h3 className="text-sm font-semibold text-foreground">Product</h3>
             <ul className="mt-4 space-y-2">
@@ -78,6 +78,42 @@ export default function Footer() {
               <li>
                 <Link href="/email-signature-for-real-estate" className="text-sm text-muted hover:text-foreground">
                   For Real Estate
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="text-sm font-semibold text-foreground">Alternatives</h3>
+            <ul className="mt-4 space-y-2">
+              <li>
+                <Link href="/alternative-to-wisestamp" className="text-sm text-muted hover:text-foreground">
+                  WiseStamp Alternative
+                </Link>
+              </li>
+              <li>
+                <Link href="/alternative-to-mysignature" className="text-sm text-muted hover:text-foreground">
+                  MySignature Alternative
+                </Link>
+              </li>
+              <li>
+                <Link href="/alternative-to-exclaimer" className="text-sm text-muted hover:text-foreground">
+                  Exclaimer Alternative
+                </Link>
+              </li>
+              <li>
+                <Link href="/alternative-to-signaturely" className="text-sm text-muted hover:text-foreground">
+                  Signaturely Alternative
+                </Link>
+              </li>
+              <li>
+                <Link href="/alternative-to-hubspot-signature" className="text-sm text-muted hover:text-foreground">
+                  HubSpot Alternative
+                </Link>
+              </li>
+              <li>
+                <Link href="/alternative-to-canva-signature" className="text-sm text-muted hover:text-foreground">
+                  Canva Alternative
                 </Link>
               </li>
             </ul>

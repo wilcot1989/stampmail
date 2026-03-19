@@ -85,6 +85,49 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.6,
     },
+    // Alternative pages (competitor comparison)
+    {
+      url: `${baseUrl}/alternative-to-wisestamp`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/alternative-to-mysignature`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/alternative-to-exclaimer`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/alternative-to-signaturely`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/alternative-to-hubspot-signature`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/alternative-to-newoldstamp`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/alternative-to-canva-signature`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.6,
+    },
     // Other pages
     {
       url: `${baseUrl}/about`,
