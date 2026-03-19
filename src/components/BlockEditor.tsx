@@ -3,7 +3,7 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { Block, BlockType, BlockConfig, BLOCK_CONFIGS, generateHtmlFromBlocks } from "@/lib/blocks";
 import { SignatureData } from "@/lib/types";
-import { GenerateOptions } from "@/lib/generateSignature";
+import { GenerateOptions, generateSignatureHtml } from "@/lib/generateSignature";
 import { copySignatureToClipboard } from "@/lib/clipboard";
 import BlockSettings from "./BlockSettings";
 
@@ -329,7 +329,8 @@ function LivePreview({
     plan,
     signatureId: sigId,
   };
-  const html = generateHtmlFromBlocks(blocks, data, options);
+  // Use template-based rendering so template selection updates the preview
+  const html = generateSignatureHtml(data, options);
 
   const handleCopy = async () => {
     const ok = await copySignatureToClipboard(html);

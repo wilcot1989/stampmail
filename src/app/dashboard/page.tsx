@@ -1047,10 +1047,10 @@ function DashboardContent() {
                 </button>
               </div>
 
-              {/* Template selector */}
+              {/* Template selector — horizontally scrollable */}
               <div>
                 <h3 className="text-sm font-semibold text-foreground mb-3">Choose a template</h3>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-thin">
                   {(["minimal", "modern", "corporate", "creative", "bold", "elegant", "startup", "compact"] as const).map((t) => {
                     const isSelected = editorData.template === t;
                     const isLocked = !isPro && !["minimal", "modern"].includes(t);
@@ -1061,7 +1061,7 @@ function DashboardContent() {
                         onClick={() => {
                           if (!isLocked) setEditorData({ ...editorData, template: t });
                         }}
-                        className={`relative rounded-xl border-2 overflow-hidden text-left transition-all ${
+                        className={`relative rounded-xl border-2 overflow-hidden text-left transition-all flex-shrink-0 w-[140px] snap-start ${
                           isSelected
                             ? "border-primary shadow-md"
                             : isLocked
