@@ -8,6 +8,7 @@ import { GenerateOptions, generateSignatureHtml } from "@/lib/generateSignature"
 
 import { copySignatureToClipboard } from "@/lib/clipboard";
 import BlockSettings from "./BlockSettings";
+import EditableSignature from "./EditableSignature";
 
 interface BlockEditorProps {
   blocks: Block[];
@@ -16,6 +17,7 @@ interface BlockEditorProps {
   onDataChange: (data: SignatureData) => void;
   plan: "free" | "pro" | "team";
   wrapperSettings?: import("@/lib/types").WrapperSettings;
+  onWrapperSettingsChange?: (ws: import("@/lib/types").WrapperSettings) => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -527,6 +529,85 @@ function DragGhost({ label, icon, x, y }: GhostProps) {
 // Main BlockEditor component
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// Copy button (standalone)
+// ---------------------------------------------------------------------------
+
+function CopyButton({
+  blocks,
+  data,
+  wrapperSettings: ws,
+  plan,
+}: {
+  blocks: Block[];
+  data: SignatureData;
+  wrapperSettings: import("@/lib/types").WrapperSettings;
+  plan: "free" | "pro" | "team";
+}) {
+  const [state, setState] = useState<"idle" | "copied" | "error">("idle");
+  const sigId = useRef(crypto.randomUUID()).current;
+
+  const handleCopy = async () => {
+    const options: GenerateOptions = { plan, signatureId: sigId };
+    let html = generateHtmlFromBlocks(blocks, data, ws, options);
+
+    // Upload base64 photo to R2 for email client compatibility
+    if (data.photoUrl && data.photoUrl.startsWith("data:")) {
+      try {
+        await fetch("/api/signatures/free", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: sigId, data, template: data.template }),
+        });
+        const res = await fetch(data.photoUrl);
+        const blob = await res.blob();
+        const formData = new FormData();
+        formData.append("file", blob, "photo.jpg");
+        formData.append("signature_id", sigId);
+        const uploadRes = await fetch("/api/images/upload", { method: "POST", body: formData });
+        const uploadData = await uploadRes.json() as { url?: string };
+        if (uploadData.url) {
+          html = html.replace(/src="data:image[^"]*"/g, `src="${uploadData.url}"`);
+        }
+      } catch {
+        // Continue with base64 if upload fails
+      }
+    }
+
+    const ok = await copySignatureToClipboard(html);
+    setState(ok ? "copied" : "error");
+    setTimeout(() => setState("idle"), 3000);
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={handleCopy}
+      className={`w-full rounded-xl px-4 py-3 text-sm font-semibold transition-all shadow-sm flex items-center justify-center gap-2 ${
+        state === "copied"
+          ? "bg-emerald-500 text-white"
+          : state === "error"
+            ? "bg-red-500 text-white"
+            : "bg-blue-600 text-white hover:bg-blue-700"
+      }`}
+    >
+      {state === "copied" ? (
+        <>
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+          Copied! Paste in your email client
+        </>
+      ) : state === "error" ? (
+        "Copy failed — try again"
+      ) : (
+        <>
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9.75a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" /></svg>
+          Copy Signature
+        </>
+      )}
+    </button>
+  );
+}
+
 export default function BlockEditor({
   blocks,
   onBlocksChange,
@@ -534,8 +615,10 @@ export default function BlockEditor({
   onDataChange,
   plan,
   wrapperSettings,
+  onWrapperSettingsChange,
 }: BlockEditorProps) {
   const ws = wrapperSettings ?? DEFAULT_WRAPPER_SETTINGS;
+  const handleWsChange = onWrapperSettingsChange ?? (() => {});
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   // Drag state
@@ -769,12 +852,25 @@ export default function BlockEditor({
         <AddBlockMenu isPro={isPro} hasPhoto={hasPhoto} onAdd={addBlock} />
       </div>
 
-      {/* RIGHT COLUMN — live preview */}
+      {/* RIGHT COLUMN — WYSIWYG preview editor */}
       <div className="lg:col-span-3">
-        <div className="sticky top-20">
-          <h2 className="text-sm font-semibold text-slate-800 mb-1">Live preview</h2>
-          <p className="text-xs text-slate-500 mb-4">Updates as you make changes.</p>
-          <LivePreview blocks={blocks} data={data} plan={plan} wrapperSettings={ws} />
+        <div className="sticky top-20 space-y-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-sm font-semibold text-slate-800">Edit your signature</h2>
+              <p className="text-xs text-slate-400">Click on any element to edit. Drag to reorder.</p>
+            </div>
+          </div>
+          <EditableSignature
+            blocks={blocks}
+            data={data}
+            wrapperSettings={ws}
+            plan={plan}
+            onBlocksChange={onBlocksChange}
+            onDataChange={onDataChange}
+            onWrapperSettingsChange={handleWsChange}
+          />
+          <CopyButton blocks={blocks} data={data} wrapperSettings={ws} plan={plan} />
         </div>
       </div>
 

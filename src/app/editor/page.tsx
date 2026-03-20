@@ -846,6 +846,7 @@ export default function EditorPage() {
             onDataChange={setData}
             plan={userPlan}
             wrapperSettings={wrapperSettings}
+            onWrapperSettingsChange={setWrapperSettings}
           />
         </div>
       </div>

@@ -1459,6 +1459,7 @@ function DashboardContent() {
                     onDataChange={setEditorData}
                     plan={plan}
                     wrapperSettings={editorWrapperSettings}
+                    onWrapperSettingsChange={setEditorWrapperSettings}
                   />
                 </div>
               </div>
