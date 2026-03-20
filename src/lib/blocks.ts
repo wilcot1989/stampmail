@@ -156,6 +156,47 @@ export function getDefaultBlocks(): Block[] {
   ];
 }
 
+// Templates that have a photo as part of their design
+const TEMPLATES_WITH_PHOTO: string[] = [
+  "minimal", "modern", "corporate", "creative", "bold", "elegant", "startup",
+  "executive", "gradient", "developer", "sales", "medical", "legal",
+  "academic", "realtor", "influencer", "photographer", "dark",
+];
+
+// Templates with NO photo: compact, simple
+
+export function getBlocksForTemplate(template: string): Block[] {
+  const hasPhoto = TEMPLATES_WITH_PHOTO.includes(template);
+  const blocks: Block[] = [];
+
+  if (hasPhoto) {
+    blocks.push(makeBlock("photo", { settings: { ...BLOCK_CONFIGS.photo.defaultSettings, position: "left" } }));
+  }
+
+  blocks.push(makeBlock("name"));
+  blocks.push(makeBlock("divider"));
+  blocks.push(makeBlock("contact"));
+  blocks.push(makeBlock("social"));
+
+  return blocks;
+}
+
+// Ensure blocks have a photo block when switching to a template that needs one
+export function ensureBlocksForTemplate(existingBlocks: Block[], template: string): Block[] {
+  const needsPhoto = TEMPLATES_WITH_PHOTO.includes(template);
+  const hasPhotoBlock = existingBlocks.some((b) => b.type === "photo");
+
+  if (needsPhoto && !hasPhotoBlock) {
+    // Add photo block at the beginning
+    return [
+      makeBlock("photo", { settings: { ...BLOCK_CONFIGS.photo.defaultSettings, position: "left" } }),
+      ...existingBlocks,
+    ];
+  }
+
+  return existingBlocks;
+}
+
 // ---------------------------------------------------------------------------
 // HTML escape helper
 // ---------------------------------------------------------------------------

@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import { SignatureData, TemplateName, DEFAULT_SIGNATURE_DATA, TEMPLATES } from "@/lib/types";
 import { generateSignatureHtml, generateCopyHtml } from "@/lib/generateSignature";
 import { copySignatureToClipboard } from "@/lib/clipboard";
-import { Block, getDefaultBlocks } from "@/lib/blocks";
+import { Block, getDefaultBlocks, getBlocksForTemplate, ensureBlocksForTemplate } from "@/lib/blocks";
 import BlockEditor from "@/components/BlockEditor";
 
 
@@ -708,7 +708,7 @@ export default function EditorPage() {
   const [planLoaded, setPlanLoaded] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: "info" | "warning" | "success" } | null>(null);
   const [editorMode, setEditorMode] = useState<"templates" | "blocks">("templates");
-  const [blocks, setBlocks] = useState<Block[]>(() => getDefaultBlocks());
+  const [blocks, setBlocks] = useState<Block[]>(() => getBlocksForTemplate("minimal"));
   const previewRef = useRef<HTMLDivElement>(null);
 
   const isPro = userPlan === "pro" || userPlan === "team";
@@ -733,6 +733,7 @@ export default function EditorPage() {
 
   const handleTemplateSelect = (template: TemplateName) => {
     setData({ ...data, template });
+    setBlocks(ensureBlocksForTemplate(blocks, template));
   };
 
   const handleProTemplateClick = () => {

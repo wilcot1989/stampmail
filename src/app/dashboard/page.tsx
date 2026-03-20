@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, useRef, Suspense } from "react";
 import Link from "next/link";
 import { SignatureData, DEFAULT_SIGNATURE_DATA, TemplateName, TEMPLATES } from "@/lib/types";
-import { Block, getDefaultBlocks } from "@/lib/blocks";
+import { Block, getDefaultBlocks, getBlocksForTemplate, ensureBlocksForTemplate } from "@/lib/blocks";
 import BlockEditor from "@/components/BlockEditor";
 import { generateSignatureHtml } from "@/lib/generateSignature";
 
@@ -1202,7 +1202,7 @@ function DashboardContent() {
               signatures={signatures}
               plan={plan}
               loading={sigsLoading}
-              onCreateNew={() => { setEditorData(DEFAULT_SIGNATURE_DATA); setEditorBlocks(getDefaultBlocks()); setEditingSignatureId(null); setActiveTab("editor"); }}
+              onCreateNew={() => { setEditorData(DEFAULT_SIGNATURE_DATA); setEditorBlocks(getBlocksForTemplate(DEFAULT_SIGNATURE_DATA.template)); setEditingSignatureId(null); setActiveTab("editor"); }}
               onEdit={(sig) => {
                 try {
                   const parsed = typeof sig.data === "string" ? JSON.parse(sig.data) : sig.data;
@@ -1381,7 +1381,10 @@ function DashboardContent() {
                       <button
                         key={t}
                         onClick={() => {
-                          if (!isLocked) setEditorData({ ...editorData, template: t });
+                          if (!isLocked) {
+                            setEditorData({ ...editorData, template: t });
+                            setEditorBlocks(ensureBlocksForTemplate(editorBlocks, t));
+                          }
                         }}
                         className={`relative rounded-xl border-2 overflow-hidden text-left transition-all flex-shrink-0 w-[140px] snap-start ${
                           isSelected
