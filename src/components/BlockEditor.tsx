@@ -715,7 +715,7 @@ export default function BlockEditor({
   return (
     <div className="grid gap-6 lg:grid-cols-5">
       {/* LEFT COLUMN — block list */}
-      <div className="lg:col-span-3 space-y-4">
+      <div className="lg:col-span-2 space-y-4">
         <div>
           <h2 className="text-sm font-semibold text-slate-800 mb-1">Signature layout</h2>
           <p className="text-xs text-slate-500">Drag blocks to reorder. Click the gear to change settings.</p>
@@ -763,7 +763,7 @@ export default function BlockEditor({
       </div>
 
       {/* RIGHT COLUMN — live preview */}
-      <div className="lg:col-span-2">
+      <div className="lg:col-span-3">
         <div className="sticky top-20">
           <h2 className="text-sm font-semibold text-slate-800 mb-1">Live preview</h2>
           <p className="text-xs text-slate-500 mb-4">Updates as you make changes.</p>
