@@ -81,12 +81,14 @@ function PhotoUpload({ data, onDataChange, photoBlock, onBlockSettingsChange }: 
     reader.onload = (ev) => {
       const img = new window.Image();
       img.onload = () => {
+        const sz = 200;
         const canvas = document.createElement("canvas");
-        canvas.width = 200; canvas.height = 200;
+        canvas.width = sz; canvas.height = sz;
         const ctx = canvas.getContext("2d");
         if (!ctx) return;
+        // Square crop from center
         const min = Math.min(img.width, img.height);
-        ctx.drawImage(img, (img.width - min) / 2, (img.height - min) / 2, min, min, 0, 0, 200, 200);
+        ctx.drawImage(img, (img.width - min) / 2, (img.height - min) / 2, min, min, 0, 0, sz, sz);
         onDataChange({ ...data, photoUrl: canvas.toDataURL("image/jpeg", 0.85) });
       };
       img.src = ev.target?.result as string;
@@ -426,18 +428,72 @@ export default function SignatureEditor({
 
   const photoBlock = blocks.find((b) => b.type === "photo" && b.visible);
 
+  // Crop photo to shape (circle/rounded) with white background for Outlook
+  const cropPhotoToShape = (photoUrl: string, shape: string): Promise<string> => {
+    return new Promise((resolve) => {
+      const img = new window.Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => {
+        const sz = 200;
+        const canvas = document.createElement("canvas");
+        canvas.width = sz; canvas.height = sz;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) { resolve(photoUrl); return; }
+
+        // White background (Outlook doesn't support transparency)
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, sz, sz);
+
+        // Clipping mask
+        if (shape === "circle") {
+          ctx.beginPath();
+          ctx.arc(sz / 2, sz / 2, sz / 2, 0, Math.PI * 2);
+          ctx.closePath();
+          ctx.clip();
+        } else if (shape === "rounded") {
+          const r = 16;
+          ctx.beginPath();
+          ctx.moveTo(r, 0); ctx.lineTo(sz - r, 0);
+          ctx.quadraticCurveTo(sz, 0, sz, r); ctx.lineTo(sz, sz - r);
+          ctx.quadraticCurveTo(sz, sz, sz - r, sz); ctx.lineTo(r, sz);
+          ctx.quadraticCurveTo(0, sz, 0, sz - r); ctx.lineTo(0, r);
+          ctx.quadraticCurveTo(0, 0, r, 0);
+          ctx.closePath();
+          ctx.clip();
+        }
+
+        // Draw photo (center crop)
+        const min = Math.min(img.width, img.height);
+        ctx.drawImage(img, (img.width - min) / 2, (img.height - min) / 2, min, min, 0, 0, sz, sz);
+        resolve(canvas.toDataURL("image/jpeg", 0.9));
+      };
+      img.onerror = () => resolve(photoUrl);
+      img.src = photoUrl;
+    });
+  };
+
   const handleCopy = async () => {
     const options: GenerateOptions = { plan, signatureId: sigId };
-    let html = generateHtmlFromBlocks(blocks, data, ws, options);
 
-    if (data.photoUrl && data.photoUrl.startsWith("data:")) {
+    // Crop photo to shape before generating HTML
+    let copyData = { ...data };
+    if (data.photoUrl && photoBlock) {
+      const shape = String(photoBlock.settings.shape ?? "circle");
+      if (shape !== "square") {
+        copyData = { ...data, photoUrl: await cropPhotoToShape(data.photoUrl, shape) };
+      }
+    }
+
+    let html = generateHtmlFromBlocks(blocks, copyData, ws, options);
+
+    if (copyData.photoUrl && copyData.photoUrl.startsWith("data:")) {
       try {
         await fetch("/api/signatures/free", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id: sigId, data, template: data.template }),
+          body: JSON.stringify({ id: sigId, data: copyData, template: data.template }),
         });
-        const res = await fetch(data.photoUrl);
+        const res = await fetch(copyData.photoUrl);
         const blob = await res.blob();
         const formData = new FormData();
         formData.append("file", blob, "photo.jpg");
