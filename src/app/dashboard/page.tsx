@@ -958,11 +958,19 @@ function DashboardContent() {
   useEffect(() => {
     if (!isPro || activeTab !== "analytics") return;
     setAnalyticsLoading(true);
-    // Stub: would call /api/analytics in a real implementation
-    setTimeout(() => {
-      setAnalytics({ opens_this_week: 34, opens_this_month: 142, top_links: [{ url: "https://acmecorp.com", clicks: 28 }, { url: "https://calendly.com/alex", clicks: 12 }] });
-      setAnalyticsLoading(false);
-    }, 600);
+    fetch("/api/analytics")
+      .then((r) => r.json())
+      .then((result) => {
+        const r = result as { signatures?: Array<{ opens_7d: number; opens_30d: number }> };
+        const sigs = r.signatures ?? [];
+        const opens7d = sigs.reduce((s, x) => s + (x.opens_7d ?? 0), 0);
+        const opens30d = sigs.reduce((s, x) => s + (x.opens_30d ?? 0), 0);
+        setAnalytics({ opens_this_week: opens7d, opens_this_month: opens30d, top_links: [] });
+      })
+      .catch(() => {
+        setAnalytics({ opens_this_week: 0, opens_this_month: 0, top_links: [] });
+      })
+      .finally(() => setAnalyticsLoading(false));
   }, [isPro, activeTab]);
 
   // Fetch campaigns (Pro only)

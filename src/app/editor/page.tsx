@@ -7,7 +7,7 @@ import { generateSignatureHtml, generateCopyHtml } from "@/lib/generateSignature
 import { copySignatureToClipboard } from "@/lib/clipboard";
 import { Block, getDefaultBlocks } from "@/lib/blocks";
 import BlockEditor from "@/components/BlockEditor";
-import Link from "next/link";
+
 
 // ---------------------------------------------------------------------------
 // ProBadge helper component
@@ -54,12 +54,12 @@ function ProGateField({
         <div className="flex flex-col items-center gap-1.5 px-3 text-center">
           <ProBadge label="PRO" />
           <p className="text-xs text-slate-600">{message}</p>
-          <Link
-            href="/pricing"
+          <a
+            href="https://neatstamp.com/pricing"
             className="mt-0.5 rounded-md bg-amber-500 px-3 py-1 text-xs font-semibold text-white hover:bg-amber-600 transition-colors"
           >
             Upgrade — $5/mo
-          </Link>
+          </a>
         </div>
       </div>
     </div>
@@ -384,7 +384,7 @@ function ProSignatureForm({ data, onChange, isPro }: ProSignatureFormProps) {
                 <span className="text-[11px] text-amber-700 font-medium">{socialLabels[field]}</span>
                 <div className="flex items-center gap-2">
                   <ProBadge label="Pro for unlimited links" />
-                  <Link href="/pricing" className="text-xs text-amber-600 underline hover:text-amber-800">Upgrade</Link>
+                  <a href="https://neatstamp.com/pricing" className="text-xs text-amber-600 underline hover:text-amber-800">Upgrade</a>
                 </div>
               </div>
             );
@@ -403,7 +403,7 @@ function ProSignatureForm({ data, onChange, isPro }: ProSignatureFormProps) {
         {!isPro && filledSocial < FREE_SOCIAL_LIMIT && (
           <p className="text-[11px] text-muted-light">
             {FREE_SOCIAL_LIMIT - filledSocial} free social link{FREE_SOCIAL_LIMIT - filledSocial !== 1 ? "s" : ""} remaining.{" "}
-            <Link href="/pricing" className="text-primary underline">Upgrade for unlimited.</Link>
+            <a href="https://neatstamp.com/pricing" className="text-primary underline">Upgrade for unlimited.</a>
           </p>
         )}
       </FormSection>
@@ -804,9 +804,9 @@ export default function EditorPage() {
       {!isPro && (
         <p className="mb-8 text-center text-xs text-muted">
           Pro templates require a $5/mo subscription.{" "}
-          <Link href="/pricing" className="font-medium text-primary underline">
+          <a href="https://neatstamp.com/pricing" className="font-medium text-primary underline">
             Upgrade to Pro
-          </Link>
+          </a>
         </p>
       )}
       {isPro && <div className="mb-8" />}
