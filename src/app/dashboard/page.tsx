@@ -132,39 +132,17 @@ function PlanCard({
 }) {
   if (plan === "free") {
     return (
-      <div className="rounded-xl border border-border bg-white p-5 shadow-sm">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100">
-              <svg className="h-5 w-5 text-slate-500" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-              </svg>
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-foreground">Free Plan</p>
-              <p className="text-xs text-muted">Limited features</p>
-            </div>
-          </div>
+      <div className="rounded-xl border border-border bg-white p-4 shadow-sm flex items-center justify-between">
+        <div className="flex items-center gap-3">
           <PlanBadge plan="free" />
+          <p className="text-sm text-muted">Free Plan</p>
         </div>
-        <div className="mt-4 rounded-lg bg-gradient-to-r from-primary/5 to-blue-50 border border-primary/10 p-4">
-          <p className="text-sm font-semibold text-foreground">Unlock custom colors, unlimited signatures, and more</p>
-          <p className="mt-1 text-xs text-muted">Analytics, Calendly buttons, CTA banners, Pro templates</p>
-          <div className="mt-3 flex gap-2">
-            <button
-              onClick={() => onUpgrade("monthly")}
-              className="rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-white hover:bg-primary-dark transition-colors shadow-sm"
-            >
-              $5/month
-            </button>
-            <button
-              onClick={() => onUpgrade("yearly")}
-              className="rounded-lg border border-primary/30 bg-white px-4 py-2 text-xs font-semibold text-primary hover:bg-blue-50 transition-colors"
-            >
-              $39/year <span className="text-emerald-600 font-bold">Save 35%</span>
-            </button>
-          </div>
-        </div>
+        <button
+          onClick={() => onUpgrade("monthly")}
+          className="rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-white hover:bg-primary-dark transition-colors"
+        >
+          Upgrade to Pro
+        </button>
       </div>
     );
   }
@@ -574,27 +552,14 @@ function SignaturesTab({
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
           </svg>
           <span className="text-sm font-medium">
-            {canCreate ? "Create new signature" : "Upgrade to Pro for more"}
+            {canCreate ? "Create new signature" : "Create another"}
           </span>
           {!canCreate && (
-            <span className="text-xs text-slate-400">Free plan: 1 signature</span>
+            <span className="text-xs text-slate-400">Requires Pro</span>
           )}
         </button>
       </div>
 
-      {/* Free upgrade CTA */}
-      {!isPro && (
-        <div className="rounded-xl bg-gradient-to-r from-primary to-blue-700 p-5 text-white">
-          <p className="font-semibold">Unlock custom colors, unlimited signatures, and more</p>
-          <p className="mt-1 text-sm text-blue-100">Analytics, Calendly buttons, CTA banners, and Pro templates.</p>
-          <button
-            onClick={onUpgrade}
-            className="mt-3 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-primary hover:bg-gray-100 transition-colors"
-          >
-            Upgrade to Pro — $5/month
-          </button>
-        </div>
-      )}
     </div>
   );
 }
@@ -1102,31 +1067,6 @@ function DashboardContent() {
         <PlanCard plan={plan} expiresAt={planExpiresAt} onUpgrade={handleUpgrade} />
       </div>
 
-      {/* Free user: signature expiry warning */}
-      {plan === "free" && signatures.length > 0 && (
-        <div className="mb-6 rounded-xl bg-amber-50 border border-amber-200 p-4 flex items-start gap-3">
-          <svg className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-          </svg>
-          <div>
-            <p className="text-sm font-medium text-amber-800">Your free signature expires in 90 days</p>
-            <p className="text-xs text-amber-700 mt-0.5">
-              <Link href="/pricing" className="underline font-medium">Upgrade to Pro</Link> for permanent, never-expiring signatures.
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* Free user: basic stats */}
-      {plan === "free" && signatures.length > 0 && (
-        <div className="mb-6 rounded-xl border border-border bg-white p-4 shadow-sm">
-          <p className="text-xs text-muted">Your signature was viewed</p>
-          <p className="mt-1 text-2xl font-bold text-foreground">— <span className="text-sm font-normal text-muted">times this week</span></p>
-          <p className="mt-1 text-xs text-muted">
-            <Link href="/pricing" className="text-primary underline">Upgrade to Pro</Link> to see full analytics.
-          </p>
-        </div>
-      )}
 
       {/* Layout: sidebar + content */}
       <div className="flex gap-6 flex-col lg:flex-row">
@@ -1362,7 +1302,7 @@ function DashboardContent() {
                   })}
                 </div>
                 {!isPro && (
-                  <p className="mt-2 text-xs text-muted">Free plan: 2 templates. <a href="https://neatstamp.com/pricing" className="text-primary underline">Upgrade for all 8+</a></p>
+                  <p className="mt-2 text-xs text-muted">2 of 8 templates available</p>
                 )}
               </div>
 
