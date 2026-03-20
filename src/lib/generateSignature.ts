@@ -113,21 +113,20 @@ function trackingPixel(signatureId: string): string {
 function generateMinimal(data: SignatureData, options?: GenerateOptions): string {
   const c = data.primaryColor;
   const isPro = options?.plan === "pro" || options?.plan === "team";
-  return `<table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#333333;">
+  const contact = [
+    data.email ? `<a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;">${escapeHtml(data.email)}</a>` : "",
+    data.phone ? `<a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:#555;text-decoration:none;">${escapeHtml(data.phone)}</a>` : "",
+    data.website ? `<a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${c};text-decoration:none;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a>` : "",
+  ].filter(Boolean).join(`<span style="color:#ccc;padding:0 6px;">·</span>`);
+  return `<table cellpadding="0" cellspacing="0" border="0" width="500" style="max-width:500px;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#333;">
   <tr>
-    ${photoCell(data, 72, "50%", options)}
-    <td style="vertical-align:top;">
+    ${photoCell(data, 70, "50%", options)}
+    <td style="vertical-align:middle;">
       <table cellpadding="0" cellspacing="0" border="0">
-        <tr><td style="font-size:16px;font-weight:bold;color:#1a1a1a;">${escapeHtml(data.fullName)}${data.pronouns ? ` <span style="font-size:12px;font-weight:normal;color:#888;">(${escapeHtml(data.pronouns)})</span>` : ""}</td></tr>
-        ${data.jobTitle ? `<tr><td style="font-size:13px;color:#555555;padding-top:2px;">${escapeHtml(data.jobTitle)}${data.company ? ` at ${escapeHtml(data.company)}` : ""}</td></tr>` : ""}
-        <tr><td style="padding-top:8px;border-top:2px solid ${c};margin-top:8px;">
-          <table cellpadding="0" cellspacing="0" border="0" style="font-size:12px;color:#555555;">
-            ${data.email ? `<tr><td style="padding-top:4px;"><a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;">${escapeHtml(data.email)}</a></td></tr>` : ""}
-            ${data.phone ? `<tr><td style="padding-top:2px;"><a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:${c};text-decoration:none;">${escapeHtml(data.phone)}</a></td></tr>` : ""}
-            ${data.website ? `<tr><td style="padding-top:2px;"><a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${c};text-decoration:none;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a></td></tr>` : ""}
-            ${data.address ? `<tr><td style="padding-top:2px;color:#888;">${escapeHtml(data.address)}</td></tr>` : ""}
-          </table>
-        </td></tr>
+        <tr><td style="font-size:17px;font-weight:bold;color:#1a1a1a;padding-bottom:1px;">${escapeHtml(data.fullName)}${data.pronouns ? ` <span style="font-size:11px;font-weight:normal;color:#999;">(${escapeHtml(data.pronouns)})</span>` : ""}</td></tr>
+        ${(data.jobTitle || data.company) ? `<tr><td style="font-size:12px;color:#666;padding-bottom:6px;">${data.jobTitle ? escapeHtml(data.jobTitle) : ""}${data.jobTitle && data.company ? " &mdash; " : ""}${data.company ? `<span style="color:#999;">${escapeHtml(data.company)}</span>` : ""}</td></tr>` : ""}
+        <tr><td style="border-top:1px solid #e5e7eb;padding-top:7px;font-size:12px;color:#555;">${contact}</td></tr>
+        ${data.address ? `<tr><td style="font-size:11px;color:#aaa;padding-top:3px;">${escapeHtml(data.address)}</td></tr>` : ""}
         ${socialLinks(data)}
         ${calendlyButton(data, c)}
         ${ctaBanner(data)}
@@ -143,25 +142,21 @@ function generateModern(data: SignatureData, options?: GenerateOptions): string 
   const c = data.primaryColor;
   const a = data.accentColor;
   const isPro = options?.plan === "pro" || options?.plan === "team";
-  return `<table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#333333;">
+  const contact = [
+    data.email ? `<a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;">${escapeHtml(data.email)}</a>` : "",
+    data.phone ? `<a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:#555;text-decoration:none;">${escapeHtml(data.phone)}</a>` : "",
+    data.website ? `<a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${c};text-decoration:none;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a>` : "",
+  ].filter(Boolean).join(`<span style="color:#d1d5db;padding:0 8px;">|</span>`);
+  return `<table cellpadding="0" cellspacing="0" border="0" width="500" style="max-width:500px;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#333;">
   <tr>
-    ${photoCell(data, 80, "8px", options)}
-    <td style="vertical-align:top;border-left:3px solid ${c};padding-left:14px;">
+    ${photoCell(data, 75, "8px", options)}
+    <td style="vertical-align:top;border-left:4px solid ${c};padding-left:16px;">
       <table cellpadding="0" cellspacing="0" border="0">
-        <tr><td style="font-size:18px;font-weight:bold;color:${c};">${escapeHtml(data.fullName)}</td></tr>
-        ${data.jobTitle ? `<tr><td style="font-size:13px;color:${a};font-weight:bold;padding-top:2px;text-transform:uppercase;letter-spacing:0.5px;">${escapeHtml(data.jobTitle)}</td></tr>` : ""}
-        ${data.company ? `<tr><td style="font-size:13px;color:#555;padding-top:1px;">${escapeHtml(data.company)}</td></tr>` : ""}
-        ${data.pronouns ? `<tr><td style="font-size:11px;color:#888;padding-top:1px;">${escapeHtml(data.pronouns)}</td></tr>` : ""}
-        <tr><td style="padding-top:8px;">
-          <table cellpadding="0" cellspacing="0" border="0" style="font-size:12px;">
-            <tr>
-              ${data.email ? `<td style="padding-right:16px;"><a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;">${escapeHtml(data.email)}</a></td>` : ""}
-              ${data.phone ? `<td style="padding-right:16px;"><a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:#555;text-decoration:none;">${escapeHtml(data.phone)}</a></td>` : ""}
-            </tr>
-          </table>
-        </td></tr>
-        ${data.website ? `<tr><td style="padding-top:2px;font-size:12px;"><a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${c};text-decoration:none;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a></td></tr>` : ""}
-        ${data.address ? `<tr><td style="padding-top:2px;font-size:11px;color:#888;">${escapeHtml(data.address)}</td></tr>` : ""}
+        <tr><td style="font-size:18px;font-weight:bold;color:${c};padding-bottom:1px;">${escapeHtml(data.fullName)}</td></tr>
+        ${(data.jobTitle || data.company) ? `<tr><td style="font-size:12px;padding-bottom:7px;">${data.jobTitle ? `<span style="color:${a};font-weight:700;text-transform:uppercase;letter-spacing:0.8px;">${escapeHtml(data.jobTitle)}</span>` : ""}${data.jobTitle && data.company ? `<span style="color:#d1d5db;"> &nbsp;|&nbsp; </span>` : ""}${data.company ? `<span style="color:#666;">${escapeHtml(data.company)}</span>` : ""}</td></tr>` : ""}
+        ${data.pronouns ? `<tr><td style="font-size:11px;color:#999;padding-bottom:5px;">${escapeHtml(data.pronouns)}</td></tr>` : ""}
+        <tr><td style="font-size:12px;color:#555;padding-bottom:4px;">${contact}</td></tr>
+        ${data.address ? `<tr><td style="font-size:11px;color:#aaa;padding-bottom:2px;">${escapeHtml(data.address)}</td></tr>` : ""}
         ${socialLinks(data)}
         ${calendlyButton(data, c)}
         ${ctaBanner(data)}
@@ -176,21 +171,20 @@ function generateModern(data: SignatureData, options?: GenerateOptions): string 
 function generateCorporate(data: SignatureData, options?: GenerateOptions): string {
   const c = data.primaryColor;
   const isPro = options?.plan === "pro" || options?.plan === "team";
-  return `<table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#333333;border-top:3px solid ${c};padding-top:12px;">
+  return `<table cellpadding="0" cellspacing="0" border="0" width="500" style="max-width:500px;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#333;border-top:3px solid ${c};">
+  <tr><td colspan="2" style="height:10px;"></td></tr>
   <tr>
-    ${photoCell(data, 70, "4px", options)}
-    <td style="vertical-align:top;">
+    ${photoCell(data, 65, "4px", options)}
+    <td style="vertical-align:top;padding-left:${data.photoUrl ? "0" : "0"};">
       <table cellpadding="0" cellspacing="0" border="0">
-        <tr><td style="font-size:17px;font-weight:bold;color:#1a1a1a;">${escapeHtml(data.fullName)}</td></tr>
-        ${data.pronouns ? `<tr><td style="font-size:11px;color:#888;">${escapeHtml(data.pronouns)}</td></tr>` : ""}
-        ${data.jobTitle ? `<tr><td style="font-size:13px;color:${c};padding-top:2px;font-weight:600;">${escapeHtml(data.jobTitle)}</td></tr>` : ""}
-        ${data.company ? `<tr><td style="font-size:13px;color:#555;font-weight:bold;padding-top:1px;">${escapeHtml(data.company)}</td></tr>` : ""}
-        <tr><td style="padding-top:8px;">
-          <table cellpadding="0" cellspacing="0" border="0" style="font-size:12px;color:#555;">
-            ${data.phone ? `<tr><td style="padding-bottom:2px;"><strong style="color:#888;">T</strong>&nbsp;&nbsp;<a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:#555;text-decoration:none;">${escapeHtml(data.phone)}</a></td></tr>` : ""}
-            ${data.email ? `<tr><td style="padding-bottom:2px;"><strong style="color:#888;">E</strong>&nbsp;&nbsp;<a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;">${escapeHtml(data.email)}</a></td></tr>` : ""}
-            ${data.website ? `<tr><td style="padding-bottom:2px;"><strong style="color:#888;">W</strong>&nbsp;&nbsp;<a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${c};text-decoration:none;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a></td></tr>` : ""}
-            ${data.address ? `<tr><td style="padding-bottom:2px;"><strong style="color:#888;">A</strong>&nbsp;&nbsp;${escapeHtml(data.address)}</td></tr>` : ""}
+        <tr><td style="font-size:17px;font-weight:bold;color:#1a1a1a;padding-bottom:1px;">${escapeHtml(data.fullName)}${data.pronouns ? ` <span style="font-size:11px;font-weight:normal;color:#999;">(${escapeHtml(data.pronouns)})</span>` : ""}</td></tr>
+        ${(data.jobTitle || data.company) ? `<tr><td style="font-size:12px;padding-bottom:7px;">${data.jobTitle ? `<span style="color:${c};font-weight:600;">${escapeHtml(data.jobTitle)}</span>` : ""}${data.jobTitle && data.company ? `<span style="color:#ccc;"> &nbsp;&bull;&nbsp; </span>` : ""}${data.company ? `<span style="color:#444;font-weight:600;">${escapeHtml(data.company)}</span>` : ""}</td></tr>` : ""}
+        <tr><td style="font-size:12px;color:#555;">
+          <table cellpadding="0" cellspacing="0" border="0">
+            ${data.phone ? `<tr><td style="padding-bottom:2px;white-space:nowrap;"><span style="color:#999;font-weight:bold;font-size:10px;letter-spacing:0.5px;">T&nbsp;</span><a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:#444;text-decoration:none;">${escapeHtml(data.phone)}</a></td></tr>` : ""}
+            ${data.email ? `<tr><td style="padding-bottom:2px;white-space:nowrap;"><span style="color:#999;font-weight:bold;font-size:10px;letter-spacing:0.5px;">E&nbsp;</span><a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;">${escapeHtml(data.email)}</a></td></tr>` : ""}
+            ${data.website ? `<tr><td style="padding-bottom:2px;white-space:nowrap;"><span style="color:#999;font-weight:bold;font-size:10px;letter-spacing:0.5px;">W&nbsp;</span><a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${c};text-decoration:none;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a></td></tr>` : ""}
+            ${data.address ? `<tr><td style="padding-bottom:2px;color:#888;"><span style="color:#999;font-weight:bold;font-size:10px;letter-spacing:0.5px;">A&nbsp;</span>${escapeHtml(data.address)}</td></tr>` : ""}
           </table>
         </td></tr>
         ${socialLinks(data)}
@@ -208,35 +202,31 @@ function generateCreative(data: SignatureData, options?: GenerateOptions): strin
   const c = data.primaryColor;
   const a = data.accentColor;
   const isPro = options?.plan === "pro" || options?.plan === "team";
-
   let photoPart = "";
   if (data.photoUrl) {
     let src = escapeHtml(data.photoUrl);
     if (!isPro && options?.signatureId && !data.photoUrl.startsWith("https://neatstamp.com")) {
       src = `https://neatstamp.com/api/images/${escapeHtml(options.signatureId)}/photo`;
     }
-    photoPart = `<img src="${src}" alt="${escapeHtml(data.fullName)}" width="90" height="90" style="width:90px;height:90px;border-radius:50%;object-fit:cover;display:block;border:3px solid ${c};" />`;
+    photoPart = `<td style="vertical-align:top;padding-right:18px;text-align:center;">
+      <img src="${src}" alt="${escapeHtml(data.fullName)}" width="90" height="90" style="width:90px;height:90px;border-radius:50%;object-fit:cover;display:block;border:3px solid ${c};" />
+      ${data.company ? `<p style="margin:5px 0 0;font-size:10px;font-weight:bold;color:${a};text-transform:uppercase;letter-spacing:1px;font-family:Arial,sans-serif;width:90px;text-align:center;">${escapeHtml(data.company)}</p>` : ""}
+    </td>`;
   }
-
-  return `<table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#333;">
+  return `<table cellpadding="0" cellspacing="0" border="0" width="500" style="max-width:500px;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#333;">
   <tr>
-    <td style="vertical-align:top;text-align:center;padding-right:16px;">
-      ${photoPart}
-      ${data.company ? `<div style="margin-top:6px;font-size:11px;font-weight:bold;color:${a};text-transform:uppercase;letter-spacing:1px;">${escapeHtml(data.company)}</div>` : ""}
-    </td>
-    <td style="vertical-align:top;border-left:2px dashed ${a};padding-left:16px;">
+    ${photoPart}
+    <td style="vertical-align:top;border-left:2px dashed ${a};padding-left:18px;">
       <table cellpadding="0" cellspacing="0" border="0">
-        <tr><td style="font-size:20px;font-weight:bold;color:${c};">${escapeHtml(data.fullName)}</td></tr>
-        ${data.jobTitle ? `<tr><td style="font-size:14px;color:#555;padding-top:2px;">${escapeHtml(data.jobTitle)}</td></tr>` : ""}
-        ${data.pronouns ? `<tr><td style="font-size:11px;color:#888;padding-top:1px;">${escapeHtml(data.pronouns)}</td></tr>` : ""}
-        <tr><td style="padding-top:10px;">
-          <table cellpadding="0" cellspacing="0" border="0" style="font-size:12px;">
-            ${data.email ? `<tr><td style="padding-bottom:3px;"><a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;">&#9993; ${escapeHtml(data.email)}</a></td></tr>` : ""}
-            ${data.phone ? `<tr><td style="padding-bottom:3px;"><a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:#555;text-decoration:none;">&#9742; ${escapeHtml(data.phone)}</a></td></tr>` : ""}
-            ${data.website ? `<tr><td style="padding-bottom:3px;"><a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${c};text-decoration:none;">&#127760; ${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a></td></tr>` : ""}
-            ${data.address ? `<tr><td style="padding-bottom:3px;color:#888;">&#128205; ${escapeHtml(data.address)}</td></tr>` : ""}
-          </table>
+        <tr><td style="font-size:20px;font-weight:bold;color:${c};padding-bottom:2px;">${escapeHtml(data.fullName)}${data.pronouns ? ` <span style="font-size:11px;font-weight:normal;color:#aaa;">(${escapeHtml(data.pronouns)})</span>` : ""}</td></tr>
+        ${data.jobTitle ? `<tr><td style="font-size:13px;color:#555;padding-bottom:8px;">${escapeHtml(data.jobTitle)}</td></tr>` : ""}
+        <tr><td style="font-size:12px;">
+          ${data.email ? `<a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;">&#9993;&nbsp;${escapeHtml(data.email)}</a>` : ""}
+          ${data.email && data.phone ? `&nbsp;&nbsp;` : ""}
+          ${data.phone ? `<a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:#555;text-decoration:none;">&#9742;&nbsp;${escapeHtml(data.phone)}</a>` : ""}
         </td></tr>
+        ${data.website ? `<tr><td style="font-size:12px;padding-top:2px;"><a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${c};text-decoration:none;">&#127760;&nbsp;${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a></td></tr>` : ""}
+        ${data.address ? `<tr><td style="font-size:11px;color:#aaa;padding-top:3px;">&#128205;&nbsp;${escapeHtml(data.address)}</td></tr>` : ""}
         ${socialLinks(data)}
         ${calendlyButton(data, a)}
         ${ctaBanner(data)}
@@ -251,41 +241,39 @@ function generateCreative(data: SignatureData, options?: GenerateOptions): strin
 function generateBold(data: SignatureData, options?: GenerateOptions): string {
   const c = data.primaryColor;
   const isPro = options?.plan === "pro" || options?.plan === "team";
-
-  let photoPartBold = "";
+  let photoPart = "";
   if (data.photoUrl) {
     let src = escapeHtml(data.photoUrl);
     if (!isPro && options?.signatureId && !data.photoUrl.startsWith("https://neatstamp.com")) {
       src = `https://neatstamp.com/api/images/${escapeHtml(options.signatureId)}/photo`;
     }
-    photoPartBold = `<td style="vertical-align:top;padding-right:16px;"><img src="${src}" alt="${escapeHtml(data.fullName)}" width="80" height="80" style="width:80px;height:80px;border-radius:8px;object-fit:cover;display:block;border:2px solid rgba(255,255,255,0.3);" /></td>`;
+    photoPart = `<td style="vertical-align:middle;padding-right:16px;"><img src="${src}" alt="${escapeHtml(data.fullName)}" width="75" height="75" style="width:75px;height:75px;border-radius:8px;object-fit:cover;display:block;border:2px solid rgba(255,255,255,0.4);" /></td>`;
   }
-
-  return `<table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#333;background-color:${c};border-radius:8px;padding:16px;">
-  <tr><td style="padding:16px;">
+  const contactInline = [
+    data.email ? `<a href="mailto:${escapeHtml(data.email)}" style="color:#fff;text-decoration:none;opacity:0.9;">${escapeHtml(data.email)}</a>` : "",
+    data.phone ? `<a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:#fff;text-decoration:none;opacity:0.85;">${escapeHtml(data.phone)}</a>` : "",
+    data.website ? `<a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:#fff;text-decoration:none;opacity:0.9;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a>` : "",
+  ].filter(Boolean).join(`<span style="opacity:0.4;padding:0 8px;">|</span>`);
+  return `<table cellpadding="0" cellspacing="0" border="0" width="500" style="max-width:500px;font-family:Arial,Helvetica,sans-serif;background-color:${c};border-radius:8px;">
+  <tr><td style="padding:18px 20px;">
     <table cellpadding="0" cellspacing="0" border="0" width="100%">
       <tr>
-        ${photoPartBold}
-        <td style="vertical-align:top;">
+        ${photoPart}
+        <td style="vertical-align:middle;">
           <table cellpadding="0" cellspacing="0" border="0">
-            <tr><td style="font-size:20px;font-weight:bold;color:#ffffff;">${escapeHtml(data.fullName)}</td></tr>
-            ${data.jobTitle ? `<tr><td style="font-size:13px;color:rgba(255,255,255,0.85);padding-top:2px;">${escapeHtml(data.jobTitle)}${data.company ? ` | ${escapeHtml(data.company)}` : ""}</td></tr>` : ""}
-            ${data.pronouns ? `<tr><td style="font-size:11px;color:rgba(255,255,255,0.6);padding-top:1px;">${escapeHtml(data.pronouns)}</td></tr>` : ""}
-            <tr><td style="padding-top:10px;">
-              <table cellpadding="0" cellspacing="0" border="0" style="font-size:12px;">
-                ${data.email ? `<tr><td style="padding-bottom:3px;"><a href="mailto:${escapeHtml(data.email)}" style="color:#ffffff;text-decoration:none;">${escapeHtml(data.email)}</a></td></tr>` : ""}
-                ${data.phone ? `<tr><td style="padding-bottom:3px;"><a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:rgba(255,255,255,0.85);text-decoration:none;">${escapeHtml(data.phone)}</a></td></tr>` : ""}
-                ${data.website ? `<tr><td style="padding-bottom:3px;"><a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:#ffffff;text-decoration:none;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a></td></tr>` : ""}
-              </table>
-            </td></tr>
+            <tr><td style="font-size:20px;font-weight:bold;color:#fff;padding-bottom:1px;">${escapeHtml(data.fullName)}${data.pronouns ? ` <span style="font-size:11px;font-weight:normal;opacity:0.6;">(${escapeHtml(data.pronouns)})</span>` : ""}</td></tr>
+            ${(data.jobTitle || data.company) ? `<tr><td style="font-size:12px;color:rgba(255,255,255,0.8);padding-bottom:8px;">${data.jobTitle ? escapeHtml(data.jobTitle) : ""}${data.jobTitle && data.company ? " &nbsp;|&nbsp; " : ""}${data.company ? escapeHtml(data.company) : ""}</td></tr>` : ""}
+            <tr><td style="font-size:12px;padding-bottom:4px;">${contactInline}</td></tr>
+            ${data.address ? `<tr><td style="font-size:11px;color:rgba(255,255,255,0.6);padding-bottom:4px;">${escapeHtml(data.address)}</td></tr>` : ""}
             ${socialLinks(data)}
-            ${data.calendlyUrl ? `<tr><td style="padding-top:10px;"><a href="${escapeHtml(data.calendlyUrl.startsWith("http") ? data.calendlyUrl : `https://${data.calendlyUrl}`)}" target="_blank" rel="noopener noreferrer" style="display:inline-block;padding:6px 16px;background-color:#ffffff;color:${c};text-decoration:none;font-size:12px;font-family:Arial,sans-serif;border-radius:4px;font-weight:bold;">Book a Meeting</a></td></tr>` : ""}
+            ${data.calendlyUrl ? `<tr><td style="padding-top:10px;"><a href="${escapeHtml(data.calendlyUrl.startsWith("http") ? data.calendlyUrl : `https://${data.calendlyUrl}`)}" target="_blank" rel="noopener noreferrer" style="display:inline-block;padding:7px 18px;background:#fff;color:${c};text-decoration:none;font-size:12px;font-family:Arial,sans-serif;border-radius:4px;font-weight:bold;">Book a Meeting</a></td></tr>` : ""}
           </table>
         </td>
       </tr>
     </table>
     <table cellpadding="0" cellspacing="0" border="0">
-      ${!isPro ? `<tr><td style="padding-top:6px;"><a href="https://neatstamp.com?ref=sig" target="_blank" rel="noopener noreferrer" style="color:rgba(255,255,255,0.4);font-size:10px;font-family:Arial,sans-serif;text-decoration:none;">Made with NeatStamp</a></td></tr>` : ""}
+      ${ctaBanner(data)}
+      ${!isPro ? `<tr><td style="padding-top:8px;"><a href="https://neatstamp.com?ref=sig" target="_blank" rel="noopener noreferrer" style="color:rgba(255,255,255,0.35);font-size:10px;font-family:Arial,sans-serif;text-decoration:none;">Made with NeatStamp</a></td></tr>` : ""}
       ${!isPro && options?.signatureId ? trackingPixel(options.signatureId) : ""}
     </table>
   </td></tr>
@@ -295,24 +283,30 @@ function generateBold(data: SignatureData, options?: GenerateOptions): string {
 function generateElegant(data: SignatureData, options?: GenerateOptions): string {
   const c = data.primaryColor;
   const isPro = options?.plan === "pro" || options?.plan === "team";
-  return `<table cellpadding="0" cellspacing="0" border="0" style="font-family:Georgia,'Times New Roman',serif;font-size:14px;color:#333;">
+  const contact = [
+    data.email ? `<a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;font-family:Arial,sans-serif;">${escapeHtml(data.email)}</a>` : "",
+    data.phone ? `<a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:#666;text-decoration:none;font-family:Arial,sans-serif;">${escapeHtml(data.phone)}</a>` : "",
+    data.website ? `<a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${c};text-decoration:none;font-family:Arial,sans-serif;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a>` : "",
+  ].filter(Boolean).join(`<span style="color:#ccc;padding:0 6px;">&mdash;</span>`);
+  return `<table cellpadding="0" cellspacing="0" border="0" width="500" style="max-width:500px;font-family:Georgia,'Times New Roman',serif;font-size:14px;color:#333;">
   <tr>
-    ${photoCell(data, 75, "50%", options)}
-    <td style="vertical-align:top;">
+    ${photoCell(data, 70, "50%", options)}
+    <td style="vertical-align:middle;">
       <table cellpadding="0" cellspacing="0" border="0">
-        <tr><td style="font-size:18px;font-weight:bold;color:#1a1a1a;font-family:Georgia,'Times New Roman',serif;letter-spacing:0.5px;">${escapeHtml(data.fullName)}</td></tr>
-        ${data.pronouns ? `<tr><td style="font-size:11px;color:#888;font-style:italic;">${escapeHtml(data.pronouns)}</td></tr>` : ""}
-        ${data.jobTitle ? `<tr><td style="font-size:12px;color:${c};padding-top:2px;font-style:italic;">${escapeHtml(data.jobTitle)}</td></tr>` : ""}
-        ${data.company ? `<tr><td style="font-size:12px;color:#555;letter-spacing:1px;text-transform:uppercase;padding-top:2px;">${escapeHtml(data.company)}</td></tr>` : ""}
-        <tr><td style="padding-top:8px;"><table cellpadding="0" cellspacing="0" border="0"><tr><td style="width:40px;height:1px;background:${c};"></td><td style="width:8px;"></td><td style="width:8px;height:1px;background:${c};"></td></tr></table></td></tr>
-        <tr><td style="padding-top:8px;">
-          <table cellpadding="0" cellspacing="0" border="0" style="font-size:12px;font-family:Arial,sans-serif;color:#555;">
-            ${data.email ? `<tr><td style="padding-bottom:2px;"><a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;">${escapeHtml(data.email)}</a></td></tr>` : ""}
-            ${data.phone ? `<tr><td style="padding-bottom:2px;"><a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:#555;text-decoration:none;">${escapeHtml(data.phone)}</a></td></tr>` : ""}
-            ${data.website ? `<tr><td style="padding-bottom:2px;"><a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${c};text-decoration:none;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a></td></tr>` : ""}
-            ${data.address ? `<tr><td style="padding-bottom:2px;color:#888;">${escapeHtml(data.address)}</td></tr>` : ""}
-          </table>
+        <tr><td style="font-size:18px;font-weight:bold;color:#1a1a1a;letter-spacing:0.5px;padding-bottom:1px;">${escapeHtml(data.fullName)}${data.pronouns ? ` <span style="font-size:11px;font-weight:normal;font-style:italic;color:#aaa;">(${escapeHtml(data.pronouns)})</span>` : ""}</td></tr>
+        ${data.jobTitle ? `<tr><td style="font-size:12px;color:${c};font-style:italic;padding-bottom:1px;">${escapeHtml(data.jobTitle)}</td></tr>` : ""}
+        ${data.company ? `<tr><td style="font-size:11px;color:#777;letter-spacing:1.5px;text-transform:uppercase;padding-bottom:7px;">${escapeHtml(data.company)}</td></tr>` : ""}
+        <tr><td style="padding-bottom:7px;">
+          <table cellpadding="0" cellspacing="0" border="0"><tr>
+            <td style="width:36px;height:1px;background-color:${c};font-size:0;line-height:0;">&nbsp;</td>
+            <td style="width:8px;font-size:0;line-height:0;">&nbsp;</td>
+            <td style="width:6px;height:1px;background-color:${c};font-size:0;line-height:0;">&nbsp;</td>
+            <td style="width:4px;font-size:0;line-height:0;">&nbsp;</td>
+            <td style="width:4px;height:4px;border-radius:50%;background-color:${c};font-size:0;line-height:0;">&nbsp;</td>
+          </tr></table>
         </td></tr>
+        <tr><td style="font-size:12px;font-family:Arial,sans-serif;color:#666;">${contact}</td></tr>
+        ${data.address ? `<tr><td style="font-size:11px;color:#aaa;font-family:Arial,sans-serif;padding-top:3px;">${escapeHtml(data.address)}</td></tr>` : ""}
         ${socialLinks(data)}
         ${calendlyButton(data, c)}
         ${ctaBanner(data)}
@@ -326,67 +320,54 @@ function generateElegant(data: SignatureData, options?: GenerateOptions): string
 
 function generateStartup(data: SignatureData, options?: GenerateOptions): string {
   const c = data.primaryColor;
-  const a = data.accentColor;
   const isPro = options?.plan === "pro" || options?.plan === "team";
-
-  let startupPhoto = "";
+  let avatarCell = "";
   if (data.photoUrl) {
     let src = escapeHtml(data.photoUrl);
     if (!isPro && options?.signatureId && !data.photoUrl.startsWith("https://neatstamp.com")) {
       src = `https://neatstamp.com/api/images/${escapeHtml(options.signatureId)}/photo`;
     }
-    startupPhoto = `<td style="vertical-align:middle;padding-right:10px;"><img src="${src}" alt="${escapeHtml(data.fullName)}" width="48" height="48" style="width:48px;height:48px;border-radius:50%;object-fit:cover;display:block;" /></td>`;
+    avatarCell = `<td style="vertical-align:middle;padding-right:12px;"><img src="${src}" alt="${escapeHtml(data.fullName)}" width="44" height="44" style="width:44px;height:44px;border-radius:50%;object-fit:cover;display:block;" /></td>`;
   }
-
-  return `<table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#333;">
-  <tr><td style="padding-bottom:8px;">
-    <table cellpadding="0" cellspacing="0" border="0">
-      <tr>
-        ${startupPhoto}
-        <td style="vertical-align:middle;">
-          <span style="font-size:16px;font-weight:bold;color:#1a1a1a;">${escapeHtml(data.fullName)}</span>
-          ${data.pronouns ? `<span style="font-size:11px;color:#888;"> (${escapeHtml(data.pronouns)})</span>` : ""}
-          <br/>
-          <span style="font-size:12px;color:${c};">${escapeHtml(data.jobTitle || "")}${data.jobTitle && data.company ? " @ " : ""}${escapeHtml(data.company || "")}</span>
-        </td>
-      </tr>
-    </table>
-  </td></tr>
-  <tr><td style="border-top:1px solid #eee;padding-top:8px;">
-    <table cellpadding="0" cellspacing="0" border="0" style="font-size:12px;">
-      <tr>
-        ${data.email ? `<td style="padding-right:12px;"><a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;">${escapeHtml(data.email)}</a></td>` : ""}
-        ${data.phone ? `<td style="padding-right:12px;color:#888;">|</td><td style="padding-right:12px;"><a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:#555;text-decoration:none;">${escapeHtml(data.phone)}</a></td>` : ""}
-        ${data.website ? `<td style="padding-right:12px;color:#888;">|</td><td><a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${c};text-decoration:none;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a></td>` : ""}
-      </tr>
-    </table>
-  </td></tr>
-  ${data.address ? `<tr><td style="font-size:11px;color:#888;padding-top:2px;">${escapeHtml(data.address)}</td></tr>` : ""}
+  const contact = [
+    data.email ? `<a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;">${escapeHtml(data.email)}</a>` : "",
+    data.phone ? `<a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:#555;text-decoration:none;">${escapeHtml(data.phone)}</a>` : "",
+    data.website ? `<a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${c};text-decoration:none;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a>` : "",
+  ].filter(Boolean).join(`<span style="color:#d1d5db;padding:0 7px;">·</span>`);
+  return `<table cellpadding="0" cellspacing="0" border="0" width="500" style="max-width:500px;font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#333;">
+  <tr>
+    ${avatarCell}
+    <td style="vertical-align:middle;">
+      <span style="font-size:15px;font-weight:bold;color:#1a1a1a;">${escapeHtml(data.fullName)}</span>${data.pronouns ? ` <span style="font-size:11px;color:#aaa;">(${escapeHtml(data.pronouns)})</span>` : ""}
+      ${(data.jobTitle || data.company) ? `&nbsp;<span style="color:#d1d5db;">|</span>&nbsp;<span style="font-size:12px;color:${c};">${data.jobTitle ? escapeHtml(data.jobTitle) : ""}${data.jobTitle && data.company ? `<span style="color:#aaa;"> @ </span>` : ""}${data.company ? escapeHtml(data.company) : ""}</span>` : ""}
+    </td>
+  </tr>
+  <tr><td colspan="2" style="border-top:1px solid #f0f0f0;padding-top:7px;font-size:12px;color:#555;">${contact}</td></tr>
+  ${data.address ? `<tr><td colspan="2" style="font-size:11px;color:#aaa;padding-top:3px;">${escapeHtml(data.address)}</td></tr>` : ""}
   ${socialLinks(data)}
-  ${data.calendlyUrl ? `<tr><td style="padding-top:8px;"><a href="${escapeHtml(data.calendlyUrl.startsWith("http") ? data.calendlyUrl : `https://${data.calendlyUrl}`)}" target="_blank" rel="noopener noreferrer" style="display:inline-block;padding:5px 14px;background:linear-gradient(135deg,${c},${a});color:#fff;text-decoration:none;font-size:11px;font-family:Arial,sans-serif;border-radius:20px;font-weight:bold;">&#128197; Book a Meeting</a></td></tr>` : ""}
+  ${data.calendlyUrl ? `<tr><td colspan="2" style="padding-top:8px;"><a href="${escapeHtml(data.calendlyUrl.startsWith("http") ? data.calendlyUrl : `https://${data.calendlyUrl}`)}" target="_blank" rel="noopener noreferrer" style="display:inline-block;padding:5px 14px;background-color:${c};color:#fff;text-decoration:none;font-size:11px;font-family:Arial,sans-serif;border-radius:12px;font-weight:bold;">Book a Meeting</a></td></tr>` : ""}
   ${ctaBanner(data)}
   ${!isPro ? neatstampBranding() : ""}
-  ${!isPro && options?.signatureId ? `<tr>${trackingPixel(options.signatureId).replace(/^<tr>/, "").replace(/<\/tr>$/, "")}</tr>` : ""}
+  ${!isPro && options?.signatureId ? trackingPixel(options.signatureId) : ""}
 </table>`;
 }
 
 function generateCompact(data: SignatureData, options?: GenerateOptions): string {
   const c = data.primaryColor;
   const isPro = options?.plan === "pro" || options?.plan === "team";
-  return `<table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#333;">
-  <tr><td>
-    <strong style="color:#1a1a1a;">${escapeHtml(data.fullName)}</strong>${data.pronouns ? ` <span style="font-size:11px;color:#888;">(${escapeHtml(data.pronouns)})</span>` : ""}${data.jobTitle ? ` | <span style="color:${c};">${escapeHtml(data.jobTitle)}</span>` : ""}${data.company ? ` | ${escapeHtml(data.company)}` : ""}
+  const contact = [
+    data.email ? `<a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;">${escapeHtml(data.email)}</a>` : "",
+    data.phone ? `<a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:#555;text-decoration:none;">${escapeHtml(data.phone)}</a>` : "",
+    data.website ? `<a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${c};text-decoration:none;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a>` : "",
+  ].filter(Boolean).join(`<span style="color:#d1d5db;padding:0 5px;">&middot;</span>`);
+  return `<table cellpadding="0" cellspacing="0" border="0" width="500" style="max-width:500px;font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#333;">
+  <tr><td style="white-space:nowrap;">
+    <strong style="color:#1a1a1a;">${escapeHtml(data.fullName)}</strong>${data.pronouns ? ` <span style="font-size:11px;color:#aaa;">(${escapeHtml(data.pronouns)})</span>` : ""}${data.jobTitle ? ` <span style="color:#ccc;">|</span> <span style="color:${c};">${escapeHtml(data.jobTitle)}</span>` : ""}${data.company ? ` <span style="color:#ccc;">|</span> <span style="color:#555;">${escapeHtml(data.company)}</span>` : ""}
   </td></tr>
-  <tr><td style="font-size:12px;padding-top:3px;color:#555;">
-    ${[
-      data.email ? `<a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;">${escapeHtml(data.email)}</a>` : "",
-      data.phone ? `<a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:#555;text-decoration:none;">${escapeHtml(data.phone)}</a>` : "",
-      data.website ? `<a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${c};text-decoration:none;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a>` : "",
-    ].filter(Boolean).join(" &middot; ")}
-  </td></tr>
-  ${data.address ? `<tr><td style="font-size:11px;color:#888;padding-top:2px;">${escapeHtml(data.address)}</td></tr>` : ""}
-  ${socialLinks(data)}
+  <tr><td style="font-size:12px;padding-top:3px;color:#555;">${contact}</td></tr>
+  ${data.address ? `<tr><td style="font-size:11px;color:#aaa;padding-top:2px;">${escapeHtml(data.address)}</td></tr>` : ""}
   ${calendlyButton(data, c)}
+  ${ctaBanner(data)}
   ${!isPro ? neatstampBranding() : ""}
   ${!isPro && options?.signatureId ? trackingPixel(options.signatureId) : ""}
 </table>`;
@@ -396,38 +377,41 @@ function generateExecutive(data: SignatureData, options?: GenerateOptions): stri
   const c = data.primaryColor;
   const a = data.accentColor;
   const isPro = options?.plan === "pro" || options?.plan === "team";
-  return `<table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#333;">
+  const contact = [
+    data.email ? `<a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;">${escapeHtml(data.email)}</a>` : "",
+    data.phone ? `<a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:#444;text-decoration:none;">${escapeHtml(data.phone)}</a>` : "",
+    data.website ? `<a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${c};text-decoration:none;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a>` : "",
+  ].filter(Boolean).join(`<span style="color:#d1d5db;padding:0 8px;">|</span>`);
+  return `<table cellpadding="0" cellspacing="0" border="0" width="500" style="max-width:500px;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#333;">
   <tr>
-    <td style="background-color:#1e293b;padding:14px 18px;vertical-align:middle;">
+    <td style="background-color:#1e293b;padding:16px 20px;border-radius:4px 4px 0 0;">
       <table cellpadding="0" cellspacing="0" border="0">
         <tr>
-          ${photoCell(data, 85, "8px", options)}
-          <td style="vertical-align:middle;padding-left:4px;">
+          ${photoCell(data, 80, "6px", options)}
+          <td style="vertical-align:middle;">
             <table cellpadding="0" cellspacing="0" border="0">
-              <tr><td style="font-size:20px;font-weight:bold;color:#ffffff;white-space:nowrap;">${escapeHtml(data.fullName)}${data.pronouns ? ` <span style="font-size:11px;font-weight:normal;color:rgba(255,255,255,0.5);">(${escapeHtml(data.pronouns)})</span>` : ""}</td></tr>
-              ${data.jobTitle ? `<tr><td style="font-size:13px;color:${a};font-weight:bold;padding-top:3px;letter-spacing:0.3px;">${escapeHtml(data.jobTitle)}</td></tr>` : ""}
-              ${data.company ? `<tr><td style="font-size:12px;color:rgba(255,255,255,0.6);padding-top:2px;letter-spacing:0.5px;text-transform:uppercase;">${escapeHtml(data.company)}</td></tr>` : ""}
+              <tr><td style="font-size:20px;font-weight:bold;color:#fff;padding-bottom:2px;">${escapeHtml(data.fullName)}${data.pronouns ? ` <span style="font-size:11px;font-weight:normal;color:rgba(255,255,255,0.45);">(${escapeHtml(data.pronouns)})</span>` : ""}</td></tr>
+              ${data.jobTitle ? `<tr><td style="font-size:13px;color:${a};font-weight:700;letter-spacing:0.3px;padding-bottom:1px;">${escapeHtml(data.jobTitle)}</td></tr>` : ""}
+              ${data.company ? `<tr><td style="font-size:11px;color:rgba(255,255,255,0.55);letter-spacing:1px;text-transform:uppercase;">${escapeHtml(data.company)}</td></tr>` : ""}
             </table>
           </td>
         </tr>
       </table>
     </td>
   </tr>
-  <tr><td style="padding:12px 18px;border-left:3px solid ${c};">
-    <table cellpadding="0" cellspacing="0" border="0" style="font-size:12px;color:#555;">
-      ${data.email ? `<tr><td style="padding-bottom:3px;border-bottom:1px solid #f0f0f0;padding-top:3px;"><a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;">${escapeHtml(data.email)}</a></td></tr>` : ""}
-      ${data.phone ? `<tr><td style="padding-bottom:3px;border-bottom:1px solid #f0f0f0;padding-top:3px;"><a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:#555;text-decoration:none;">${escapeHtml(data.phone)}</a></td></tr>` : ""}
-      ${data.website ? `<tr><td style="padding-bottom:3px;border-bottom:1px solid #f0f0f0;padding-top:3px;"><a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${c};text-decoration:none;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a></td></tr>` : ""}
-      ${data.address ? `<tr><td style="padding-top:3px;color:#888;">${escapeHtml(data.address)}</td></tr>` : ""}
-    </table>
-    <table cellpadding="0" cellspacing="0" border="0">
-      ${socialLinks(data)}
-      ${calendlyButton(data, c)}
-      ${ctaBanner(data)}
-      ${!isPro ? neatstampBranding() : ""}
-      ${!isPro && options?.signatureId ? trackingPixel(options.signatureId) : ""}
-    </table>
-  </td></tr>
+  <tr>
+    <td style="padding:12px 20px;border-left:3px solid ${c};background-color:#fafafa;border-radius:0 0 4px 4px;">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr><td style="font-size:12px;color:#555;padding-bottom:4px;">${contact}</td></tr>
+        ${data.address ? `<tr><td style="font-size:11px;color:#aaa;padding-bottom:4px;">${escapeHtml(data.address)}</td></tr>` : ""}
+        ${socialLinks(data)}
+        ${calendlyButton(data, c)}
+        ${ctaBanner(data)}
+        ${!isPro ? neatstampBranding() : ""}
+        ${!isPro && options?.signatureId ? trackingPixel(options.signatureId) : ""}
+      </table>
+    </td>
+  </tr>
 </table>`;
 }
 
@@ -435,29 +419,25 @@ function generateGradient(data: SignatureData, options?: GenerateOptions): strin
   const c = data.primaryColor;
   const a = data.accentColor;
   const isPro = options?.plan === "pro" || options?.plan === "team";
-  return `<table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#333;">
+  const contact = [
+    data.email ? `<a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;">${escapeHtml(data.email)}</a>` : "",
+    data.phone ? `<a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:#555;text-decoration:none;">${escapeHtml(data.phone)}</a>` : "",
+    data.website ? `<a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${a};text-decoration:none;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a>` : "",
+  ].filter(Boolean).join(`<span style="color:#cbd5e1;padding:0 7px;">|</span>`);
+  return `<table cellpadding="0" cellspacing="0" border="0" width="500" style="max-width:500px;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#333;">
   <tr>
-    <td style="width:8px;background-color:${c};border-radius:4px 0 0 0;">&nbsp;</td>
-    <td style="width:4px;background-color:${a};border-radius:0;">&nbsp;</td>
-    <td style="padding:12px 16px;background-color:#f8fafc;border-radius:0 4px 4px 0;">
+    <td style="width:8px;background-color:${c};padding:0;font-size:0;line-height:0;">&nbsp;</td>
+    <td style="width:4px;background-color:${a};padding:0;font-size:0;line-height:0;">&nbsp;</td>
+    <td style="padding:14px 18px;background-color:#f8fafc;">
       <table cellpadding="0" cellspacing="0" border="0">
         <tr>
           ${photoCell(data, 70, "50%", options)}
-          <td style="vertical-align:top;">
+          <td style="vertical-align:middle;">
             <table cellpadding="0" cellspacing="0" border="0">
-              <tr><td style="font-size:19px;font-weight:bold;color:${c};">${escapeHtml(data.fullName)}${data.pronouns ? ` <span style="font-size:11px;font-weight:normal;color:#888;">(${escapeHtml(data.pronouns)})</span>` : ""}</td></tr>
-              ${data.jobTitle ? `<tr><td style="font-size:13px;color:${a};font-weight:bold;padding-top:2px;">${escapeHtml(data.jobTitle)}</td></tr>` : ""}
-              ${data.company ? `<tr><td style="font-size:12px;color:#555;padding-top:1px;">${escapeHtml(data.company)}</td></tr>` : ""}
-              <tr><td style="padding-top:8px;">
-                <table cellpadding="0" cellspacing="0" border="0" style="font-size:12px;">
-                  <tr>
-                    ${data.email ? `<td style="padding-right:14px;"><a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;">${escapeHtml(data.email)}</a></td>` : ""}
-                    ${data.phone ? `<td style="padding-right:14px;color:#555;"><a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:#555;text-decoration:none;">${escapeHtml(data.phone)}</a></td>` : ""}
-                    ${data.website ? `<td><a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${a};text-decoration:none;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a></td>` : ""}
-                  </tr>
-                </table>
-              </td></tr>
-              ${data.address ? `<tr><td style="font-size:11px;color:#888;padding-top:2px;">${escapeHtml(data.address)}</td></tr>` : ""}
+              <tr><td style="font-size:19px;font-weight:bold;color:${c};padding-bottom:1px;">${escapeHtml(data.fullName)}${data.pronouns ? ` <span style="font-size:11px;font-weight:normal;color:#999;">(${escapeHtml(data.pronouns)})</span>` : ""}</td></tr>
+              ${(data.jobTitle || data.company) ? `<tr><td style="font-size:12px;padding-bottom:7px;">${data.jobTitle ? `<span style="color:${a};font-weight:700;">${escapeHtml(data.jobTitle)}</span>` : ""}${data.jobTitle && data.company ? `<span style="color:#cbd5e1;padding:0 6px;">·</span>` : ""}${data.company ? `<span style="color:#666;">${escapeHtml(data.company)}</span>` : ""}</td></tr>` : ""}
+              <tr><td style="font-size:12px;color:#555;padding-bottom:3px;">${contact}</td></tr>
+              ${data.address ? `<tr><td style="font-size:11px;color:#aaa;padding-bottom:2px;">${escapeHtml(data.address)}</td></tr>` : ""}
               ${socialLinks(data)}
               ${calendlyButton(data, c)}
               ${ctaBanner(data)}
@@ -476,20 +456,20 @@ function generateDeveloper(data: SignatureData, options?: GenerateOptions): stri
   const c = data.primaryColor;
   const a = data.accentColor;
   const isPro = options?.plan === "pro" || options?.plan === "team";
-  return `<table cellpadding="0" cellspacing="0" border="0" style="font-family:'Courier New',Courier,monospace;font-size:13px;color:#333;border-bottom:2px solid #e2e8f0;padding-bottom:10px;">
+  return `<table cellpadding="0" cellspacing="0" border="0" width="500" style="max-width:500px;font-family:'Courier New',Courier,monospace;font-size:13px;color:#334155;border-bottom:2px solid #e2e8f0;">
   <tr>
     ${photoCell(data, 64, "4px", options)}
-    <td style="vertical-align:top;">
+    <td style="vertical-align:top;padding-bottom:10px;">
       <table cellpadding="0" cellspacing="0" border="0">
-        <tr><td style="font-size:15px;font-weight:bold;color:${c};font-family:'Courier New',Courier,monospace;">// ${escapeHtml(data.fullName)}${data.pronouns ? ` <span style="font-size:11px;color:#888;">(${escapeHtml(data.pronouns)})</span>` : ""}</td></tr>
-        ${data.jobTitle ? `<tr><td style="font-size:12px;color:${a};padding-top:2px;font-family:'Courier New',Courier,monospace;">/* ${escapeHtml(data.jobTitle)}${data.company ? ` @ ${escapeHtml(data.company)}` : ""} */</td></tr>` : ""}
-        <tr><td style="padding-top:8px;">
-          <table cellpadding="0" cellspacing="0" border="0" style="font-size:12px;font-family:'Courier New',Courier,monospace;">
-            ${data.email ? `<tr><td style="padding-bottom:2px;color:#555;">&gt; <a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;">${escapeHtml(data.email)}</a></td></tr>` : ""}
-            ${data.phone ? `<tr><td style="padding-bottom:2px;color:#555;">&gt; <a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:#555;text-decoration:none;">${escapeHtml(data.phone)}</a></td></tr>` : ""}
-            ${data.website ? `<tr><td style="padding-bottom:2px;color:#555;">&gt; <a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${c};text-decoration:none;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a></td></tr>` : ""}
-            ${data.github ? `<tr><td style="padding-bottom:2px;"><a href="${escapeHtml(data.github.startsWith("http") ? data.github : `https://${data.github}`)}" target="_blank" rel="noopener noreferrer" style="color:${a};text-decoration:none;font-weight:bold;">&gt; github: ${escapeHtml(data.github.replace(/^https?:\/\/(www\.)?github\.com\//, ""))}</a></td></tr>` : ""}
-            ${data.address ? `<tr><td style="padding-bottom:2px;color:#888;"># ${escapeHtml(data.address)}</td></tr>` : ""}
+        <tr><td style="font-size:15px;font-weight:bold;color:${c};padding-bottom:1px;"><span style="color:#94a3b8;">// </span>${escapeHtml(data.fullName)}${data.pronouns ? ` <span style="font-size:11px;font-weight:normal;color:#94a3b8;">(${escapeHtml(data.pronouns)})</span>` : ""}</td></tr>
+        ${data.jobTitle ? `<tr><td style="font-size:11px;color:${a};padding-bottom:1px;"><span style="color:#94a3b8;">const </span><span style="color:#334155;">role</span><span style="color:#94a3b8;"> = </span>'${escapeHtml(data.jobTitle)}${data.company ? ` @ ${escapeHtml(data.company)}` : ""}'</td></tr>` : ""}
+        <tr><td style="padding-top:6px;">
+          <table cellpadding="0" cellspacing="0" border="0" style="font-size:12px;">
+            ${data.email ? `<tr><td style="padding-bottom:2px;color:#64748b;"><span style="color:#94a3b8;">&gt; </span><a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;">${escapeHtml(data.email)}</a></td></tr>` : ""}
+            ${data.phone ? `<tr><td style="padding-bottom:2px;color:#64748b;"><span style="color:#94a3b8;">&gt; </span><a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:#475569;text-decoration:none;">${escapeHtml(data.phone)}</a></td></tr>` : ""}
+            ${data.website ? `<tr><td style="padding-bottom:2px;color:#64748b;"><span style="color:#94a3b8;">&gt; </span><a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${c};text-decoration:none;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a></td></tr>` : ""}
+            ${data.github ? `<tr><td style="padding-bottom:2px;color:#64748b;"><span style="color:#94a3b8;">&gt; </span><a href="${escapeHtml(data.github.startsWith("http") ? data.github : `https://${data.github}`)}" target="_blank" rel="noopener noreferrer" style="color:${a};text-decoration:none;">github/${escapeHtml(data.github.replace(/^https?:\/\/(www\.)?github\.com\//, ""))}</a></td></tr>` : ""}
+            ${data.address ? `<tr><td style="padding-bottom:2px;color:#94a3b8;"><span style="color:#cbd5e1;"># </span>${escapeHtml(data.address)}</td></tr>` : ""}
           </table>
         </td></tr>
         ${socialLinks(data)}
@@ -505,25 +485,23 @@ function generateDeveloper(data: SignatureData, options?: GenerateOptions): stri
 
 function generateSales(data: SignatureData, options?: GenerateOptions): string {
   const c = data.primaryColor;
-  const a = data.accentColor;
   const isPro = options?.plan === "pro" || options?.plan === "team";
-  return `<table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#333;">
+  const contact = [
+    data.email ? `<a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;">${escapeHtml(data.email)}</a>` : "",
+    data.website ? `<a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${c};text-decoration:none;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a>` : "",
+  ].filter(Boolean).join(`<span style="color:#d1d5db;padding:0 7px;">·</span>`);
+  return `<table cellpadding="0" cellspacing="0" border="0" width="500" style="max-width:500px;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#333;">
   <tr>
     ${photoCell(data, 72, "50%", options)}
     <td style="vertical-align:top;">
       <table cellpadding="0" cellspacing="0" border="0">
-        ${data.phone ? `<tr><td style="font-size:20px;font-weight:bold;color:#16a34a;padding-bottom:4px;"><a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:#16a34a;text-decoration:none;">${escapeHtml(data.phone)}</a></td></tr>` : ""}
-        <tr><td style="font-size:16px;font-weight:bold;color:#1a1a1a;">${escapeHtml(data.fullName)}${data.pronouns ? ` <span style="font-size:11px;font-weight:normal;color:#888;">(${escapeHtml(data.pronouns)})</span>` : ""}</td></tr>
-        ${data.jobTitle ? `<tr><td style="font-size:13px;color:${c};font-weight:600;padding-top:1px;">${escapeHtml(data.jobTitle)}${data.company ? ` &mdash; ${escapeHtml(data.company)}` : ""}</td></tr>` : ""}
-        <tr><td style="padding-top:8px;">
-          <table cellpadding="0" cellspacing="0" border="0" style="font-size:12px;color:#555;">
-            ${data.email ? `<tr><td style="padding-bottom:3px;"><a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;">${escapeHtml(data.email)}</a></td></tr>` : ""}
-            ${data.website ? `<tr><td style="padding-bottom:3px;"><a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${c};text-decoration:none;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a></td></tr>` : ""}
-            ${data.address ? `<tr><td style="color:#888;">${escapeHtml(data.address)}</td></tr>` : ""}
-          </table>
-        </td></tr>
+        ${data.phone ? `<tr><td style="font-size:18px;font-weight:bold;color:#16a34a;padding-bottom:3px;"><a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:#16a34a;text-decoration:none;">${escapeHtml(data.phone)}</a></td></tr>` : ""}
+        <tr><td style="font-size:16px;font-weight:bold;color:#1a1a1a;padding-bottom:1px;">${escapeHtml(data.fullName)}${data.pronouns ? ` <span style="font-size:11px;font-weight:normal;color:#aaa;">(${escapeHtml(data.pronouns)})</span>` : ""}</td></tr>
+        ${(data.jobTitle || data.company) ? `<tr><td style="font-size:12px;color:${c};font-weight:600;padding-bottom:6px;">${data.jobTitle ? escapeHtml(data.jobTitle) : ""}${data.jobTitle && data.company ? " &mdash; " : ""}${data.company ? escapeHtml(data.company) : ""}</td></tr>` : ""}
+        <tr><td style="font-size:12px;color:#555;padding-bottom:3px;">${contact}</td></tr>
+        ${data.address ? `<tr><td style="font-size:11px;color:#aaa;padding-bottom:4px;">${escapeHtml(data.address)}</td></tr>` : ""}
         ${socialLinks(data)}
-        ${data.calendlyUrl ? `<tr><td style="padding-top:10px;"><a href="${escapeHtml(data.calendlyUrl.startsWith("http") ? data.calendlyUrl : `https://${data.calendlyUrl}`)}" target="_blank" rel="noopener noreferrer" style="display:inline-block;padding:8px 20px;background-color:#16a34a;color:#ffffff;text-decoration:none;font-size:13px;font-family:Arial,sans-serif;border-radius:4px;font-weight:bold;">&#128197; Schedule a Call</a></td></tr>` : ""}
+        ${data.calendlyUrl ? `<tr><td style="padding-top:8px;"><a href="${escapeHtml(data.calendlyUrl.startsWith("http") ? data.calendlyUrl : `https://${data.calendlyUrl}`)}" target="_blank" rel="noopener noreferrer" style="display:inline-block;padding:8px 22px;background-color:#16a34a;color:#fff;text-decoration:none;font-size:13px;font-family:Arial,sans-serif;border-radius:4px;font-weight:bold;">Schedule a Call</a></td></tr>` : ""}
         ${ctaBanner(data)}
         ${!isPro ? neatstampBranding() : ""}
         ${!isPro && options?.signatureId ? trackingPixel(options.signatureId) : ""}
@@ -536,32 +514,30 @@ function generateSales(data: SignatureData, options?: GenerateOptions): string {
 function generateMedical(data: SignatureData, options?: GenerateOptions): string {
   const c = "#0d9488";
   const isPro = options?.plan === "pro" || options?.plan === "team";
-
-  let src = "";
+  let photoCell2 = "";
   if (data.photoUrl) {
-    src = escapeHtml(data.photoUrl);
+    let src = escapeHtml(data.photoUrl);
     if (!isPro && options?.signatureId && !data.photoUrl.startsWith("https://neatstamp.com")) {
       src = `https://neatstamp.com/api/images/${escapeHtml(options.signatureId)}/photo`;
     }
+    photoCell2 = `<td style="vertical-align:top;padding-right:16px;"><img src="${src}" alt="${escapeHtml(data.fullName)}" width="72" height="72" style="width:72px;height:72px;border-radius:50%;object-fit:cover;display:block;border:2px solid ${c};" /></td>`;
   }
-
-  return `<table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#1a1a1a;border-top:3px solid ${c};padding-top:12px;">
+  const contact = [
+    data.phone ? `<a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:#333;text-decoration:none;">${escapeHtml(data.phone)}</a>` : "",
+    data.email ? `<a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;">${escapeHtml(data.email)}</a>` : "",
+    data.website ? `<a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${c};text-decoration:none;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a>` : "",
+  ].filter(Boolean).join(`<span style="color:#d1d5db;padding:0 7px;">·</span>`);
+  return `<table cellpadding="0" cellspacing="0" border="0" width="500" style="max-width:500px;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#1a1a1a;border-top:3px solid ${c};">
+  <tr><td colspan="2" style="height:10px;"></td></tr>
   <tr>
-    ${src ? `<td style="vertical-align:top;padding-right:16px;"><img src="${src}" alt="${escapeHtml(data.fullName)}" width="72" height="72" style="width:72px;height:72px;border-radius:50%;object-fit:cover;display:block;border:2px solid ${c};" /></td>` : ""}
+    ${photoCell2}
     <td style="vertical-align:top;">
       <table cellpadding="0" cellspacing="0" border="0">
-        <tr><td style="font-size:17px;font-weight:bold;color:#1a1a1a;">${escapeHtml(data.fullName)}</td></tr>
-        ${data.jobTitle ? `<tr><td style="font-size:13px;color:${c};font-weight:600;padding-top:2px;">${escapeHtml(data.jobTitle)}</td></tr>` : ""}
-        ${data.company ? `<tr><td style="font-size:12px;color:#555;padding-top:1px;">${escapeHtml(data.company)}</td></tr>` : ""}
-        ${data.pronouns ? `<tr><td style="font-size:11px;color:#888;padding-top:1px;">${escapeHtml(data.pronouns)}</td></tr>` : ""}
-        <tr><td style="padding-top:8px;">
-          <table cellpadding="0" cellspacing="0" border="0" style="font-size:12px;color:#555;">
-            ${data.phone ? `<tr><td style="padding-bottom:2px;"><a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:#333;text-decoration:none;">${escapeHtml(data.phone)}</a></td></tr>` : ""}
-            ${data.email ? `<tr><td style="padding-bottom:2px;"><a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;">${escapeHtml(data.email)}</a></td></tr>` : ""}
-            ${data.website ? `<tr><td style="padding-bottom:2px;"><a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${c};text-decoration:none;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a></td></tr>` : ""}
-            ${data.address ? `<tr><td style="color:#888;">${escapeHtml(data.address)}</td></tr>` : ""}
-          </table>
-        </td></tr>
+        <tr><td style="font-size:17px;font-weight:bold;color:#1a1a1a;padding-bottom:1px;">${escapeHtml(data.fullName)}${data.pronouns ? ` <span style="font-size:11px;font-weight:normal;color:#aaa;">(${escapeHtml(data.pronouns)})</span>` : ""}</td></tr>
+        ${data.jobTitle ? `<tr><td style="font-size:12px;color:${c};font-weight:600;padding-bottom:1px;">${escapeHtml(data.jobTitle)}</td></tr>` : ""}
+        ${data.company ? `<tr><td style="font-size:12px;color:#555;padding-bottom:6px;">${escapeHtml(data.company)}</td></tr>` : ""}
+        <tr><td style="font-size:12px;color:#555;padding-bottom:3px;">${contact}</td></tr>
+        ${data.address ? `<tr><td style="font-size:11px;color:#aaa;padding-bottom:2px;">${escapeHtml(data.address)}</td></tr>` : ""}
         ${socialLinks(data)}
         ${calendlyButton(data, c)}
         ${ctaBanner(data)}
@@ -576,21 +552,20 @@ function generateMedical(data: SignatureData, options?: GenerateOptions): string
 function generateLegal(data: SignatureData, options?: GenerateOptions): string {
   const c = data.primaryColor;
   const isPro = options?.plan === "pro" || options?.plan === "team";
-  return `<table cellpadding="0" cellspacing="0" border="0" style="font-family:Georgia,'Times New Roman',serif;font-size:14px;color:#1a1a1a;border-bottom:3px solid #1a1a1a;padding-bottom:14px;">
+  return `<table cellpadding="0" cellspacing="0" border="0" width="500" style="max-width:500px;font-family:Georgia,'Times New Roman',serif;font-size:14px;color:#1a1a1a;">
   <tr>
-    ${photoCell(data, 72, "4px", options)}
+    ${photoCell(data, 72, "2px", options)}
     <td style="vertical-align:top;">
       <table cellpadding="0" cellspacing="0" border="0">
-        <tr><td style="font-size:17px;font-weight:bold;color:#1a1a1a;letter-spacing:2px;text-transform:uppercase;font-family:Georgia,'Times New Roman',serif;">${escapeHtml(data.fullName)}</td></tr>
-        ${data.pronouns ? `<tr><td style="font-size:11px;color:#888;font-style:italic;padding-top:1px;">${escapeHtml(data.pronouns)}</td></tr>` : ""}
-        ${data.jobTitle ? `<tr><td style="font-size:13px;color:${c};font-style:italic;padding-top:3px;font-family:Georgia,'Times New Roman',serif;">${escapeHtml(data.jobTitle)}</td></tr>` : ""}
-        ${data.company ? `<tr><td style="font-size:13px;color:#333;font-weight:bold;padding-top:2px;font-family:Georgia,'Times New Roman',serif;">${escapeHtml(data.company)}</td></tr>` : ""}
-        <tr><td style="padding-top:10px;padding-bottom:10px;border-top:1px solid #ccc;margin-top:8px;">
+        <tr><td style="font-size:16px;font-weight:bold;color:#1a1a1a;letter-spacing:2px;text-transform:uppercase;padding-bottom:1px;">${escapeHtml(data.fullName)}${data.pronouns ? ` <span style="font-size:10px;font-weight:normal;letter-spacing:0;font-style:italic;color:#aaa;">(${escapeHtml(data.pronouns)})</span>` : ""}</td></tr>
+        ${data.jobTitle ? `<tr><td style="font-size:12px;color:${c};font-style:italic;padding-bottom:1px;">${escapeHtml(data.jobTitle)}</td></tr>` : ""}
+        ${data.company ? `<tr><td style="font-size:13px;color:#1a1a1a;font-weight:bold;padding-bottom:7px;">${escapeHtml(data.company)}</td></tr>` : ""}
+        <tr><td style="border-top:2px solid #334155;padding-top:8px;">
           <table cellpadding="0" cellspacing="0" border="0" style="font-size:12px;font-family:Arial,Helvetica,sans-serif;color:#555;">
-            ${data.phone ? `<tr><td style="padding-bottom:3px;">T: <a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:#333;text-decoration:none;">${escapeHtml(data.phone)}</a></td></tr>` : ""}
-            ${data.email ? `<tr><td style="padding-bottom:3px;">E: <a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;">${escapeHtml(data.email)}</a></td></tr>` : ""}
-            ${data.website ? `<tr><td style="padding-bottom:3px;">W: <a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${c};text-decoration:none;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a></td></tr>` : ""}
-            ${data.address ? `<tr><td style="color:#888;">${escapeHtml(data.address)}</td></tr>` : ""}
+            ${data.phone ? `<tr><td style="padding-bottom:3px;"><span style="color:#94a3b8;font-size:10px;letter-spacing:0.5px;font-weight:bold;">T&nbsp;</span><a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:#333;text-decoration:none;">${escapeHtml(data.phone)}</a></td></tr>` : ""}
+            ${data.email ? `<tr><td style="padding-bottom:3px;"><span style="color:#94a3b8;font-size:10px;letter-spacing:0.5px;font-weight:bold;">E&nbsp;</span><a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;">${escapeHtml(data.email)}</a></td></tr>` : ""}
+            ${data.website ? `<tr><td style="padding-bottom:3px;"><span style="color:#94a3b8;font-size:10px;letter-spacing:0.5px;font-weight:bold;">W&nbsp;</span><a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${c};text-decoration:none;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a></td></tr>` : ""}
+            ${data.address ? `<tr><td style="color:#888;"><span style="color:#94a3b8;font-size:10px;letter-spacing:0.5px;font-weight:bold;">A&nbsp;</span>${escapeHtml(data.address)}</td></tr>` : ""}
           </table>
         </td></tr>
         ${socialLinks(data)}
@@ -601,6 +576,7 @@ function generateLegal(data: SignatureData, options?: GenerateOptions): string {
       </table>
     </td>
   </tr>
+  <tr><td colspan="2" style="border-bottom:3px solid #334155;padding-top:10px;"></td></tr>
 </table>`;
 }
 
@@ -608,27 +584,26 @@ function generateAcademic(data: SignatureData, options?: GenerateOptions): strin
   const c = data.primaryColor;
   const a = data.accentColor;
   const isPro = options?.plan === "pro" || options?.plan === "team";
-  return `<table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#333;">
+  const contact = [
+    data.email ? `<a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;">${escapeHtml(data.email)}</a>` : "",
+    data.phone ? `<a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:#555;text-decoration:none;">${escapeHtml(data.phone)}</a>` : "",
+    data.website ? `<a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${a};text-decoration:none;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a>` : "",
+  ].filter(Boolean).join(`<span style="color:#d1d5db;padding:0 8px;">·</span>`);
+  return `<table cellpadding="0" cellspacing="0" border="0" width="500" style="max-width:500px;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#333;">
   <tr>
     ${photoCell(data, 68, "4px", options)}
     <td style="vertical-align:middle;">
       <table cellpadding="0" cellspacing="0" border="0">
-        <tr><td style="font-size:18px;font-weight:bold;color:#1e3a5f;">${escapeHtml(data.fullName)}${data.pronouns ? ` <span style="font-size:11px;font-weight:normal;color:#888;">(${escapeHtml(data.pronouns)})</span>` : ""}</td></tr>
-        ${data.jobTitle ? `<tr><td style="font-size:13px;color:${c};padding-top:2px;font-style:italic;">${escapeHtml(data.jobTitle)}</td></tr>` : ""}
-        ${data.company ? `<tr><td style="font-size:13px;color:#1e3a5f;font-weight:bold;padding-top:2px;">${escapeHtml(data.company)}</td></tr>` : ""}
+        <tr><td style="font-size:18px;font-weight:bold;color:#1e3a5f;padding-bottom:1px;">${escapeHtml(data.fullName)}${data.pronouns ? ` <span style="font-size:11px;font-weight:normal;color:#aaa;">(${escapeHtml(data.pronouns)})</span>` : ""}</td></tr>
+        ${data.jobTitle ? `<tr><td style="font-size:12px;color:${c};font-style:italic;padding-bottom:1px;">${escapeHtml(data.jobTitle)}</td></tr>` : ""}
+        ${data.company ? `<tr><td style="font-size:13px;color:#1e3a5f;font-weight:bold;">${escapeHtml(data.company)}</td></tr>` : ""}
       </table>
     </td>
   </tr>
-  <tr><td colspan="2" style="padding-top:10px;border-top:1px solid #cbd5e1;">
-    <table cellpadding="0" cellspacing="0" border="0" style="font-size:12px;color:#555;width:100%;">
-      <tr>
-        ${data.email ? `<td style="padding-right:16px;padding-top:4px;"><a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;">${escapeHtml(data.email)}</a></td>` : ""}
-        ${data.phone ? `<td style="padding-right:16px;padding-top:4px;"><a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:#555;text-decoration:none;">${escapeHtml(data.phone)}</a></td>` : ""}
-        ${data.website ? `<td style="padding-top:4px;"><a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${a};text-decoration:none;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a></td>` : ""}
-      </tr>
-      ${data.address ? `<tr><td colspan="3" style="color:#888;padding-top:4px;">${escapeHtml(data.address)}</td></tr>` : ""}
-    </table>
+  <tr><td colspan="2" style="border-top:1px solid #cbd5e1;padding-top:8px;">
     <table cellpadding="0" cellspacing="0" border="0">
+      <tr><td style="font-size:12px;color:#555;padding-bottom:3px;">${contact}</td></tr>
+      ${data.address ? `<tr><td style="font-size:11px;color:#aaa;padding-bottom:3px;">${escapeHtml(data.address)}</td></tr>` : ""}
       ${socialLinks(data)}
       ${calendlyButton(data, c)}
       ${ctaBanner(data)}
@@ -643,33 +618,29 @@ function generateRealtor(data: SignatureData, options?: GenerateOptions): string
   const c = data.primaryColor;
   const a = data.accentColor;
   const isPro = options?.plan === "pro" || options?.plan === "team";
-
-  let src = "";
+  let photoCell2 = "";
   if (data.photoUrl) {
-    src = escapeHtml(data.photoUrl);
+    let src = escapeHtml(data.photoUrl);
     if (!isPro && options?.signatureId && !data.photoUrl.startsWith("https://neatstamp.com")) {
       src = `https://neatstamp.com/api/images/${escapeHtml(options.signatureId)}/photo`;
     }
+    photoCell2 = `<td style="vertical-align:top;padding-right:18px;"><img src="${src}" alt="${escapeHtml(data.fullName)}" width="100" height="100" style="width:100px;height:100px;border-radius:10px;object-fit:cover;display:block;border:3px solid ${c};" /></td>`;
   }
-
-  return `<table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#333;">
+  return `<table cellpadding="0" cellspacing="0" border="0" width="500" style="max-width:500px;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#333;">
   <tr>
-    ${src ? `<td style="vertical-align:top;padding-right:18px;"><img src="${src}" alt="${escapeHtml(data.fullName)}" width="100" height="100" style="width:100px;height:100px;border-radius:8px;object-fit:cover;display:block;border:3px solid ${c};" /></td>` : ""}
-    <td style="vertical-align:top;border-left:3px solid ${c};padding-left:16px;">
+    ${photoCell2}
+    <td style="vertical-align:top;border-left:4px solid ${c};padding-left:18px;">
       <table cellpadding="0" cellspacing="0" border="0">
-        <tr><td style="font-size:22px;font-weight:bold;color:#1a1a1a;">${escapeHtml(data.fullName)}${data.pronouns ? ` <span style="font-size:12px;font-weight:normal;color:#888;">(${escapeHtml(data.pronouns)})</span>` : ""}</td></tr>
-        ${data.jobTitle ? `<tr><td style="font-size:13px;color:${c};font-weight:bold;padding-top:2px;">${escapeHtml(data.jobTitle)}</td></tr>` : ""}
-        ${data.company ? `<tr><td style="font-size:14px;color:#333;font-weight:bold;padding-top:2px;">${escapeHtml(data.company)}</td></tr>` : ""}
-        <tr><td style="padding-top:8px;">
-          <table cellpadding="0" cellspacing="0" border="0" style="font-size:13px;">
-            <tr>
-              ${data.phone ? `<td style="padding-right:20px;"><a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:#333;text-decoration:none;font-weight:bold;">${escapeHtml(data.phone)}</a></td>` : ""}
-              ${data.email ? `<td><a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;">${escapeHtml(data.email)}</a></td>` : ""}
-            </tr>
-          </table>
+        <tr><td style="font-size:22px;font-weight:bold;color:#1a1a1a;padding-bottom:1px;">${escapeHtml(data.fullName)}${data.pronouns ? ` <span style="font-size:12px;font-weight:normal;color:#aaa;">(${escapeHtml(data.pronouns)})</span>` : ""}</td></tr>
+        ${data.jobTitle ? `<tr><td style="font-size:13px;color:${c};font-weight:700;padding-bottom:1px;">${escapeHtml(data.jobTitle)}</td></tr>` : ""}
+        ${data.company ? `<tr><td style="font-size:14px;color:#333;font-weight:700;padding-bottom:7px;">${escapeHtml(data.company)}</td></tr>` : ""}
+        <tr><td style="font-size:13px;padding-bottom:3px;">
+          ${data.phone ? `<a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:#1a1a1a;text-decoration:none;font-weight:bold;">${escapeHtml(data.phone)}</a>` : ""}
+          ${data.phone && data.email ? `<span style="color:#d1d5db;padding:0 10px;">|</span>` : ""}
+          ${data.email ? `<a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;">${escapeHtml(data.email)}</a>` : ""}
         </td></tr>
-        ${data.website ? `<tr><td style="font-size:12px;padding-top:3px;"><a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${a};text-decoration:none;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a></td></tr>` : ""}
-        ${data.address ? `<tr><td style="font-size:11px;color:#888;padding-top:2px;">${escapeHtml(data.address)}</td></tr>` : ""}
+        ${data.website ? `<tr><td style="font-size:12px;padding-bottom:2px;"><a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${a};text-decoration:none;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a></td></tr>` : ""}
+        ${data.address ? `<tr><td style="font-size:11px;color:#aaa;padding-bottom:2px;">${escapeHtml(data.address)}</td></tr>` : ""}
         ${socialLinks(data)}
         ${calendlyButton(data, c)}
         ${ctaBanner(data)}
@@ -685,37 +656,35 @@ function generateInfluencer(data: SignatureData, options?: GenerateOptions): str
   const c = data.primaryColor;
   const a = data.accentColor;
   const isPro = options?.plan === "pro" || options?.plan === "team";
-
-  let src = "";
+  let photoCell2 = "";
   if (data.photoUrl) {
-    src = escapeHtml(data.photoUrl);
+    let src = escapeHtml(data.photoUrl);
     if (!isPro && options?.signatureId && !data.photoUrl.startsWith("https://neatstamp.com")) {
       src = `https://neatstamp.com/api/images/${escapeHtml(options.signatureId)}/photo`;
     }
+    photoCell2 = `<td style="vertical-align:top;padding-right:18px;"><img src="${src}" alt="${escapeHtml(data.fullName)}" width="85" height="85" style="width:85px;height:85px;border-radius:50%;object-fit:cover;display:block;border:3px solid ${c};outline:3px solid ${a};outline-offset:2px;" /></td>`;
   }
-
-  const socialRow = [
-    data.instagram ? `<a href="${escapeHtml(data.instagram.startsWith("http") ? data.instagram : `https://${data.instagram}`)}" target="_blank" rel="noopener noreferrer" style="display:inline-block;margin-right:10px;text-decoration:none;"><img src="https://neatstamp.com/icons/instagram.svg" alt="Instagram" width="26" height="26" style="width:26px;height:26px;display:block;border:0;" /></a>` : "",
-    data.twitter ? `<a href="${escapeHtml(data.twitter.startsWith("http") ? data.twitter : `https://${data.twitter}`)}" target="_blank" rel="noopener noreferrer" style="display:inline-block;margin-right:10px;text-decoration:none;"><img src="https://neatstamp.com/icons/twitter.svg" alt="Twitter" width="26" height="26" style="width:26px;height:26px;display:block;border:0;" /></a>` : "",
-    data.youtube ? `<a href="${escapeHtml(data.youtube.startsWith("http") ? data.youtube : `https://${data.youtube}`)}" target="_blank" rel="noopener noreferrer" style="display:inline-block;margin-right:10px;text-decoration:none;"><img src="https://neatstamp.com/icons/youtube.svg" alt="YouTube" width="26" height="26" style="width:26px;height:26px;display:block;border:0;" /></a>` : "",
-    data.facebook ? `<a href="${escapeHtml(data.facebook.startsWith("http") ? data.facebook : `https://${data.facebook}`)}" target="_blank" rel="noopener noreferrer" style="display:inline-block;margin-right:10px;text-decoration:none;"><img src="https://neatstamp.com/icons/facebook.svg" alt="Facebook" width="26" height="26" style="width:26px;height:26px;display:block;border:0;" /></a>` : "",
-  ].filter(Boolean).join("");
-
-  return `<table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#333;">
+  const bigSocials = [
+    data.instagram ? socialLink(data.instagram, "instagram") : "",
+    data.twitter ? socialLink(data.twitter, "twitter") : "",
+    data.youtube ? socialLink(data.youtube, "youtube") : "",
+    data.facebook ? socialLink(data.facebook, "facebook") : "",
+  ].filter(Boolean).join("").replace(/width="20" height="20" style="width:20px;height:20px/g, `width="24" height="24" style="width:24px;height:24px`);
+  const contact = [
+    data.email ? `<a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;">${escapeHtml(data.email)}</a>` : "",
+    data.website ? `<a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${c};text-decoration:none;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a>` : "",
+  ].filter(Boolean).join(`<span style="color:#d1d5db;padding:0 8px;">·</span>`);
+  return `<table cellpadding="0" cellspacing="0" border="0" width="500" style="max-width:500px;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#333;">
   <tr>
-    ${src ? `<td style="vertical-align:top;padding-right:16px;"><img src="${src}" alt="${escapeHtml(data.fullName)}" width="78" height="78" style="width:78px;height:78px;border-radius:50%;object-fit:cover;display:block;border:3px solid ${c};" /></td>` : ""}
+    ${photoCell2}
     <td style="vertical-align:top;">
       <table cellpadding="0" cellspacing="0" border="0">
-        <tr><td style="font-size:21px;font-weight:bold;color:${c};">${escapeHtml(data.fullName)}</td></tr>
-        ${data.jobTitle ? `<tr><td style="font-size:13px;color:${a};font-weight:bold;padding-top:2px;">${escapeHtml(data.jobTitle)}</td></tr>` : ""}
-        ${data.company ? `<tr><td style="font-size:12px;color:#888;padding-top:1px;">@${escapeHtml(data.company)}</td></tr>` : ""}
-        ${socialRow ? `<tr><td style="padding-top:10px;padding-bottom:6px;">${socialRow}</td></tr>` : ""}
-        <tr><td style="padding-top:4px;">
-          <table cellpadding="0" cellspacing="0" border="0" style="font-size:12px;color:#555;">
-            ${data.email ? `<tr><td style="padding-bottom:2px;"><a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;">${escapeHtml(data.email)}</a></td></tr>` : ""}
-            ${data.website ? `<tr><td style="padding-bottom:2px;"><a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${c};text-decoration:none;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a></td></tr>` : ""}
-          </table>
-        </td></tr>
+        <tr><td style="font-size:21px;font-weight:bold;color:${c};padding-bottom:1px;">${escapeHtml(data.fullName)}</td></tr>
+        ${data.jobTitle ? `<tr><td style="font-size:13px;color:${a};font-weight:700;padding-bottom:1px;">${escapeHtml(data.jobTitle)}</td></tr>` : ""}
+        ${data.company ? `<tr><td style="font-size:12px;color:#999;padding-bottom:6px;">@${escapeHtml(data.company)}</td></tr>` : ""}
+        ${bigSocials ? `<tr><td style="padding-bottom:7px;">${bigSocials}</td></tr>` : ""}
+        <tr><td style="font-size:12px;color:#555;padding-bottom:3px;">${contact}</td></tr>
+        ${data.phone ? `<tr><td style="font-size:12px;color:#555;padding-bottom:2px;"><a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:#555;text-decoration:none;">${escapeHtml(data.phone)}</a></td></tr>` : ""}
         ${calendlyButton(data, c)}
         ${ctaBanner(data)}
         ${!isPro ? neatstampBranding() : ""}
@@ -729,30 +698,31 @@ function generateInfluencer(data: SignatureData, options?: GenerateOptions): str
 function generatePhotographer(data: SignatureData, options?: GenerateOptions): string {
   const c = data.primaryColor;
   const isPro = options?.plan === "pro" || options?.plan === "team";
-
-  let src = "";
+  let photoCell2 = "";
   if (data.photoUrl) {
-    src = escapeHtml(data.photoUrl);
+    let src = escapeHtml(data.photoUrl);
     if (!isPro && options?.signatureId && !data.photoUrl.startsWith("https://neatstamp.com")) {
       src = `https://neatstamp.com/api/images/${escapeHtml(options.signatureId)}/photo`;
     }
+    photoCell2 = `<td style="vertical-align:top;padding-right:22px;"><img src="${src}" alt="${escapeHtml(data.fullName)}" width="55" height="55" style="width:55px;height:55px;border-radius:0;object-fit:cover;display:block;" /></td>`;
   }
-
-  return `<table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#333;">
+  return `<table cellpadding="0" cellspacing="0" border="0" width="500" style="max-width:500px;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#333;">
   <tr>
-    ${src ? `<td style="vertical-align:top;padding-right:20px;"><img src="${src}" alt="${escapeHtml(data.fullName)}" width="60" height="60" style="width:60px;height:60px;border-radius:0;object-fit:cover;display:block;" /></td>` : ""}
-    <td style="vertical-align:top;padding-top:4px;">
+    ${photoCell2}
+    <td style="vertical-align:middle;">
       <table cellpadding="0" cellspacing="0" border="0">
-        <tr><td style="font-size:18px;font-weight:300;color:#1a1a1a;letter-spacing:1px;">${escapeHtml(data.fullName)}${data.pronouns ? ` <span style="font-size:11px;color:#bbb;">(${escapeHtml(data.pronouns)})</span>` : ""}</td></tr>
-        ${data.jobTitle ? `<tr><td style="font-size:12px;color:#888;padding-top:3px;letter-spacing:0.5px;">${escapeHtml(data.jobTitle)}${data.company ? ` &bull; ${escapeHtml(data.company)}` : ""}</td></tr>` : ""}
-        <tr><td style="padding-top:10px;">
-          <table cellpadding="0" cellspacing="0" border="0" style="font-size:12px;color:#777;">
-            ${data.email ? `<tr><td style="padding-bottom:2px;"><a href="mailto:${escapeHtml(data.email)}" style="color:#555;text-decoration:none;">${escapeHtml(data.email)}</a></td></tr>` : ""}
-            ${data.phone ? `<tr><td style="padding-bottom:2px;"><a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:#777;text-decoration:none;">${escapeHtml(data.phone)}</a></td></tr>` : ""}
-            ${data.website ? `<tr><td style="padding-bottom:2px;"><a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${c};text-decoration:underline;font-style:italic;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a></td></tr>` : ""}
-            ${data.address ? `<tr><td style="color:#bbb;">${escapeHtml(data.address)}</td></tr>` : ""}
+        <tr><td style="font-size:18px;font-weight:300;color:#1a1a1a;letter-spacing:1.5px;padding-bottom:2px;">${escapeHtml(data.fullName)}${data.pronouns ? ` <span style="font-size:11px;color:#ccc;">(${escapeHtml(data.pronouns)})</span>` : ""}</td></tr>
+        ${(data.jobTitle || data.company) ? `<tr><td style="font-size:11px;color:#aaa;letter-spacing:0.5px;padding-bottom:8px;">${data.jobTitle ? escapeHtml(data.jobTitle) : ""}${data.jobTitle && data.company ? " &bull; " : ""}${data.company ? escapeHtml(data.company) : ""}</td></tr>` : ""}
+        <tr><td style="border-top:1px solid #e5e7eb;padding-top:7px;">
+          <table cellpadding="0" cellspacing="0" border="0" style="font-size:12px;">
+            <tr>
+              ${data.email ? `<td style="padding-right:14px;"><a href="mailto:${escapeHtml(data.email)}" style="color:#666;text-decoration:none;">${escapeHtml(data.email)}</a></td>` : ""}
+              ${data.phone ? `<td style="padding-right:14px;"><a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:#888;text-decoration:none;">${escapeHtml(data.phone)}</a></td>` : ""}
+            </tr>
           </table>
         </td></tr>
+        ${data.website ? `<tr><td style="font-size:12px;padding-top:3px;"><a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${c};text-decoration:underline;font-style:italic;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a></td></tr>` : ""}
+        ${data.address ? `<tr><td style="font-size:11px;color:#ccc;padding-top:3px;">${escapeHtml(data.address)}</td></tr>` : ""}
         ${socialLinks(data)}
         ${calendlyButton(data, c)}
         ${ctaBanner(data)}
@@ -768,42 +738,40 @@ function generateDark(data: SignatureData, options?: GenerateOptions): string {
   const c = data.primaryColor;
   const a = data.accentColor;
   const isPro = options?.plan === "pro" || options?.plan === "team";
-
-  let src = "";
+  let photoCell2 = "";
   if (data.photoUrl) {
-    src = escapeHtml(data.photoUrl);
+    let src = escapeHtml(data.photoUrl);
     if (!isPro && options?.signatureId && !data.photoUrl.startsWith("https://neatstamp.com")) {
       src = `https://neatstamp.com/api/images/${escapeHtml(options.signatureId)}/photo`;
     }
+    photoCell2 = `<td style="vertical-align:middle;padding-right:18px;"><img src="${src}" alt="${escapeHtml(data.fullName)}" width="76" height="76" style="width:76px;height:76px;border-radius:8px;object-fit:cover;display:block;border:2px solid rgba(255,255,255,0.2);" /></td>`;
   }
-
-  return `<table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#f1f5f9;background-color:#111827;border-radius:8px;">
-  <tr><td style="padding:16px 20px;">
-    <table cellpadding="0" cellspacing="0" border="0">
+  const contact = [
+    data.email ? `<a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;">${escapeHtml(data.email)}</a>` : "",
+    data.phone ? `<a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:rgba(255,255,255,0.7);text-decoration:none;">${escapeHtml(data.phone)}</a>` : "",
+    data.website ? `<a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${c};text-decoration:none;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a>` : "",
+  ].filter(Boolean).join(`<span style="color:rgba(255,255,255,0.2);padding:0 8px;">|</span>`);
+  return `<table cellpadding="0" cellspacing="0" border="0" width="500" style="max-width:500px;font-family:Arial,Helvetica,sans-serif;background-color:#111827;border-radius:8px;">
+  <tr><td style="padding:18px 22px;">
+    <table cellpadding="0" cellspacing="0" border="0" width="100%">
       <tr>
-        ${src ? `<td style="vertical-align:top;padding-right:16px;"><img src="${src}" alt="${escapeHtml(data.fullName)}" width="76" height="76" style="width:76px;height:76px;border-radius:8px;object-fit:cover;display:block;border:2px solid #ffffff;" /></td>` : ""}
-        <td style="vertical-align:top;">
+        ${photoCell2}
+        <td style="vertical-align:middle;">
           <table cellpadding="0" cellspacing="0" border="0">
-            <tr><td style="font-size:19px;font-weight:bold;color:#f1f5f9;">${escapeHtml(data.fullName)}${data.pronouns ? ` <span style="font-size:11px;font-weight:normal;color:rgba(255,255,255,0.4);">(${escapeHtml(data.pronouns)})</span>` : ""}</td></tr>
-            ${data.jobTitle ? `<tr><td style="font-size:13px;color:${a};font-weight:bold;padding-top:2px;">${escapeHtml(data.jobTitle)}</td></tr>` : ""}
-            ${data.company ? `<tr><td style="font-size:12px;color:rgba(255,255,255,0.5);padding-top:1px;">${escapeHtml(data.company)}</td></tr>` : ""}
-            <tr><td style="padding-top:10px;">
-              <table cellpadding="0" cellspacing="0" border="0" style="font-size:12px;">
-                ${data.email ? `<tr><td style="padding-bottom:3px;"><a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;">${escapeHtml(data.email)}</a></td></tr>` : ""}
-                ${data.phone ? `<tr><td style="padding-bottom:3px;"><a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:rgba(255,255,255,0.7);text-decoration:none;">${escapeHtml(data.phone)}</a></td></tr>` : ""}
-                ${data.website ? `<tr><td style="padding-bottom:3px;"><a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${c};text-decoration:none;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a></td></tr>` : ""}
-                ${data.address ? `<tr><td style="color:rgba(255,255,255,0.4);">${escapeHtml(data.address)}</td></tr>` : ""}
-              </table>
-            </td></tr>
+            <tr><td style="font-size:19px;font-weight:bold;color:#f1f5f9;padding-bottom:1px;">${escapeHtml(data.fullName)}${data.pronouns ? ` <span style="font-size:11px;font-weight:normal;color:rgba(255,255,255,0.35);">(${escapeHtml(data.pronouns)})</span>` : ""}</td></tr>
+            ${data.jobTitle ? `<tr><td style="font-size:12px;color:${a};font-weight:700;padding-bottom:1px;">${escapeHtml(data.jobTitle)}</td></tr>` : ""}
+            ${data.company ? `<tr><td style="font-size:12px;color:rgba(255,255,255,0.45);padding-bottom:8px;">${escapeHtml(data.company)}</td></tr>` : ""}
+            <tr><td style="font-size:12px;padding-bottom:3px;">${contact}</td></tr>
+            ${data.address ? `<tr><td style="font-size:11px;color:rgba(255,255,255,0.35);padding-bottom:4px;">${escapeHtml(data.address)}</td></tr>` : ""}
             ${socialLinks(data)}
-            ${data.calendlyUrl ? `<tr><td style="padding-top:10px;"><a href="${escapeHtml(data.calendlyUrl.startsWith("http") ? data.calendlyUrl : `https://${data.calendlyUrl}`)}" target="_blank" rel="noopener noreferrer" style="display:inline-block;padding:6px 16px;background-color:${c};color:#111827;text-decoration:none;font-size:12px;font-family:Arial,sans-serif;border-radius:4px;font-weight:bold;">Book a Meeting</a></td></tr>` : ""}
+            ${data.calendlyUrl ? `<tr><td style="padding-top:8px;"><a href="${escapeHtml(data.calendlyUrl.startsWith("http") ? data.calendlyUrl : `https://${data.calendlyUrl}`)}" target="_blank" rel="noopener noreferrer" style="display:inline-block;padding:7px 18px;background-color:${c};color:#111827;text-decoration:none;font-size:12px;font-family:Arial,sans-serif;border-radius:4px;font-weight:bold;">Book a Meeting</a></td></tr>` : ""}
           </table>
         </td>
       </tr>
     </table>
     <table cellpadding="0" cellspacing="0" border="0">
       ${ctaBanner(data)}
-      ${!isPro ? `<tr><td style="padding-top:8px;"><a href="https://neatstamp.com?ref=sig" target="_blank" rel="noopener noreferrer" style="color:rgba(255,255,255,0.25);font-size:10px;font-family:Arial,sans-serif;text-decoration:none;">Made with NeatStamp</a></td></tr>` : ""}
+      ${!isPro ? `<tr><td style="padding-top:8px;"><a href="https://neatstamp.com?ref=sig" target="_blank" rel="noopener noreferrer" style="color:rgba(255,255,255,0.2);font-size:10px;font-family:Arial,sans-serif;text-decoration:none;">Made with NeatStamp</a></td></tr>` : ""}
       ${!isPro && options?.signatureId ? trackingPixel(options.signatureId) : ""}
     </table>
   </td></tr>
@@ -813,17 +781,18 @@ function generateDark(data: SignatureData, options?: GenerateOptions): string {
 function generateSimple(data: SignatureData, options?: GenerateOptions): string {
   const c = data.primaryColor;
   const isPro = options?.plan === "pro" || options?.plan === "team";
-  return `<table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#333;">
-  <tr><td>
-    <strong style="font-size:14px;color:#1a1a1a;">${escapeHtml(data.fullName)}</strong>${data.jobTitle ? ` <span style="color:#888;">|</span> <span style="color:${c};">${escapeHtml(data.jobTitle)}</span>` : ""}${data.company ? ` <span style="color:#888;">|</span> ${escapeHtml(data.company)}` : ""}${data.pronouns ? ` <span style="font-size:11px;color:#aaa;">(${escapeHtml(data.pronouns)})</span>` : ""}
+  const contact = [
+    data.email ? `<a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;">${escapeHtml(data.email)}</a>` : "",
+    data.phone ? `<a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:#555;text-decoration:none;">${escapeHtml(data.phone)}</a>` : "",
+    data.website ? `<a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${c};text-decoration:none;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a>` : "",
+  ].filter(Boolean).join(`<span style="color:#d1d5db;padding:0 5px;">&middot;</span>`);
+  return `<table cellpadding="0" cellspacing="0" border="0" width="500" style="max-width:500px;font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#333;">
+  <tr><td style="white-space:nowrap;padding-bottom:2px;">
+    <strong style="font-size:14px;color:#1a1a1a;">${escapeHtml(data.fullName)}</strong>${data.pronouns ? ` <span style="font-size:11px;color:#bbb;">(${escapeHtml(data.pronouns)})</span>` : ""}${data.jobTitle ? ` <span style="color:#d1d5db;">|</span> <span style="color:${c};">${escapeHtml(data.jobTitle)}</span>` : ""}${data.company ? ` <span style="color:#d1d5db;">|</span> <span style="color:#555;">${escapeHtml(data.company)}</span>` : ""}
   </td></tr>
-  <tr><td style="font-size:12px;padding-top:3px;color:#555;">
-    ${[
-      data.email ? `<a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;">${escapeHtml(data.email)}</a>` : "",
-      data.phone ? `<a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:#555;text-decoration:none;">${escapeHtml(data.phone)}</a>` : "",
-      data.website ? `<a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${c};text-decoration:none;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a>` : "",
-    ].filter(Boolean).join(" &middot; ")}
-  </td></tr>
+  <tr><td style="font-size:12px;padding-bottom:3px;color:#555;">${contact}</td></tr>
+  ${data.address ? `<tr><td style="font-size:11px;color:#bbb;padding-bottom:3px;">${escapeHtml(data.address)}</td></tr>` : ""}
+  ${socialLinks(data)}
   ${calendlyButton(data, c)}
   ${ctaBanner(data)}
   ${!isPro ? neatstampBranding() : ""}
