@@ -1382,7 +1382,12 @@ function DashboardContent() {
                         key={t}
                         onClick={() => {
                           if (!isLocked) {
-                            setEditorData({ ...editorData, template: t });
+                            const updatedData = { ...editorData, template: t };
+                            // If user has no photo and template has a preview photo, use it as placeholder
+                            if (!editorData.photoUrl && tpl.previewPhoto) {
+                              updatedData.photoUrl = `https://neatstamp.com${tpl.previewPhoto}`;
+                            }
+                            setEditorData(updatedData);
                             setEditorBlocks(ensureBlocksForTemplate(editorBlocks, t));
                           }
                         }}

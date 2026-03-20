@@ -732,7 +732,13 @@ export default function EditorPage() {
   }, [status]);
 
   const handleTemplateSelect = (template: TemplateName) => {
-    setData({ ...data, template });
+    const tpl = TEMPLATES.find((t) => t.id === template);
+    const updatedData = { ...data, template };
+    // If user has no photo and template has a preview photo, use it as placeholder
+    if (!data.photoUrl && tpl?.previewPhoto) {
+      updatedData.photoUrl = `https://neatstamp.com${tpl.previewPhoto}`;
+    }
+    setData(updatedData);
     setBlocks(ensureBlocksForTemplate(blocks, template));
   };
 
