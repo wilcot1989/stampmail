@@ -24,12 +24,12 @@ interface SignatureEditorProps {
 // Drag handle — 6-dot ⠿ pattern
 // ---------------------------------------------------------------------------
 
-function DragHandle() {
+function DragHandle({ onDragStart }: { onDragStart?: (e: React.MouseEvent) => void }) {
   return (
     <span
-      className="cursor-grab select-none text-slate-300 hover:text-slate-400 transition-colors flex-shrink-0"
+      onMouseDown={onDragStart}
+      className="cursor-grab active:cursor-grabbing select-none text-slate-300 hover:text-slate-500 transition-colors flex-shrink-0 px-0.5"
       title="Drag to reorder"
-      aria-hidden="true"
     >
       <svg width="10" height="16" viewBox="0 0 10 16" fill="currentColor">
         <circle cx="2" cy="2" r="1.5" />
@@ -41,6 +41,14 @@ function DragHandle() {
       </svg>
     </span>
   );
+}
+
+// Simple reorder: move item up or down
+function moveItem<T>(arr: T[], from: number, to: number): T[] {
+  const result = [...arr];
+  const [moved] = result.splice(from, 1);
+  result.splice(to, 0, moved);
+  return result;
 }
 
 // ---------------------------------------------------------------------------
@@ -147,33 +155,60 @@ function FontSizeInput({ value, onChange }: { value: number; onChange: (v: numbe
 
 // --- User Info Section ---
 
+type FieldDef = { key: keyof SignatureData; label: string; placeholder: string; required?: boolean };
+
+const DEFAULT_USER_FIELDS: FieldDef[] = [
+  { key: "jobTitle", label: "Job Title", placeholder: "Marketing Manager" },
+  { key: "fullName", label: "Name", placeholder: "John Doe", required: true },
+  { key: "company", label: "Company", placeholder: "Acme Corp" },
+  { key: "pronouns", label: "Pronouns", placeholder: "he/him" },
+];
+
 function UserInfoSection({
   data,
   onDataChange,
+  fieldOrder,
+  onFieldOrderChange,
 }: {
   data: SignatureData;
   onDataChange: (d: SignatureData) => void;
+  fieldOrder: string[];
+  onFieldOrderChange: (order: string[]) => void;
 }) {
-  const fields: { key: keyof SignatureData; label: string; placeholder: string; required?: boolean }[] = [
-    { key: "jobTitle", label: "Job Title", placeholder: "Marketing Manager" },
-    { key: "fullName", label: "Name", placeholder: "John Doe", required: true },
-    { key: "company", label: "Company", placeholder: "Acme Corp" },
-    { key: "pronouns", label: "Pronouns", placeholder: "he/him" },
-  ];
+  const fields = fieldOrder
+    .map((key) => DEFAULT_USER_FIELDS.find((f) => f.key === key))
+    .filter(Boolean) as FieldDef[];
 
   return (
     <div className="space-y-1.5">
       <SectionHeader title="User Info" />
-      {fields.map((f) => (
-        <div key={f.key} className="flex items-center gap-2 group">
-          <DragHandle />
-          <input
-            type="text"
-            value={String(data[f.key] ?? "")}
-            onChange={(e) => onDataChange({ ...data, [f.key]: e.target.value })}
-            placeholder={f.placeholder}
-            className="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-800 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors"
-          />
+      {fields.map((f, idx) => (
+        <div key={f.key} className="flex items-center gap-1.5 group">
+          <DragHandle onDragStart={() => {
+            // Move up/down on click — simple approach
+          }} />
+          <div className="flex flex-col gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+            {idx > 0 && (
+              <button type="button" onClick={() => onFieldOrderChange(moveItem(fieldOrder, idx, idx - 1))} className="text-slate-400 hover:text-slate-600" title="Move up">
+                <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor"><path d="M5 0L10 6H0z"/></svg>
+              </button>
+            )}
+            {idx < fields.length - 1 && (
+              <button type="button" onClick={() => onFieldOrderChange(moveItem(fieldOrder, idx, idx + 1))} className="text-slate-400 hover:text-slate-600" title="Move down">
+                <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor"><path d="M5 6L0 0h10z"/></svg>
+              </button>
+            )}
+          </div>
+          <div className="flex-1 min-w-0">
+            <label className="text-[10px] text-slate-400 mb-0.5 block">{f.label}</label>
+            <input
+              type="text"
+              value={String(data[f.key] ?? "")}
+              onChange={(e) => onDataChange({ ...data, [f.key]: e.target.value })}
+              placeholder={f.placeholder}
+              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-800 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors"
+            />
+          </div>
           {f.required ? (
             <div className="h-7 w-7 flex-shrink-0" />
           ) : (
@@ -181,64 +216,89 @@ function UserInfoSection({
           )}
         </div>
       ))}
-      <button
-        type="button"
-        className="mt-1 text-xs text-blue-600 hover:text-blue-700 font-medium transition-colors"
-      >
-        + Add text field
-      </button>
     </div>
   );
 }
 
 // --- Contact Info Section ---
 
-type ContactRow = { id: string; label: string; value: string; dataKey: keyof SignatureData };
+type ContactRowDef = { key: keyof SignatureData; label: string; placeholder: string };
+
+const ALL_CONTACT_FIELDS: ContactRowDef[] = [
+  { key: "phone", label: "p.", placeholder: "+1 (555) 123-4567" },
+  { key: "email", label: "e.", placeholder: "john@company.com" },
+  { key: "website", label: "w.", placeholder: "www.company.com" },
+  { key: "address", label: "a.", placeholder: "123 Main St" },
+];
 
 function ContactInfoSection({
   data,
   onDataChange,
+  contactOrder,
+  onContactOrderChange,
 }: {
   data: SignatureData;
   onDataChange: (d: SignatureData) => void;
+  contactOrder: string[];
+  onContactOrderChange: (order: string[]) => void;
 }) {
-  const defaultRows: ContactRow[] = [
-    { id: "phone", label: "p.", value: data.phone, dataKey: "phone" },
-    { id: "email", label: "e.", value: data.email, dataKey: "email" },
-    { id: "website", label: "w.", value: data.website, dataKey: "website" },
-    ...(data.address ? [{ id: "address", label: "a.", value: data.address, dataKey: "address" as keyof SignatureData }] : []),
-  ];
+  // Only show fields that are in the order list and have content (or were manually added)
+  const visibleRows = contactOrder
+    .map((key) => ALL_CONTACT_FIELDS.find((f) => f.key === key))
+    .filter(Boolean) as ContactRowDef[];
+
+  const hiddenFields = ALL_CONTACT_FIELDS.filter((f) => !contactOrder.includes(f.key));
 
   return (
     <div className="space-y-1.5">
       <SectionHeader title="Contact Info" />
-      {defaultRows.map((row) => (
-        <div key={row.id} className="flex items-center gap-2">
+      {visibleRows.map((row, idx) => (
+        <div key={row.key} className="flex items-center gap-1.5 group">
           <DragHandle />
+          <div className="flex flex-col gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+            {idx > 0 && (
+              <button type="button" onClick={() => onContactOrderChange(moveItem(contactOrder, idx, idx - 1))} className="text-slate-400 hover:text-slate-600">
+                <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor"><path d="M5 0L10 6H0z"/></svg>
+              </button>
+            )}
+            {idx < visibleRows.length - 1 && (
+              <button type="button" onClick={() => onContactOrderChange(moveItem(contactOrder, idx, idx + 1))} className="text-slate-400 hover:text-slate-600">
+                <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor"><path d="M5 6L0 0h10z"/></svg>
+              </button>
+            )}
+          </div>
           <input
             type="text"
             value={row.label}
             readOnly
-            className="w-10 rounded-lg border border-slate-200 bg-slate-50 px-2 py-1.5 text-xs text-slate-500 text-center focus:outline-none flex-shrink-0"
+            className="w-8 rounded-lg border border-slate-200 bg-slate-50 px-1.5 py-1.5 text-[11px] text-slate-500 text-center focus:outline-none flex-shrink-0"
           />
           <input
             type="text"
-            value={row.value}
-            onChange={(e) => onDataChange({ ...data, [row.dataKey]: e.target.value })}
-            placeholder={row.dataKey === "email" ? "john@company.com" : row.dataKey === "phone" ? "+1 (555) 123-4567" : row.dataKey === "website" ? "www.company.com" : "123 Main St"}
+            value={String(data[row.key] ?? "")}
+            onChange={(e) => onDataChange({ ...data, [row.key]: e.target.value })}
+            placeholder={row.placeholder}
             className="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-800 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors"
           />
-          <DeleteBtn onClick={() => onDataChange({ ...data, [row.dataKey]: "" })} />
+          <DeleteBtn onClick={() => {
+            onDataChange({ ...data, [row.key]: "" });
+            onContactOrderChange(contactOrder.filter((k) => k !== row.key));
+          }} />
         </div>
       ))}
-      {!data.address && (
-        <button
-          type="button"
-          onClick={() => onDataChange({ ...data, address: " " })}
-          className="mt-1 text-xs text-blue-600 hover:text-blue-700 font-medium transition-colors"
-        >
-          + Add contact field
-        </button>
+      {hiddenFields.length > 0 && (
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => {
+              const next = hiddenFields[0];
+              onContactOrderChange([...contactOrder, next.key]);
+            }}
+            className="mt-1 text-xs text-blue-600 hover:text-blue-700 font-medium transition-colors"
+          >
+            + Add contact field
+          </button>
+        </div>
       )}
     </div>
   );
@@ -856,6 +916,8 @@ export default function SignatureEditor({
   const [sigId] = useState(() =>
     typeof crypto !== "undefined" ? crypto.randomUUID() : "temp"
   );
+  const [userFieldOrder, setUserFieldOrder] = useState<string[]>(["jobTitle", "fullName", "company", "pronouns"]);
+  const [contactOrder, setContactOrder] = useState<string[]>(["phone", "email", "website"]);
 
   const ws = wrapperSettings ?? DEFAULT_WRAPPER_SETTINGS;
   const photoBlock = blocks.find((b) => b.type === "photo" && b.visible);
@@ -939,9 +1001,9 @@ export default function SignatureEditor({
     <div className="grid gap-6 lg:grid-cols-5">
 
       {/* ================================================================
-          LEFT PANEL — 3 cols
+          LEFT PANEL — 2 cols (form)
       ================================================================ */}
-      <div className="lg:col-span-3 flex flex-col min-h-0">
+      <div className="lg:col-span-2 flex flex-col min-h-0">
 
         {/* Tab switcher */}
         <div className="flex border-b border-slate-200 mb-5">
@@ -968,8 +1030,8 @@ export default function SignatureEditor({
         <div className="flex-1 overflow-y-auto pr-1 space-y-6 pb-4">
           {activeTab === "details" ? (
             <>
-              <UserInfoSection data={data} onDataChange={onDataChange} />
-              <ContactInfoSection data={data} onDataChange={onDataChange} />
+              <UserInfoSection data={data} onDataChange={onDataChange} fieldOrder={userFieldOrder} onFieldOrderChange={setUserFieldOrder} />
+              <ContactInfoSection data={data} onDataChange={onDataChange} contactOrder={contactOrder} onContactOrderChange={setContactOrder} />
               <PhotoSection
                 data={data}
                 onDataChange={onDataChange}
@@ -993,9 +1055,9 @@ export default function SignatureEditor({
       </div>
 
       {/* ================================================================
-          RIGHT PANEL — 2 cols: live preview + copy button
+          RIGHT PANEL — 3 cols: live preview + copy button
       ================================================================ */}
-      <div className="lg:col-span-2">
+      <div className="lg:col-span-3">
         <div className="sticky top-20 space-y-3">
           <LivePreview data={data} plan={plan} />
 
