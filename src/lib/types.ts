@@ -81,6 +81,8 @@ export interface TemplateConfig {
   previewName?: string;
   previewTitle?: string;
   previewCompany?: string;
+  styleCategory?: string;
+  professionCategory?: string;
 }
 
 export const DEFAULT_SIGNATURE_DATA: SignatureData = {
@@ -118,6 +120,8 @@ export const TEMPLATES: TemplateConfig[] = [
     previewName: "Sarah Chen",
     previewTitle: "Marketing Manager",
     previewCompany: "Bloom Agency",
+    styleCategory: "minimal",
+    professionCategory: "business",
   },
   {
     id: "modern",
@@ -128,6 +132,8 @@ export const TEMPLATES: TemplateConfig[] = [
     previewName: "James Rivera",
     previewTitle: "Product Designer",
     previewCompany: "Vercel",
+    styleCategory: "modern",
+    professionCategory: "tech",
   },
   // --- Pro templates ---
   {
@@ -139,6 +145,8 @@ export const TEMPLATES: TemplateConfig[] = [
     previewName: "Michael Brooks",
     previewTitle: "VP of Operations",
     previewCompany: "Sterling & Associates",
+    styleCategory: "corporate",
+    professionCategory: "business",
   },
   {
     id: "creative",
@@ -149,6 +157,8 @@ export const TEMPLATES: TemplateConfig[] = [
     previewName: "Luna Martinez",
     previewTitle: "Art Director",
     previewCompany: "Pixelwave Studio",
+    styleCategory: "creative",
+    professionCategory: "creative-pro",
   },
   {
     id: "bold",
@@ -159,6 +169,8 @@ export const TEMPLATES: TemplateConfig[] = [
     previewName: "David Park",
     previewTitle: "CEO & Founder",
     previewCompany: "Nexus AI",
+    styleCategory: "bold",
+    professionCategory: "business",
   },
   {
     id: "elegant",
@@ -169,6 +181,8 @@ export const TEMPLATES: TemplateConfig[] = [
     previewName: "Victoria Wells",
     previewTitle: "Managing Partner",
     previewCompany: "Wells & Hart LLP",
+    styleCategory: "corporate",
+    professionCategory: "legal",
   },
   {
     id: "startup",
@@ -179,6 +193,8 @@ export const TEMPLATES: TemplateConfig[] = [
     previewName: "Ryan Patel",
     previewTitle: "CTO",
     previewCompany: "LaunchPad",
+    styleCategory: "modern",
+    professionCategory: "tech",
   },
   {
     id: "compact",
@@ -188,6 +204,8 @@ export const TEMPLATES: TemplateConfig[] = [
     previewName: "Emily Zhang",
     previewTitle: "Analyst",
     previewCompany: "Deloitte",
+    styleCategory: "compact",
+    professionCategory: "business",
   },
   {
     id: "executive",
@@ -198,6 +216,8 @@ export const TEMPLATES: TemplateConfig[] = [
     previewName: "Richard Thornton",
     previewTitle: "Chief Financial Officer",
     previewCompany: "Meridian Capital",
+    styleCategory: "corporate",
+    professionCategory: "business",
   },
   {
     id: "gradient",
@@ -208,6 +228,8 @@ export const TEMPLATES: TemplateConfig[] = [
     previewName: "Mia Nakamura",
     previewTitle: "Brand Strategist",
     previewCompany: "Prism Creative",
+    styleCategory: "modern",
+    professionCategory: "creative-pro",
   },
   {
     id: "developer",
@@ -218,6 +240,8 @@ export const TEMPLATES: TemplateConfig[] = [
     previewName: "Alex Kowalski",
     previewTitle: "Senior Engineer",
     previewCompany: "GitHub",
+    styleCategory: "modern",
+    professionCategory: "tech",
   },
   {
     id: "sales",
@@ -228,6 +252,8 @@ export const TEMPLATES: TemplateConfig[] = [
     previewName: "Rachel Foster",
     previewTitle: "Account Executive",
     previewCompany: "Salesforce",
+    styleCategory: "bold",
+    professionCategory: "business",
   },
   {
     id: "medical",
@@ -238,6 +264,8 @@ export const TEMPLATES: TemplateConfig[] = [
     previewName: "Dr. Amanda Liu",
     previewTitle: "Cardiologist",
     previewCompany: "St. Mary's Hospital",
+    styleCategory: "minimal",
+    professionCategory: "medical",
   },
   {
     id: "legal",
@@ -248,6 +276,8 @@ export const TEMPLATES: TemplateConfig[] = [
     previewName: "Thomas J. Crawford",
     previewTitle: "Senior Partner",
     previewCompany: "Crawford & Mills LLP",
+    styleCategory: "corporate",
+    professionCategory: "legal",
   },
   {
     id: "academic",
@@ -258,6 +288,8 @@ export const TEMPLATES: TemplateConfig[] = [
     previewName: "Prof. Daniel Russo",
     previewTitle: "Professor of Computer Science",
     previewCompany: "MIT",
+    styleCategory: "minimal",
+    professionCategory: "academic",
   },
   {
     id: "realtor",
@@ -268,6 +300,8 @@ export const TEMPLATES: TemplateConfig[] = [
     previewName: "Jessica Palmer",
     previewTitle: "Licensed Realtor",
     previewCompany: "Keller Williams",
+    styleCategory: "modern",
+    professionCategory: "real-estate",
   },
   {
     id: "influencer",
@@ -278,6 +312,8 @@ export const TEMPLATES: TemplateConfig[] = [
     previewName: "Zara Mitchell",
     previewTitle: "Content Creator",
     previewCompany: "@zaramitchell",
+    styleCategory: "creative",
+    professionCategory: "creative-pro",
   },
   {
     id: "photographer",
@@ -288,6 +324,8 @@ export const TEMPLATES: TemplateConfig[] = [
     previewName: "Marco Bellini",
     previewTitle: "Photographer",
     previewCompany: "Bellini Studios",
+    styleCategory: "creative",
+    professionCategory: "creative-pro",
   },
   {
     id: "dark",
@@ -298,6 +336,8 @@ export const TEMPLATES: TemplateConfig[] = [
     previewName: "Nathan Cole",
     previewTitle: "Lead Developer",
     previewCompany: "Midnight Labs",
+    styleCategory: "bold",
+    professionCategory: "tech",
   },
   {
     id: "simple",
@@ -307,5 +347,53 @@ export const TEMPLATES: TemplateConfig[] = [
     previewName: "Kate Morrison",
     previewTitle: "Consultant",
     previewCompany: "Independent",
+    styleCategory: "minimal",
+    professionCategory: "business",
   },
 ];
+
+// ---------------------------------------------------------------------------
+// Color themes — multiply templates by applying different palettes
+// ---------------------------------------------------------------------------
+
+export interface ColorTheme {
+  id: string;
+  name: string;
+  primary: string;
+  accent: string;
+  swatch: string; // display color for the theme pill
+}
+
+export const COLOR_THEMES: ColorTheme[] = [
+  { id: "blue", name: "Blue", primary: "#2563eb", accent: "#f59e0b", swatch: "#2563eb" },
+  { id: "teal", name: "Teal", primary: "#0d9488", accent: "#f59e0b", swatch: "#0d9488" },
+  { id: "purple", name: "Purple", primary: "#7c3aed", accent: "#f472b6", swatch: "#7c3aed" },
+  { id: "red", name: "Red", primary: "#dc2626", accent: "#f59e0b", swatch: "#dc2626" },
+  { id: "green", name: "Green", primary: "#16a34a", accent: "#fbbf24", swatch: "#16a34a" },
+  { id: "orange", name: "Orange", primary: "#ea580c", accent: "#fbbf24", swatch: "#ea580c" },
+  { id: "pink", name: "Pink", primary: "#db2777", accent: "#a855f7", swatch: "#db2777" },
+  { id: "slate", name: "Slate", primary: "#475569", accent: "#94a3b8", swatch: "#475569" },
+];
+
+// Template categories for filtering
+export const TEMPLATE_CATEGORIES = {
+  style: [
+    { id: "all", label: "All" },
+    { id: "minimal", label: "Minimal" },
+    { id: "modern", label: "Modern" },
+    { id: "bold", label: "Bold" },
+    { id: "creative", label: "Creative" },
+    { id: "corporate", label: "Corporate" },
+    { id: "compact", label: "Compact" },
+  ],
+  profession: [
+    { id: "all", label: "All" },
+    { id: "business", label: "Business" },
+    { id: "tech", label: "Tech" },
+    { id: "creative-pro", label: "Creative" },
+    { id: "medical", label: "Medical" },
+    { id: "legal", label: "Legal" },
+    { id: "real-estate", label: "Real Estate" },
+    { id: "academic", label: "Academic" },
+  ],
+};

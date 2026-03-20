@@ -4,9 +4,10 @@ import { useSession, signOut } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, useRef, Suspense } from "react";
 import Link from "next/link";
-import { SignatureData, DEFAULT_SIGNATURE_DATA, TemplateName, TEMPLATES, WrapperSettings, DEFAULT_WRAPPER_SETTINGS } from "@/lib/types";
+import { SignatureData, DEFAULT_SIGNATURE_DATA, TemplateName, TEMPLATES, WrapperSettings, DEFAULT_WRAPPER_SETTINGS, ColorTheme, COLOR_THEMES } from "@/lib/types";
 import { Block, getDefaultBlocks, getPresetForTemplate } from "@/lib/blocks";
 import SignatureEditor from "@/components/SignatureEditor";
+import TemplateSelector from "@/components/TemplateSelector";
 import { generateSignatureHtml } from "@/lib/generateSignature";
 
 // ---------------------------------------------------------------------------
@@ -955,6 +956,7 @@ function DashboardContent() {
   const [editorData, setEditorData] = useState<SignatureData>(DEFAULT_SIGNATURE_DATA);
   const [editorBlocks, setEditorBlocks] = useState<Block[]>(getDefaultBlocks());
   const [editorWrapperSettings, setEditorWrapperSettings] = useState<WrapperSettings>(DEFAULT_WRAPPER_SETTINGS);
+  const [editorTheme, setEditorTheme] = useState("blue");
   const [editingSignatureId, setEditingSignatureId] = useState<string | null>(null);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
 
@@ -1361,87 +1363,24 @@ function DashboardContent() {
                 </button>
               </div>
 
-              {/* Template selector — horizontally scrollable */}
-              <div>
-                <h3 className="text-sm font-semibold text-foreground mb-3">Choose a template</h3>
-                <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-thin">
-                  {TEMPLATES.map((tpl) => {
-                    const t = tpl.id;
-                    const isSelected = editorData.template === t;
-                    const isLocked = tpl.isPro && !isPro;
-                    const previewData: SignatureData = {
-                      ...DEFAULT_SIGNATURE_DATA,
-                      template: t,
-                      fullName: tpl.previewName || DEFAULT_SIGNATURE_DATA.fullName,
-                      jobTitle: tpl.previewTitle || DEFAULT_SIGNATURE_DATA.jobTitle,
-                      company: tpl.previewCompany || DEFAULT_SIGNATURE_DATA.company,
-                      photoUrl: tpl.previewPhoto ? `https://neatstamp.com${tpl.previewPhoto}` : "",
-                    };
-                    const previewHtml = generateSignatureHtml(previewData);
-                    return (
-                      <button
-                        key={t}
-                        onClick={() => {
-                          if (!isLocked) {
-                            const updatedData = { ...editorData, template: t };
-                            if (!editorData.photoUrl && tpl.previewPhoto) {
-                              updatedData.photoUrl = `https://neatstamp.com${tpl.previewPhoto}`;
-                            }
-                            const preset = getPresetForTemplate(t, updatedData);
-                            setEditorData(updatedData);
-                            setEditorBlocks(preset.blocks);
-                            setEditorWrapperSettings(preset.wrapperSettings);
-                          }
-                        }}
-                        className={`relative rounded-xl border-2 overflow-hidden text-left transition-all flex-shrink-0 w-[140px] snap-start ${
-                          isSelected
-                            ? "border-primary shadow-md"
-                            : isLocked
-                              ? "border-border bg-slate-50 cursor-not-allowed opacity-70"
-                              : "border-border bg-white hover:border-primary/50 hover:shadow-sm"
-                        }`}
-                      >
-                        {/* Mini preview */}
-                        <div className="relative h-[70px] overflow-hidden bg-white">
-                          <div
-                            style={{
-                              transform: "scale(0.3)",
-                              transformOrigin: "top left",
-                              width: "333%",
-                              pointerEvents: "none",
-                              userSelect: "none",
-                            }}
-                            dangerouslySetInnerHTML={{ __html: previewHtml }}
-                          />
-                          {isLocked && (
-                            <div className="absolute inset-0 bg-slate-100/70 flex items-center justify-center">
-                              <svg className="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-                              </svg>
-                            </div>
-                          )}
-                        </div>
-                        <div className={`px-2 py-1.5 border-t flex items-center justify-between ${isSelected ? "border-primary/20 bg-blue-50" : "border-border"}`}>
-                          <span className={`text-xs font-medium ${isSelected ? "text-primary" : isLocked ? "text-slate-400" : "text-slate-700"}`}>
-                            {tpl.name}
-                          </span>
-                          {isLocked && (
-                            <span className="inline-flex items-center rounded-full bg-amber-100 px-1.5 py-0.5 text-[9px] font-bold text-amber-700">PRO</span>
-                          )}
-                          {isSelected && (
-                            <svg className="h-3.5 w-3.5 text-primary" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" />
-                            </svg>
-                          )}
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-                {!isPro && (
-                  <p className="mt-2 text-xs text-muted">2 of {TEMPLATES.length} templates available</p>
-                )}
-              </div>
+              {/* Template selector */}
+              <TemplateSelector
+                selectedTemplate={editorData.template}
+                selectedTheme={editorTheme}
+                isPro={isPro}
+                onSelect={(template, theme) => {
+                  const tpl = TEMPLATES.find((t) => t.id === template);
+                  const updatedData = { ...editorData, template, primaryColor: theme.primary, accentColor: theme.accent };
+                  if (!editorData.photoUrl && tpl?.previewPhoto) {
+                    updatedData.photoUrl = `https://neatstamp.com${tpl.previewPhoto}`;
+                  }
+                  const preset = getPresetForTemplate(template, updatedData);
+                  setEditorData(updatedData);
+                  setEditorBlocks(preset.blocks);
+                  setEditorWrapperSettings(preset.wrapperSettings);
+                  setEditorTheme(theme.id);
+                }}
+              />
 
               {/* Signature editor: form left + live preview right */}
               <SignatureEditor

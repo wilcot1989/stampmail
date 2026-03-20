@@ -2,11 +2,12 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
-import { SignatureData, TemplateName, DEFAULT_SIGNATURE_DATA, TEMPLATES, WrapperSettings, DEFAULT_WRAPPER_SETTINGS } from "@/lib/types";
+import { SignatureData, TemplateName, DEFAULT_SIGNATURE_DATA, TEMPLATES, WrapperSettings, DEFAULT_WRAPPER_SETTINGS, ColorTheme, COLOR_THEMES } from "@/lib/types";
 import { generateSignatureHtml, generateCopyHtml } from "@/lib/generateSignature";
 import { copySignatureToClipboard } from "@/lib/clipboard";
 import { Block, getDefaultBlocks, getPresetForTemplate } from "@/lib/blocks";
 import SignatureEditor from "@/components/SignatureEditor";
+import TemplateSelector from "@/components/TemplateSelector";
 
 
 // ---------------------------------------------------------------------------
@@ -710,6 +711,7 @@ export default function EditorPage() {
   const [editorMode, setEditorMode] = useState<"templates" | "blocks">("templates");
   const [blocks, setBlocks] = useState<Block[]>(() => getDefaultBlocks());
   const [wrapperSettings, setWrapperSettings] = useState<WrapperSettings>(DEFAULT_WRAPPER_SETTINGS);
+  const [selectedTheme, setSelectedTheme] = useState("blue");
   const previewRef = useRef<HTMLDivElement>(null);
 
   const isPro = userPlan === "pro" || userPlan === "team";
@@ -732,9 +734,9 @@ export default function EditorPage() {
     }
   }, [status]);
 
-  const handleTemplateSelect = (template: TemplateName) => {
+  const handleTemplateSelect = (template: TemplateName, theme: ColorTheme) => {
     const tpl = TEMPLATES.find((t) => t.id === template);
-    const updatedData = { ...data, template };
+    const updatedData = { ...data, template, primaryColor: theme.primary, accentColor: theme.accent };
     if (!data.photoUrl && tpl?.previewPhoto) {
       updatedData.photoUrl = `https://neatstamp.com${tpl.previewPhoto}`;
     }
@@ -742,6 +744,7 @@ export default function EditorPage() {
     setData(updatedData);
     setBlocks(preset.blocks);
     setWrapperSettings(preset.wrapperSettings);
+    setSelectedTheme(theme.id);
   };
 
   const handleProTemplateClick = () => {
@@ -804,28 +807,15 @@ export default function EditorPage() {
         </p>
       </div>
 
-      {/* Template selector + Drag & Drop editor — all on one page */}
-
-      <div className="mb-2">
-        <ProTemplateSelector
-          data={data}
+      {/* Template selector */}
+      <div className="mb-8">
+        <TemplateSelector
           selectedTemplate={data.template}
-          onSelect={handleTemplateSelect}
+          selectedTheme={selectedTheme}
           isPro={isPro}
-          onProClick={handleProTemplateClick}
+          onSelect={handleTemplateSelect}
         />
       </div>
-
-      {/* Pro template note */}
-      {!isPro && (
-        <p className="mb-8 text-center text-xs text-muted">
-          Pro templates require a $5/mo subscription.{" "}
-          <a href="https://neatstamp.com/pricing" className="font-medium text-primary underline">
-            Upgrade to Pro
-          </a>
-        </p>
-      )}
-      {isPro && <div className="mb-8" />}
 
       {/* Signature editor: form left + live preview right */}
       <div>
