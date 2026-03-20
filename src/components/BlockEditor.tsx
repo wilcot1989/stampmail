@@ -2,8 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { Block, BlockType, BlockConfig, BLOCK_CONFIGS, generateHtmlFromBlocks } from "@/lib/blocks";
-import { DEFAULT_WRAPPER_SETTINGS } from "@/lib/types";
-import { SignatureData } from "@/lib/types";
+import { DEFAULT_WRAPPER_SETTINGS, WrapperSettings, SignatureData } from "@/lib/types";
 import { GenerateOptions, generateSignatureHtml } from "@/lib/generateSignature";
 
 import { copySignatureToClipboard } from "@/lib/clipboard";
@@ -16,8 +15,8 @@ interface BlockEditorProps {
   data: SignatureData;
   onDataChange: (data: SignatureData) => void;
   plan: "free" | "pro" | "team";
-  wrapperSettings?: import("@/lib/types").WrapperSettings;
-  onWrapperSettingsChange?: (ws: import("@/lib/types").WrapperSettings) => void;
+  wrapperSettings?: WrapperSettings;
+  onWrapperSettingsChange?: (ws: WrapperSettings) => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -329,7 +328,7 @@ function LivePreview({
   blocks: Block[];
   data: SignatureData;
   plan: "free" | "pro" | "team";
-  wrapperSettings: import("@/lib/types").WrapperSettings;
+  wrapperSettings: WrapperSettings;
 }) {
   const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
   const [sigId] = useState(() => crypto.randomUUID());
@@ -541,11 +540,11 @@ function CopyButton({
 }: {
   blocks: Block[];
   data: SignatureData;
-  wrapperSettings: import("@/lib/types").WrapperSettings;
+  wrapperSettings: WrapperSettings;
   plan: "free" | "pro" | "team";
 }) {
   const [state, setState] = useState<"idle" | "copied" | "error">("idle");
-  const sigId = useRef(crypto.randomUUID()).current;
+  const [sigId] = useState(() => crypto.randomUUID());
 
   const handleCopy = async () => {
     const options: GenerateOptions = { plan, signatureId: sigId };
