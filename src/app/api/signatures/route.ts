@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
   }
 
   const dataStr = JSON.stringify(data);
-  if (dataStr.length > 10000) {
+  if (dataStr.length > 50000) {
     return NextResponse.json({ error: "Signature data too large" }, { status: 400 });
   }
 

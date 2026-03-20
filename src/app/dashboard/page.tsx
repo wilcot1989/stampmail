@@ -940,6 +940,7 @@ function DashboardContent() {
   // Editor state (shared)
   const [editorData, setEditorData] = useState<SignatureData>(DEFAULT_SIGNATURE_DATA);
   const [editorBlocks, setEditorBlocks] = useState<Block[]>(getDefaultBlocks());
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
 
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
@@ -1165,10 +1166,17 @@ function DashboardContent() {
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-foreground">Signature Editor</h2>
                 <button
+                  disabled={saveStatus === "saving"}
                   onClick={async () => {
+                    setSaveStatus("saving");
                     try {
-                      // Save both signature data AND block layout
-                      const saveData = { ...editorData, _blocks: editorBlocks };
+                      // Strip base64 photo from save data (too large for DB)
+                      // Photo is uploaded to R2 on copy, not on save
+                      const cleanData = { ...editorData };
+                      if (cleanData.photoUrl?.startsWith("data:")) {
+                        cleanData.photoUrl = "__base64__"; // marker to know photo was set
+                      }
+                      const saveData = { ...cleanData, _blocks: editorBlocks };
                       const res = await fetch("/api/signatures", {
                         method: signatures.length > 0 ? "PUT" : "POST",
                         headers: { "Content-Type": "application/json" },
@@ -1180,22 +1188,52 @@ function DashboardContent() {
                         }),
                       });
                       if (res.ok) {
+                        setSaveStatus("saved");
+                        setTimeout(() => setSaveStatus("idle"), 2500);
                         // Refresh signatures
                         const sigRes = await fetch("/api/signatures");
                         const sigData = await sigRes.json() as { signatures?: Signature[] };
                         setSignatures(sigData.signatures ?? []);
-                        setActiveTab("signatures");
+                      } else {
+                        const err = await res.json() as { error?: string };
+                        console.error("Save failed:", err);
+                        setSaveStatus("error");
+                        setTimeout(() => setSaveStatus("idle"), 3000);
                       }
                     } catch (err) {
                       console.error("Save error:", err);
+                      setSaveStatus("error");
+                      setTimeout(() => setSaveStatus("idle"), 3000);
                     }
                   }}
-                  className="inline-flex items-center gap-2 rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-600 transition-colors shadow-sm"
+                  className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white transition-colors shadow-sm ${
+                    saveStatus === "saved"
+                      ? "bg-emerald-500"
+                      : saveStatus === "error"
+                        ? "bg-red-500"
+                        : saveStatus === "saving"
+                          ? "bg-blue-400 cursor-wait"
+                          : "bg-emerald-500 hover:bg-emerald-600"
+                  }`}
                 >
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                  </svg>
-                  Save Signature
+                  {saveStatus === "saving" ? (
+                    <>
+                      <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+                      Saving...
+                    </>
+                  ) : saveStatus === "saved" ? (
+                    <>
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+                      Saved!
+                    </>
+                  ) : saveStatus === "error" ? (
+                    <>Save failed — try again</>
+                  ) : (
+                    <>
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+                      Save Signature
+                    </>
+                  )}
                 </button>
               </div>
 
