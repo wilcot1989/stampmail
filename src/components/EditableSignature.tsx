@@ -85,25 +85,24 @@ function FloatingToolbar({
   const s = block.settings;
   const set = (key: string, val: unknown) => onSettingsChange({ ...s, [key]: val });
 
-  // Position: to the right of the anchor element, or below if no space
+  // Position: fixed to viewport, to the right of anchor or below if no space
   const [pos, setPos] = useState({ top: 0, left: 0 });
 
   useEffect(() => {
     if (!anchorRect) return;
-    const top = Math.max(8, anchorRect.top + window.scrollY);
+    const top = Math.max(8, anchorRect.top);
     const left = anchorRect.right + 16;
-    // If would overflow right edge, position below instead
     if (left + 260 > window.innerWidth) {
-      setPos({ top: anchorRect.bottom + window.scrollY + 8, left: Math.max(8, anchorRect.left) });
+      setPos({ top: Math.min(anchorRect.bottom + 8, window.innerHeight - 300), left: Math.max(8, anchorRect.left) });
     } else {
-      setPos({ top, left });
+      setPos({ top: Math.min(top, window.innerHeight - 300), left });
     }
   }, [anchorRect]);
 
   return (
     <div
       ref={toolbarRef}
-      className="absolute z-50 rounded-xl border border-slate-200 bg-white shadow-2xl p-3 w-[240px]"
+      className="fixed z-50 rounded-xl border border-slate-200 bg-white shadow-2xl p-3 w-[240px]"
       style={{ top: pos.top, left: pos.left }}
       onClick={(e) => e.stopPropagation()}
       onMouseDown={(e) => e.stopPropagation()}
