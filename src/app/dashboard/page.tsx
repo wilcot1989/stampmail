@@ -6,8 +6,7 @@ import { useEffect, useState, useRef, Suspense } from "react";
 import Link from "next/link";
 import { SignatureData, DEFAULT_SIGNATURE_DATA, TemplateName, TEMPLATES, WrapperSettings, DEFAULT_WRAPPER_SETTINGS } from "@/lib/types";
 import { Block, getDefaultBlocks, getPresetForTemplate } from "@/lib/blocks";
-import dynamic from "next/dynamic";
-const SignatureEditor = dynamic(() => import("@/components/SignatureEditor"), { ssr: false });
+import SignatureEditor from "@/components/SignatureEditor";
 import { generateSignatureHtml } from "@/lib/generateSignature";
 
 // ---------------------------------------------------------------------------
@@ -1444,26 +1443,16 @@ function DashboardContent() {
                 )}
               </div>
 
-              {/* Form + Signature editor side by side */}
-              <div className="grid gap-6 lg:grid-cols-7">
-                <div className="lg:col-span-2">
-                  <div className="sticky top-20">
-                    <h3 className="text-sm font-semibold text-slate-800 mb-3">Your Details</h3>
-                    <CompactSignatureForm data={editorData} onChange={setEditorData} plan={plan} />
-                  </div>
-                </div>
-                <div className="lg:col-span-5">
-                  <SignatureEditor
-                    blocks={editorBlocks}
-                    data={editorData}
-                    wrapperSettings={editorWrapperSettings}
-                    plan={plan}
-                    onBlocksChange={setEditorBlocks}
-                    onDataChange={setEditorData}
-                    onWrapperSettingsChange={setEditorWrapperSettings}
-                  />
-                </div>
-              </div>
+              {/* Signature editor: form left + live preview right */}
+              <SignatureEditor
+                blocks={editorBlocks}
+                data={editorData}
+                wrapperSettings={editorWrapperSettings}
+                plan={plan}
+                onBlocksChange={setEditorBlocks}
+                onDataChange={setEditorData}
+                onWrapperSettingsChange={setEditorWrapperSettings}
+              />
             </div>
           );
           })()}

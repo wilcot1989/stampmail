@@ -1,273 +1,82 @@
 "use client";
 
-import { useEditor, EditorContent, Editor } from "@tiptap/react";
-import { StarterKit } from "@tiptap/starter-kit";
-import { TextStyleKit } from "@tiptap/extension-text-style";
-import { TextAlign } from "@tiptap/extension-text-align";
-import { Link } from "@tiptap/extension-link";
-import { Placeholder } from "@tiptap/extension-placeholder";
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef } from "react";
 import { SignatureData, WrapperSettings, DEFAULT_WRAPPER_SETTINGS } from "@/lib/types";
-import { generateHtmlFromBlocks, Block, getPresetForTemplate, SOCIAL_ICON_URLS, SOCIAL_LABELS, SOCIAL_FIELDS } from "@/lib/blocks";
-import { generateSignatureHtml, GenerateOptions } from "@/lib/generateSignature";
+import { generateHtmlFromBlocks, Block, SOCIAL_ICON_URLS, SOCIAL_LABELS } from "@/lib/blocks";
+import { GenerateOptions } from "@/lib/generateSignature";
 import { copySignatureToClipboard } from "@/lib/clipboard";
 
 // ---------------------------------------------------------------------------
-// Toolbar
+// Props
 // ---------------------------------------------------------------------------
 
-// Text color picker with preset colors + custom picker
-function TextColorPicker({ editor, currentColor }: { editor: Editor; currentColor: string }) {
-  const [open, setOpen] = useState(false);
-  const presets = ["#000000", "#1a1a1a", "#555555", "#888888", "#ffffff", "#2563eb", "#dc2626", "#16a34a", "#f59e0b", "#8b5cf6", "#ec4899", "#0d9488"];
-
-  const applyColor = (color: string) => {
-    editor.chain().focus().setColor(color).run();
-    setOpen(false);
-  };
-
-  return (
-    <div className="relative">
-      <button
-        type="button"
-        onClick={() => setOpen(!open)}
-        className="flex h-7 w-7 items-center justify-center rounded hover:bg-slate-200 transition-colors"
-        title="Text color"
-      >
-        <span className="text-sm font-bold" style={{ color: currentColor }}>A</span>
-        <div className="absolute bottom-0.5 left-1 right-1 h-0.5 rounded" style={{ backgroundColor: currentColor }} />
-      </button>
-      {open && (
-        <div className="absolute top-full left-0 mt-1 z-50 rounded-lg border border-slate-200 bg-white shadow-xl p-2 w-[168px]" onMouseDown={(e) => e.preventDefault()}>
-          <div className="grid grid-cols-6 gap-1 mb-2">
-            {presets.map((c) => (
-              <button
-                key={c}
-                type="button"
-                onClick={() => applyColor(c)}
-                className={`h-5 w-5 rounded border ${currentColor === c ? "ring-2 ring-blue-500 ring-offset-1" : "border-slate-200 hover:border-slate-400"}`}
-                style={{ backgroundColor: c }}
-              />
-            ))}
-          </div>
-          <label className="flex items-center gap-2 text-[10px] text-slate-500 cursor-pointer">
-            Custom
-            <input
-              type="color"
-              value={currentColor}
-              onChange={(e) => applyColor(e.target.value)}
-              className="h-5 w-5 rounded border border-slate-200 cursor-pointer"
-            />
-          </label>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function EditorToolbar({
-  editor,
-  wrapperSettings: ws,
-  onWrapperChange,
-}: {
-  editor: Editor | null;
-  wrapperSettings: WrapperSettings;
-  onWrapperChange: (ws: WrapperSettings) => void;
-}) {
-  if (!editor) return null;
-
-  const currentColor = editor.getAttributes("textStyle").color || "#000000";
-  const currentSize = editor.getAttributes("textStyle").fontSize || "14";
-
-  return (
-    <div className="flex flex-wrap items-center gap-1 rounded-t-xl border border-b-0 border-slate-200 bg-slate-50 px-2 py-1.5">
-      {/* Font size */}
-      <select
-        value={currentSize}
-        onChange={(e) => {
-          editor.commands.setFontSize(e.target.value + "px");
-        }}
-        className="h-7 rounded border border-slate-200 bg-white px-1.5 text-xs text-slate-700 focus:outline-none focus:ring-1 focus:ring-blue-400"
-      >
-        {[10, 11, 12, 13, 14, 16, 18, 20, 22, 24, 28].map((s) => (
-          <option key={s} value={s}>{s}px</option>
-        ))}
-      </select>
-
-      <div className="w-px h-5 bg-slate-200 mx-1" />
-
-      {/* Bold */}
-      <ToolbarBtn
-        active={editor.isActive("bold")}
-        onClick={() => editor.chain().focus().toggleBold().run()}
-        title="Bold"
-      >
-        <strong>B</strong>
-      </ToolbarBtn>
-
-      {/* Italic */}
-      <ToolbarBtn
-        active={editor.isActive("italic")}
-        onClick={() => editor.chain().focus().toggleItalic().run()}
-        title="Italic"
-      >
-        <em>I</em>
-      </ToolbarBtn>
-
-      {/* Strike */}
-      <ToolbarBtn
-        active={editor.isActive("strike")}
-        onClick={() => editor.chain().focus().toggleStrike().run()}
-        title="Strikethrough"
-      >
-        <s>S</s>
-      </ToolbarBtn>
-
-      <div className="w-px h-5 bg-slate-200 mx-1" />
-
-      {/* Text color — quick color buttons + picker */}
-      <TextColorPicker editor={editor} currentColor={currentColor} />
-
-      <div className="w-px h-5 bg-slate-200 mx-1" />
-
-      {/* Alignment */}
-      <ToolbarBtn
-        active={editor.isActive({ textAlign: "left" })}
-        onClick={() => editor.chain().focus().setTextAlign("left").run()}
-        title="Align left"
-      >
-        <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M3 6h18M3 12h10M3 18h14"/></svg>
-      </ToolbarBtn>
-      <ToolbarBtn
-        active={editor.isActive({ textAlign: "center" })}
-        onClick={() => editor.chain().focus().setTextAlign("center").run()}
-        title="Align center"
-      >
-        <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M3 6h18M7 12h10M5 18h14"/></svg>
-      </ToolbarBtn>
-
-      <div className="w-px h-5 bg-slate-200 mx-1" />
-
-      {/* Link */}
-      <ToolbarBtn
-        active={editor.isActive("link")}
-        onClick={() => {
-          if (editor.isActive("link")) {
-            editor.chain().focus().unsetLink().run();
-          } else {
-            const url = prompt("Enter URL:");
-            if (url) editor.chain().focus().setLink({ href: url }).run();
-          }
-        }}
-        title="Link"
-      >
-        <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"/></svg>
-      </ToolbarBtn>
-
-      {/* Undo / Redo */}
-      <div className="w-px h-5 bg-slate-200 mx-1" />
-      <ToolbarBtn onClick={() => editor.chain().focus().undo().run()} title="Undo">
-        <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 010 11H11"/></svg>
-      </ToolbarBtn>
-      <ToolbarBtn onClick={() => editor.chain().focus().redo().run()} title="Redo">
-        <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M15 14l5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 000 11H13"/></svg>
-      </ToolbarBtn>
-
-      {/* Spacer to push BG controls to the right */}
-      <div className="flex-1" />
-
-      {/* Background color */}
-      <label className="relative cursor-pointer flex items-center gap-1" title="Signature background color">
-        <div
-          className="h-5 w-5 rounded border border-slate-300"
-          style={{ backgroundColor: ws.backgroundColor !== "none" ? ws.backgroundColor : "#ffffff" }}
-        />
-        <span className="text-[10px] text-slate-500 hidden sm:inline">BG</span>
-        <input
-          type="color"
-          value={ws.backgroundColor !== "none" ? ws.backgroundColor : "#ffffff"}
-          onChange={(e) => onWrapperChange({
-            ...ws,
-            backgroundColor: e.target.value,
-            backgroundRadius: ws.backgroundRadius || 8,
-            backgroundPadding: ws.backgroundPadding || 16,
-          })}
-          className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-        />
-      </label>
-      {ws.backgroundColor !== "none" && (
-        <>
-          <ToolbarBtn
-            active={ws.textOnDark}
-            onClick={() => onWrapperChange({ ...ws, textOnDark: !ws.textOnDark })}
-            title="Light text (for dark backgrounds)"
-          >
-            <span className="text-[10px]">Aa</span>
-          </ToolbarBtn>
-          <button
-            onClick={() => onWrapperChange({ ...ws, backgroundColor: "none", backgroundPadding: 0, backgroundRadius: 0, textOnDark: false })}
-            className="text-[10px] text-red-500 hover:text-red-700 px-1"
-            title="Remove background"
-          >
-            &times;
-          </button>
-        </>
-      )}
-    </div>
-  );
-}
-
-function ToolbarBtn({
-  active,
-  onClick,
-  title,
-  children,
-}: {
-  active?: boolean;
-  onClick: () => void;
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      title={title}
-      className={`flex h-7 w-7 items-center justify-center rounded text-xs transition-colors ${
-        active ? "bg-blue-100 text-blue-700" : "text-slate-600 hover:bg-slate-200"
-      }`}
-    >
-      {children}
-    </button>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Photo section (above or beside the editor)
-// ---------------------------------------------------------------------------
-
-function PhotoSection({
-  data,
-  photoSettings,
-  onDataChange,
-  onSettingsChange,
-}: {
+interface SignatureEditorProps {
+  blocks: Block[];
   data: SignatureData;
-  photoSettings: Record<string, unknown>;
-  onDataChange: (d: SignatureData) => void;
-  onSettingsChange: (s: Record<string, unknown>) => void;
+  wrapperSettings: WrapperSettings;
+  plan: "free" | "pro" | "team";
+  onBlocksChange: (blocks: Block[]) => void;
+  onDataChange: (data: SignatureData) => void;
+  onWrapperSettingsChange: (ws: WrapperSettings) => void;
+}
+
+// ---------------------------------------------------------------------------
+// Small form controls
+// ---------------------------------------------------------------------------
+
+function Field({ label, value, onChange, placeholder, type = "text" }: {
+  label: string; value: string; onChange: (v: string) => void; placeholder?: string; type?: string;
 }) {
-  const size = Number(photoSettings.size ?? 80);
-  const shape = String(photoSettings.shape ?? "circle");
-  const borderWidth = Number(photoSettings.borderWidth ?? 0);
-  const borderColor = String(photoSettings.borderColor ?? "#2563eb");
-  const borderRadius = shape === "circle" ? "50%" : shape === "rounded" ? "8px" : shape === "near-square" ? "4px" : "0px";
+  return (
+    <div>
+      <label className="block text-[11px] font-medium text-slate-500 mb-0.5">{label}</label>
+      <input
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors"
+      />
+    </div>
+  );
+}
+
+function Section({ title, icon, children, defaultOpen = true }: {
+  title: string; icon: string; children: React.ReactNode; defaultOpen?: boolean;
+}) {
+  return (
+    <details open={defaultOpen} className="group">
+      <summary className="flex cursor-pointer items-center gap-2 rounded-lg bg-slate-50 px-3 py-2.5 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition-colors select-none">
+        <span>{icon}</span>
+        <span className="flex-1">{title}</span>
+        <svg className="h-4 w-4 text-slate-400 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+      </summary>
+      <div className="mt-2 space-y-2.5 px-1 pb-1">{children}</div>
+    </details>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Photo upload section
+// ---------------------------------------------------------------------------
+
+function PhotoUpload({ data, onDataChange, photoBlock, onBlockSettingsChange }: {
+  data: SignatureData;
+  onDataChange: (d: SignatureData) => void;
+  photoBlock: Block | undefined;
+  onBlockSettingsChange: (id: string, s: Record<string, unknown>) => void;
+}) {
   const fileRef = useRef<HTMLInputElement>(null);
-  const [showControls, setShowControls] = useState(false);
+  const s = photoBlock?.settings ?? {};
+  const size = Number(s.size ?? 80);
+  const shape = String(s.shape ?? "circle");
+  const borderWidth = Number(s.borderWidth ?? 0);
+  const borderColor = String(s.borderColor ?? "#2563eb");
 
   const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (file.size > 2 * 1024 * 1024) { alert("Max 2MB"); return; }
     const reader = new FileReader();
     reader.onload = (ev) => {
       const img = new window.Image();
@@ -285,60 +94,69 @@ function PhotoSection({
     reader.readAsDataURL(file);
   };
 
-  if (!data.photoUrl) {
-    return (
-      <div>
-        <div
-          onClick={() => fileRef.current?.click()}
-          className="cursor-pointer bg-slate-100 hover:bg-slate-200 transition-colors flex items-center justify-center text-slate-400 text-xs"
-          style={{ width: size, height: size, borderRadius, border: "2px dashed #cbd5e1" }}
-        >
-          + Photo
-        </div>
-        <input ref={fileRef} type="file" accept="image/*" onChange={handleUpload} className="hidden" />
-      </div>
-    );
-  }
+  const set = (key: string, val: unknown) => {
+    if (!photoBlock) return;
+    onBlockSettingsChange(photoBlock.id, { ...s, [key]: val });
+  };
 
   return (
-    <div className="relative group" style={{ width: size }}>
-      <img
-        src={data.photoUrl}
-        alt={data.fullName}
-        onClick={() => setShowControls(!showControls)}
-        className="cursor-pointer"
-        style={{ width: size, height: size, borderRadius, objectFit: "cover", display: "block", border: borderWidth > 0 ? `${borderWidth}px solid ${borderColor}` : "none" }}
-      />
-      {/* Overlay buttons */}
-      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 rounded" style={{ borderRadius }}>
-        <button onClick={() => fileRef.current?.click()} className="rounded bg-white/90 px-2 py-1 text-[10px] font-medium text-slate-700 hover:bg-white">Change</button>
-        <button onClick={() => onDataChange({ ...data, photoUrl: "" })} className="rounded bg-red-500/90 px-2 py-1 text-[10px] font-medium text-white hover:bg-red-500">Remove</button>
-      </div>
+    <div className="space-y-2.5">
+      {data.photoUrl ? (
+        <div className="flex items-center gap-3">
+          <img
+            src={data.photoUrl}
+            alt="Photo"
+            className="object-cover border border-slate-200"
+            style={{
+              width: 56, height: 56,
+              borderRadius: shape === "circle" ? "50%" : shape === "rounded" ? "8px" : "0px",
+            }}
+          />
+          <div className="flex gap-2">
+            <button onClick={() => fileRef.current?.click()} className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50">Change</button>
+            <button onClick={() => onDataChange({ ...data, photoUrl: "" })} className="rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-100">Remove</button>
+          </div>
+        </div>
+      ) : (
+        <label className="flex cursor-pointer items-center justify-center rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 py-5 text-sm text-slate-500 hover:border-blue-300 hover:text-blue-600 transition-colors">
+          Click to upload photo
+          <input ref={fileRef} type="file" accept="image/*" onChange={handleUpload} className="hidden" />
+        </label>
+      )}
       <input ref={fileRef} type="file" accept="image/*" onChange={handleUpload} className="hidden" />
 
-      {/* Photo controls */}
-      {showControls && (
-        <div className="absolute top-full left-0 mt-2 z-20 rounded-lg border border-slate-200 bg-white shadow-lg p-2.5 w-48 space-y-2" onClick={(e) => e.stopPropagation()}>
-          <label className="flex items-center gap-2 text-[11px] text-slate-600">
-            <span className="w-10">Size</span>
-            <input type="range" min={40} max={120} value={size} onChange={(e) => onSettingsChange({ ...photoSettings, size: Number(e.target.value) })} className="flex-1 accent-blue-600 h-1" />
-            <span className="text-slate-400 w-7 text-right text-[10px]">{size}</span>
-          </label>
-          <div className="flex gap-1">
-            {(["circle", "rounded", "square"] as const).map((s) => (
-              <button key={s} onClick={() => onSettingsChange({ ...photoSettings, shape: s })} className={`flex-1 px-1 py-0.5 text-[10px] rounded ${shape === s ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-600"}`}>{s}</button>
-            ))}
+      {photoBlock && (
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <label className="text-[10px] text-slate-500">Size</label>
+            <input type="range" min={40} max={120} value={size} onChange={(e) => set("size", Number(e.target.value))} className="w-full accent-blue-600 h-1" />
           </div>
-          <label className="flex items-center gap-2 text-[11px] text-slate-600">
-            <span className="w-10">Border</span>
-            <input type="range" min={0} max={5} value={borderWidth} onChange={(e) => onSettingsChange({ ...photoSettings, borderWidth: Number(e.target.value) })} className="flex-1 accent-blue-600 h-1" />
-          </label>
+          <div>
+            <label className="text-[10px] text-slate-500">Shape</label>
+            <div className="flex gap-1">
+              {(["circle", "rounded", "square"] as const).map((sh) => (
+                <button key={sh} onClick={() => set("shape", sh)} className={`flex-1 px-1 py-0.5 text-[10px] rounded ${shape === sh ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}>{sh}</button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <label className="text-[10px] text-slate-500">Border</label>
+            <input type="range" min={0} max={5} value={borderWidth} onChange={(e) => set("borderWidth", Number(e.target.value))} className="w-full accent-blue-600 h-1" />
+          </div>
           {borderWidth > 0 && (
-            <label className="flex items-center gap-2 text-[11px] text-slate-600">
-              <span className="w-10">Color</span>
-              <input type="color" value={borderColor} onChange={(e) => onSettingsChange({ ...photoSettings, borderColor: e.target.value })} className="h-5 w-5 rounded border cursor-pointer" />
-            </label>
+            <div>
+              <label className="text-[10px] text-slate-500">Border color</label>
+              <input type="color" value={borderColor} onChange={(e) => set("borderColor", e.target.value)} className="h-6 w-full rounded border cursor-pointer" />
+            </div>
           )}
+          <div>
+            <label className="text-[10px] text-slate-500">Position</label>
+            <div className="flex gap-1">
+              {(["left", "right"] as const).map((p) => (
+                <button key={p} onClick={() => set("position", p)} className={`flex-1 px-1 py-0.5 text-[10px] rounded ${String(s.position ?? "left") === p ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}>{p === "left" ? "← Left" : "Right →"}</button>
+              ))}
+            </div>
+          </div>
         </div>
       )}
     </div>
@@ -346,20 +164,241 @@ function PhotoSection({
 }
 
 // ---------------------------------------------------------------------------
-// Social icons row
+// Style controls
 // ---------------------------------------------------------------------------
 
-function SocialRow({ data, plan }: { data: SignatureData; plan: "free" | "pro" | "team" }) {
-  const isPro = plan === "pro" || plan === "team";
-  const maxLinks = isPro ? 99 : 2;
-  const links = SOCIAL_FIELDS.filter((f) => !!data[f]).slice(0, maxLinks);
-  if (links.length === 0) return null;
+function StyleControls({ blocks, wrapperSettings: ws, onBlockSettingsChange, onWrapperChange }: {
+  blocks: Block[];
+  wrapperSettings: WrapperSettings;
+  onBlockSettingsChange: (id: string, s: Record<string, unknown>) => void;
+  onWrapperChange: (ws: WrapperSettings) => void;
+}) {
+  const nameBlock = blocks.find((b) => b.type === "name");
+  const contactBlock = blocks.find((b) => b.type === "contact");
+  const dividerBlock = blocks.find((b) => b.type === "divider");
+  const ns = nameBlock?.settings ?? {};
+  const cs = contactBlock?.settings ?? {};
+  const ds = dividerBlock?.settings ?? {};
+
+  const setName = (key: string, val: unknown) => nameBlock && onBlockSettingsChange(nameBlock.id, { ...ns, [key]: val });
+  const setContact = (key: string, val: unknown) => contactBlock && onBlockSettingsChange(contactBlock.id, { ...cs, [key]: val });
+  const setDivider = (key: string, val: unknown) => dividerBlock && onBlockSettingsChange(dividerBlock.id, { ...ds, [key]: val });
 
   return (
-    <div className="flex items-center gap-2 pt-1">
-      {links.map((f) => (
-        <img key={f} src={SOCIAL_ICON_URLS[f]} alt={SOCIAL_LABELS[f]} title={SOCIAL_LABELS[f]} className="w-5 h-5" />
-      ))}
+    <div className="space-y-3">
+      {/* Font family */}
+      <div>
+        <label className="text-[10px] text-slate-500">Font</label>
+        <select
+          value={ws.fontFamily}
+          onChange={(e) => onWrapperChange({ ...ws, fontFamily: e.target.value })}
+          className="w-full rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs text-slate-700 focus:border-blue-500 focus:outline-none"
+        >
+          <option value="Arial,Helvetica,sans-serif">Arial</option>
+          <option value="Georgia,'Times New Roman',serif">Georgia</option>
+          <option value="'Courier New',Courier,monospace">Courier New</option>
+          <option value="Verdana,Geneva,sans-serif">Verdana</option>
+          <option value="Tahoma,Geneva,sans-serif">Tahoma</option>
+          <option value="'Trebuchet MS',Helvetica,sans-serif">Trebuchet MS</option>
+        </select>
+      </div>
+
+      {/* Name styling */}
+      {nameBlock && (
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <label className="text-[10px] text-slate-500">Name color</label>
+            <input type="color" value={String(ns.nameColor ?? "#1a1a1a")} onChange={(e) => setName("nameColor", e.target.value)} className="h-6 w-full rounded border cursor-pointer" />
+          </div>
+          <div>
+            <label className="text-[10px] text-slate-500">Name size</label>
+            <input type="range" min={12} max={28} value={Number(ns.nameSize ?? 16)} onChange={(e) => setName("nameSize", Number(e.target.value))} className="w-full accent-blue-600 h-1" />
+          </div>
+          <div>
+            <label className="text-[10px] text-slate-500">Title color</label>
+            <input type="color" value={String(ns.titleColor ?? "#555555")} onChange={(e) => setName("titleColor", e.target.value)} className="h-6 w-full rounded border cursor-pointer" />
+          </div>
+          <div>
+            <label className="text-[10px] text-slate-500">Weight</label>
+            <div className="flex gap-1">
+              {(["300", "normal", "bold"] as const).map((w) => (
+                <button key={w} onClick={() => setName("nameWeight", w)} className={`flex-1 px-1 py-0.5 text-[10px] rounded ${String(ns.nameWeight ?? "bold") === w ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-600"}`}>
+                  {w === "300" ? "Light" : w === "normal" ? "Reg" : "Bold"}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Contact link color */}
+      {contactBlock && (
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <label className="text-[10px] text-slate-500">Link color</label>
+            <input type="color" value={String(cs.linkColor ?? "#2563eb")} onChange={(e) => setContact("linkColor", e.target.value)} className="h-6 w-full rounded border cursor-pointer" />
+          </div>
+          <div>
+            <label className="text-[10px] text-slate-500">Contact layout</label>
+            <select
+              value={String(cs.layout ?? "stacked")}
+              onChange={(e) => setContact("layout", e.target.value)}
+              className="w-full rounded border border-slate-200 bg-white px-1.5 py-1 text-[10px] text-slate-700"
+            >
+              <option value="stacked">Stacked</option>
+              <option value="inline-pipes">Inline |</option>
+              <option value="inline-middot">Inline ·</option>
+              <option value="stacked-labeled">With labels</option>
+              <option value="stacked-emoji">With emoji</option>
+            </select>
+          </div>
+        </div>
+      )}
+
+      {/* Divider */}
+      {dividerBlock && (
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <label className="text-[10px] text-slate-500">Divider color</label>
+            <input type="color" value={String(ds.color ?? "#2563eb")} onChange={(e) => setDivider("color", e.target.value)} className="h-6 w-full rounded border cursor-pointer" />
+          </div>
+          <div>
+            <label className="text-[10px] text-slate-500">Divider style</label>
+            <div className="flex gap-1">
+              {(["solid", "dashed", "dotted"] as const).map((st) => (
+                <button key={st} onClick={() => setDivider("style", st)} className={`flex-1 px-1 py-0.5 text-[10px] rounded ${String(ds.style ?? "solid") === st ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-600"}`}>{st}</button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <label className="text-[10px] text-slate-500">Thickness</label>
+            <input type="range" min={1} max={5} value={Number(ds.thickness ?? 2)} onChange={(e) => setDivider("thickness", Number(e.target.value))} className="w-full accent-blue-600 h-1" />
+          </div>
+          <div>
+            <label className="text-[10px] text-slate-500">Width</label>
+            <input type="range" min={20} max={100} value={Number(ds.width ?? 100)} onChange={(e) => setDivider("width", Number(e.target.value))} className="w-full accent-blue-600 h-1" />
+          </div>
+        </div>
+      )}
+
+      {/* Background */}
+      <div className="grid grid-cols-2 gap-2">
+        <div>
+          <label className="text-[10px] text-slate-500">Background</label>
+          <div className="flex items-center gap-1">
+            <input
+              type="color"
+              value={ws.backgroundColor !== "none" ? ws.backgroundColor : "#ffffff"}
+              onChange={(e) => onWrapperChange({ ...ws, backgroundColor: e.target.value, backgroundRadius: 8, backgroundPadding: 16 })}
+              className="h-6 w-8 rounded border cursor-pointer"
+            />
+            {ws.backgroundColor !== "none" && (
+              <button onClick={() => onWrapperChange({ ...ws, backgroundColor: "none", backgroundPadding: 0, backgroundRadius: 0, textOnDark: false })} className="text-[10px] text-red-500">&times;</button>
+            )}
+          </div>
+        </div>
+        {ws.backgroundColor !== "none" && (
+          <div>
+            <label className="text-[10px] text-slate-500">Light text</label>
+            <label className="flex items-center gap-1.5 mt-1">
+              <input type="checkbox" checked={ws.textOnDark} onChange={(e) => onWrapperChange({ ...ws, textOnDark: e.target.checked })} className="accent-blue-600 h-3 w-3" />
+              <span className="text-[10px] text-slate-600">For dark bg</span>
+            </label>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Social media fields
+// ---------------------------------------------------------------------------
+
+function SocialFields({ data, onDataChange, plan }: {
+  data: SignatureData; onDataChange: (d: SignatureData) => void; plan: "free" | "pro" | "team";
+}) {
+  const isPro = plan === "pro" || plan === "team";
+  const socialFields: { key: keyof SignatureData; label: string; placeholder: string; icon: string }[] = [
+    { key: "linkedin", label: "LinkedIn", placeholder: "https://linkedin.com/in/...", icon: "linkedin" },
+    { key: "twitter", label: "X (Twitter)", placeholder: "https://x.com/...", icon: "twitter" },
+    { key: "instagram", label: "Instagram", placeholder: "https://instagram.com/...", icon: "instagram" },
+    { key: "facebook", label: "Facebook", placeholder: "https://facebook.com/...", icon: "facebook" },
+    { key: "github", label: "GitHub", placeholder: "https://github.com/...", icon: "github" },
+    { key: "youtube", label: "YouTube", placeholder: "https://youtube.com/@...", icon: "youtube" },
+  ];
+
+  return (
+    <div className="space-y-2">
+      {socialFields.map((f, i) => {
+        const locked = !isPro && i >= 2 && !data[f.key];
+        if (locked) {
+          return (
+            <div key={f.key} className="flex items-center justify-between rounded-lg border border-dashed border-amber-200 bg-amber-50 px-3 py-2">
+              <div className="flex items-center gap-2">
+                <img src={SOCIAL_ICON_URLS[f.icon]} alt={f.label} className="h-4 w-4 opacity-50" />
+                <span className="text-[11px] text-amber-700">{f.label}</span>
+              </div>
+              <span className="text-[9px] font-bold text-amber-600 bg-amber-100 px-1.5 py-0.5 rounded-full">PRO</span>
+            </div>
+          );
+        }
+        return (
+          <div key={f.key} className="flex items-center gap-2">
+            <img src={SOCIAL_ICON_URLS[f.icon]} alt={f.label} className="h-4 w-4" />
+            <input
+              type="text"
+              value={String(data[f.key] ?? "")}
+              onChange={(e) => onDataChange({ ...data, [f.key]: e.target.value })}
+              placeholder={f.placeholder}
+              className="flex-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-700 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none"
+            />
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Live Preview — email chrome + rendered signature
+// ---------------------------------------------------------------------------
+
+function LivePreview({ blocks, data, wrapperSettings, plan }: {
+  blocks: Block[]; data: SignatureData; wrapperSettings: WrapperSettings; plan: "free" | "pro" | "team";
+}) {
+  const options: GenerateOptions = { plan };
+  const html = generateHtmlFromBlocks(blocks, data, wrapperSettings, options);
+
+  return (
+    <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+      {/* Email chrome */}
+      <div className="border-b border-slate-100 bg-slate-50 px-4 py-2.5 flex items-center gap-2">
+        <div className="flex gap-1.5">
+          <span className="h-3 w-3 rounded-full bg-red-400" />
+          <span className="h-3 w-3 rounded-full bg-amber-400" />
+          <span className="h-3 w-3 rounded-full bg-emerald-400" />
+        </div>
+        <span className="ml-2 text-xs text-slate-400 font-medium">New Message</span>
+      </div>
+      <div className="border-b border-slate-100 px-4 py-1.5">
+        <span className="text-xs text-slate-400">To: </span>
+        <span className="text-xs text-slate-600">recipient@company.com</span>
+      </div>
+      <div className="border-b border-slate-100 px-4 py-1.5">
+        <span className="text-xs text-slate-400">Subject: </span>
+        <span className="text-xs text-slate-600">Quick follow up</span>
+      </div>
+      {/* Email body */}
+      <div className="px-4 pt-3 pb-2">
+        <p className="text-sm text-slate-500 leading-relaxed">Hi there,</p>
+        <p className="text-sm text-slate-500 mt-2 leading-relaxed">Just wanted to follow up on our conversation. Let me know if you have any questions.</p>
+        <p className="text-sm text-slate-500 mt-2 leading-relaxed">Best regards,</p>
+      </div>
+      {/* Signature */}
+      <div className="px-4 pb-4">
+        <div dangerouslySetInnerHTML={{ __html: html }} />
+      </div>
     </div>
   );
 }
@@ -367,16 +406,6 @@ function SocialRow({ data, plan }: { data: SignatureData; plan: "free" | "pro" |
 // ---------------------------------------------------------------------------
 // Main SignatureEditor component
 // ---------------------------------------------------------------------------
-
-interface SignatureEditorProps {
-  blocks: Block[];
-  data: SignatureData;
-  wrapperSettings: WrapperSettings;
-  plan: "free" | "pro" | "team";
-  onBlocksChange: (blocks: Block[]) => void;
-  onDataChange: (data: SignatureData) => void;
-  onWrapperSettingsChange: (ws: WrapperSettings) => void;
-}
 
 export default function SignatureEditor({
   blocks,
@@ -391,140 +420,16 @@ export default function SignatureEditor({
   const [sigId] = useState(() => typeof crypto !== "undefined" ? crypto.randomUUID() : "temp");
   const ws = wrapperSettings ?? DEFAULT_WRAPPER_SETTINGS;
 
-  // Build initial editor content from signature data
-  // Build editor HTML from signature data + block settings
-  const buildContent = useCallback(() => {
-    // Find name block settings for colors/sizes
-    const nameBlock = blocks.find((b) => b.type === "name");
-    const ns = nameBlock?.settings ?? {};
-    const nameSize = Number(ns.nameSize ?? 16);
-    const nameColor = String(ns.nameColor ?? (ws.textOnDark ? "#ffffff" : "#1a1a1a"));
-    const nameWeight = String(ns.nameWeight ?? "bold");
-    const titleSize = Number(ns.titleSize ?? 13);
-    const titleColor = String(ns.titleColor ?? (ws.textOnDark ? "rgba(255,255,255,0.85)" : "#555555"));
-    const companyColor = String(ns.companyColor ?? (ws.textOnDark ? "rgba(255,255,255,0.6)" : "#555555"));
+  const updateBlockSettings = (blockId: string, newSettings: Record<string, unknown>) => {
+    onBlocksChange(blocks.map((b) => b.id === blockId ? { ...b, settings: newSettings } : b));
+  };
 
-    // Find contact block settings
-    const contactBlock = blocks.find((b) => b.type === "contact");
-    const cs = contactBlock?.settings ?? {};
-    const linkColor = String(cs.linkColor ?? data.primaryColor ?? "#2563eb");
-    const textColor = String(cs.textColor ?? (ws.textOnDark ? "rgba(255,255,255,0.7)" : "#555555"));
-
-    // Find divider block settings
-    const dividerBlock = blocks.find((b) => b.type === "divider");
-    const ds = dividerBlock?.settings ?? {};
-    const divColor = String(ds.color ?? data.primaryColor ?? "#2563eb");
-    const divStyle = String(ds.style ?? "solid");
-    const divThickness = Number(ds.thickness ?? 2);
-    const divWidth = Number(ds.width ?? 100);
-
-    const lines: string[] = [];
-
-    // Name
-    lines.push(`<p><span style="font-size: ${nameSize}px; font-weight: ${nameWeight}; color: ${nameColor}">${data.fullName || "Your Name"}</span>${data.pronouns ? ` <span style="color: #888; font-size: 12px">(${data.pronouns})</span>` : ""}</p>`);
-
-    // Title + Company
-    if (data.jobTitle) {
-      lines.push(`<p><span style="font-size: ${titleSize}px; color: ${titleColor}">${data.jobTitle}${data.company ? ` at <span style="color: ${companyColor}">${data.company}</span>` : ""}</span></p>`);
-    } else if (data.company) {
-      lines.push(`<p><span style="font-size: 13px; color: ${companyColor}">${data.company}</span></p>`);
-    }
-
-    // Divider
-    if (dividerBlock?.visible !== false) {
-      if (divStyle === "decorative") {
-        lines.push(`<p style="color: ${divColor}">——  ·</p>`);
-      } else {
-        lines.push(`<p><span style="display: inline-block; width: ${divWidth}%; border-top: ${divThickness}px ${divStyle} ${divColor}; line-height: 0">&nbsp;</span></p>`);
-      }
-    }
-
-    // Contact
-    const contacts: string[] = [];
-    if (data.email) contacts.push(`<a href="mailto:${data.email}" style="color: ${linkColor}; text-decoration: none">${data.email}</a>`);
-    if (data.phone) contacts.push(`<span style="color: ${textColor}">${data.phone}</span>`);
-    if (data.website) contacts.push(`<a href="https://${data.website.replace(/^https?:\/\//, "")}" style="color: ${linkColor}; text-decoration: none">${data.website.replace(/^https?:\/\//, "")}</a>`);
-    if (contacts.length > 0) {
-      lines.push(`<p style="font-size: 12px">${contacts.join(' <span style="color: #ccc">·</span> ')}</p>`);
-    }
-
-    if (data.address) {
-      lines.push(`<p style="font-size: 12px; color: ${textColor}">${data.address}</p>`);
-    }
-
-    return lines.join("");
-  }, [data, blocks, ws.textOnDark]);
-
-  const editor = useEditor({
-    extensions: [
-      StarterKit.configure({
-        heading: false,
-        codeBlock: false,
-        blockquote: false,
-        bulletList: false,
-        orderedList: false,
-        listItem: false,
-        code: false,
-        horizontalRule: false,
-      }),
-      TextStyleKit.configure({
-        lineHeight: false,
-        backgroundColor: false,
-      }),
-      TextAlign.configure({ types: ["paragraph"] }),
-      Link.configure({ openOnClick: false }),
-      Placeholder.configure({ placeholder: "Start typing your signature..." }),
-    ],
-    content: buildContent(),
-    editorProps: {
-      attributes: {
-        class: "outline-none min-h-[120px] prose prose-sm max-w-none",
-        style: `font-family: ${ws.fontFamily || "Arial,Helvetica,sans-serif"}; font-size: ${ws.baseFontSize || 14}px; color: ${ws.textOnDark ? "#fff" : "#333"}`,
-      },
-    },
-    onUpdate: ({ editor: ed }) => {
-      // Sync editor content back to data
-      syncEditorToData(ed);
-    },
-  });
-
-  // Update editor content + styling when template/wrapper changes
-  const lastTemplate = useRef(data.template);
-  useEffect(() => {
-    if (!editor) return;
-    // Update base styling
-    editor.view.dom.style.fontFamily = ws.fontFamily || "Arial,Helvetica,sans-serif";
-    editor.view.dom.style.fontSize = `${ws.baseFontSize || 14}px`;
-    editor.view.dom.style.color = ws.textOnDark ? "#fff" : "#333";
-    // Reload content when template changes
-    if (data.template !== lastTemplate.current) {
-      lastTemplate.current = data.template;
-      editor.commands.setContent(buildContent());
-    }
-  }, [editor, ws, data.template, buildContent]);
-
-  // Sync TipTap content back to SignatureData (basic extraction)
-  const syncEditorToData = useCallback((ed: Editor) => {
-    // For now, we keep the data in sync through direct editing
-    // The TipTap content IS the source of truth for the text
-    // The export will use TipTap's HTML output
-  }, []);
-
-  // Photo block
   const photoBlock = blocks.find((b) => b.type === "photo" && b.visible);
-  const photoPosition = photoBlock ? String(photoBlock.settings.position ?? "left") : "left";
 
-  const updatePhotoSettings = useCallback((s: Record<string, unknown>) => {
-    if (!photoBlock) return;
-    onBlocksChange(blocks.map((b) => b.id === photoBlock.id ? { ...b, settings: s } : b));
-  }, [photoBlock, blocks, onBlocksChange]);
-
-  // Copy handler — uses the block renderer for email-safe output
   const handleCopy = async () => {
     const options: GenerateOptions = { plan, signatureId: sigId };
     let html = generateHtmlFromBlocks(blocks, data, ws, options);
 
-    // Upload base64 photo to R2
     if (data.photoUrl && data.photoUrl.startsWith("data:")) {
       try {
         await fetch("/api/signatures/free", {
@@ -550,100 +455,71 @@ export default function SignatureEditor({
     setTimeout(() => setCopyState("idle"), 3000);
   };
 
-  // Wrapper styles for the editor area
-  const editorWrapperStyle: React.CSSProperties = {
-    backgroundColor: ws.backgroundColor !== "none" ? ws.backgroundColor : "#ffffff",
-    borderRadius: ws.backgroundRadius || 0,
-    padding: ws.backgroundPadding || 24,
-    borderTop: ws.borderTop || undefined,
-    borderLeft: ws.borderLeft || undefined,
-    paddingLeft: ws.borderLeft ? (ws.backgroundPadding || 24) : (ws.backgroundPadding || 24),
-  };
-
   return (
-    <div className="space-y-3">
-      {/* Toolbar */}
-      <EditorToolbar editor={editor} wrapperSettings={ws} onWrapperChange={onWrapperSettingsChange} />
+    <div className="grid gap-6 lg:grid-cols-5">
+      {/* LEFT: Form */}
+      <div className="lg:col-span-2 space-y-3">
+        <Section title="Personal Info" icon="👤" defaultOpen={true}>
+          <Field label="Full Name" value={data.fullName} onChange={(v) => onDataChange({ ...data, fullName: v })} placeholder="John Doe" />
+          <Field label="Job Title" value={data.jobTitle} onChange={(v) => onDataChange({ ...data, jobTitle: v })} placeholder="Marketing Manager" />
+          <Field label="Company" value={data.company} onChange={(v) => onDataChange({ ...data, company: v })} placeholder="Acme Corp" />
+          <Field label="Pronouns" value={data.pronouns} onChange={(v) => onDataChange({ ...data, pronouns: v })} placeholder="he/him" />
+        </Section>
 
-      {/* Mock email compose window */}
-      <div className="rounded-b-xl border border-slate-200 shadow-sm overflow-hidden">
-        {/* Email chrome header */}
-        <div className="border-b border-slate-100 bg-slate-50 px-4 py-2.5 flex items-center gap-2">
-          <div className="flex gap-1.5">
-            <span className="h-3 w-3 rounded-full bg-red-400" />
-            <span className="h-3 w-3 rounded-full bg-amber-400" />
-            <span className="h-3 w-3 rounded-full bg-emerald-400" />
-          </div>
-          <span className="ml-2 text-xs text-slate-400 font-medium">New Message</span>
-        </div>
-        {/* Email fields */}
-        <div className="border-b border-slate-100 px-4 py-1.5">
-          <span className="text-xs text-slate-400">To: </span>
-          <span className="text-xs text-slate-600">recipient@company.com</span>
-        </div>
-        <div className="border-b border-slate-100 px-4 py-1.5">
-          <span className="text-xs text-slate-400">Subject: </span>
-          <span className="text-xs text-slate-600">Quick follow up</span>
-        </div>
-        {/* Email body with typed message */}
-        <div className="px-4 pt-3 pb-2">
-          <p className="text-sm text-slate-500">Hi there,</p>
-          <p className="text-sm text-slate-500 mt-1">Just wanted to follow up on our conversation. Let me know if you have any questions.</p>
-          <p className="text-sm text-slate-500 mt-1">Best regards,</p>
-        </div>
-        {/* Signature area */}
-        <div className="px-4 pb-4" style={editorWrapperStyle}>
-        <div style={{
-          display: "flex",
-          gap: 14,
-          flexDirection: photoPosition === "right" ? "row-reverse" : "row",
-          alignItems: "flex-start",
-        }}>
-          {/* Photo */}
-          {photoBlock && (
-            <div style={{ flexShrink: 0 }}>
-              <PhotoSection
-                data={data}
-                photoSettings={photoBlock.settings}
-                onDataChange={onDataChange}
-                onSettingsChange={updatePhotoSettings}
-              />
-            </div>
-          )}
+        <Section title="Contact" icon="📞" defaultOpen={true}>
+          <Field label="Email" value={data.email} onChange={(v) => onDataChange({ ...data, email: v })} placeholder="john@company.com" type="email" />
+          <Field label="Phone" value={data.phone} onChange={(v) => onDataChange({ ...data, phone: v })} placeholder="+1 (555) 123-4567" type="tel" />
+          <Field label="Website" value={data.website} onChange={(v) => onDataChange({ ...data, website: v })} placeholder="www.company.com" />
+          <Field label="Address" value={data.address} onChange={(v) => onDataChange({ ...data, address: v })} placeholder="123 Main St, New York" />
+        </Section>
 
-          {/* Text content */}
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <EditorContent editor={editor} />
-            <SocialRow data={data} plan={plan} />
-          </div>
-        </div>
-        </div>
+        <Section title="Photo" icon="🖼️" defaultOpen={false}>
+          <PhotoUpload data={data} onDataChange={onDataChange} photoBlock={photoBlock} onBlockSettingsChange={updateBlockSettings} />
+        </Section>
+
+        <Section title="Social Media" icon="🔗" defaultOpen={false}>
+          <SocialFields data={data} onDataChange={onDataChange} plan={plan} />
+        </Section>
+
+        <Section title="Styling" icon="🎨" defaultOpen={false}>
+          <StyleControls blocks={blocks} wrapperSettings={ws} onBlockSettingsChange={updateBlockSettings} onWrapperChange={onWrapperSettingsChange} />
+        </Section>
       </div>
 
-      {/* Copy button */}
-      <button
-        type="button"
-        onClick={handleCopy}
-        className={`w-full rounded-xl px-4 py-3 text-sm font-semibold transition-all shadow-sm flex items-center justify-center gap-2 ${
-          copyState === "copied"
-            ? "bg-emerald-500 text-white"
-            : copyState === "error"
-              ? "bg-red-500 text-white"
-              : "bg-blue-600 text-white hover:bg-blue-700"
-        }`}
-      >
-        {copyState === "copied" ? (
-          <>
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
-            Copied! Paste in your email client
-          </>
-        ) : copyState === "error" ? "Copy failed — try again" : (
-          <>
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9.75a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" /></svg>
-            Copy Signature
-          </>
-        )}
-      </button>
+      {/* RIGHT: Live Preview + Copy */}
+      <div className="lg:col-span-3">
+        <div className="sticky top-20 space-y-3">
+          <LivePreview blocks={blocks} data={data} wrapperSettings={ws} plan={plan} />
+
+          <button
+            type="button"
+            onClick={handleCopy}
+            className={`w-full rounded-xl px-4 py-3 text-sm font-semibold transition-all shadow-sm flex items-center justify-center gap-2 ${
+              copyState === "copied"
+                ? "bg-emerald-500 text-white"
+                : copyState === "error"
+                  ? "bg-red-500 text-white"
+                  : "bg-blue-600 text-white hover:bg-blue-700"
+            }`}
+          >
+            {copyState === "copied" ? (
+              <>
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+                Copied! Paste in your email client
+              </>
+            ) : copyState === "error" ? "Copy failed — try again" : (
+              <>
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9.75a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" /></svg>
+                Copy Signature
+              </>
+            )}
+          </button>
+
+          <div className="text-center">
+            <p className="text-xs text-slate-400">Works in Gmail, Outlook, Apple Mail & Yahoo</p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

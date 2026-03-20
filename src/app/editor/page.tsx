@@ -6,9 +6,7 @@ import { SignatureData, TemplateName, DEFAULT_SIGNATURE_DATA, TEMPLATES, Wrapper
 import { generateSignatureHtml, generateCopyHtml } from "@/lib/generateSignature";
 import { copySignatureToClipboard } from "@/lib/clipboard";
 import { Block, getDefaultBlocks, getPresetForTemplate } from "@/lib/blocks";
-import dynamic from "next/dynamic";
-
-const SignatureEditor = dynamic(() => import("@/components/SignatureEditor"), { ssr: false });
+import SignatureEditor from "@/components/SignatureEditor";
 
 
 // ---------------------------------------------------------------------------
@@ -829,18 +827,8 @@ export default function EditorPage() {
       )}
       {isPro && <div className="mb-8" />}
 
-      {/* Two-column layout: form | editor */}
-      <div className="grid gap-6 lg:grid-cols-7">
-        {/* Left: Your details form (compact) */}
-        <div className="lg:col-span-2">
-          <div className="sticky top-20">
-            <h2 className="mb-3 text-sm font-semibold text-foreground">Your Details</h2>
-            <ProSignatureForm data={data} onChange={setData} isPro={isPro} />
-          </div>
-        </div>
-
-        {/* Right: TipTap signature editor */}
-        <div className="lg:col-span-5">
+      {/* Signature editor: form left + live preview right */}
+      <div>
           <SignatureEditor
             blocks={blocks}
             data={data}
@@ -850,7 +838,6 @@ export default function EditorPage() {
             onDataChange={setData}
             onWrapperSettingsChange={setWrapperSettings}
           />
-        </div>
       </div>
 
       {/* Why sign up — only for free users */}
