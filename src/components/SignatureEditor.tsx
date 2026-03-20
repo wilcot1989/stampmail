@@ -16,7 +16,15 @@ import { copySignatureToClipboard } from "@/lib/clipboard";
 // Toolbar
 // ---------------------------------------------------------------------------
 
-function EditorToolbar({ editor }: { editor: Editor | null }) {
+function EditorToolbar({
+  editor,
+  wrapperSettings: ws,
+  onWrapperChange,
+}: {
+  editor: Editor | null;
+  wrapperSettings: WrapperSettings;
+  onWrapperChange: (ws: WrapperSettings) => void;
+}) {
   if (!editor) return null;
 
   const currentColor = editor.getAttributes("textStyle").color || "#000000";
@@ -126,6 +134,47 @@ function EditorToolbar({ editor }: { editor: Editor | null }) {
       <ToolbarBtn onClick={() => editor.chain().focus().redo().run()} title="Redo">
         <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M15 14l5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 000 11H13"/></svg>
       </ToolbarBtn>
+
+      {/* Spacer to push BG controls to the right */}
+      <div className="flex-1" />
+
+      {/* Background color */}
+      <label className="relative cursor-pointer flex items-center gap-1" title="Signature background color">
+        <div
+          className="h-5 w-5 rounded border border-slate-300"
+          style={{ backgroundColor: ws.backgroundColor !== "none" ? ws.backgroundColor : "#ffffff" }}
+        />
+        <span className="text-[10px] text-slate-500 hidden sm:inline">BG</span>
+        <input
+          type="color"
+          value={ws.backgroundColor !== "none" ? ws.backgroundColor : "#ffffff"}
+          onChange={(e) => onWrapperChange({
+            ...ws,
+            backgroundColor: e.target.value,
+            backgroundRadius: ws.backgroundRadius || 8,
+            backgroundPadding: ws.backgroundPadding || 16,
+          })}
+          className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+        />
+      </label>
+      {ws.backgroundColor !== "none" && (
+        <>
+          <ToolbarBtn
+            active={ws.textOnDark}
+            onClick={() => onWrapperChange({ ...ws, textOnDark: !ws.textOnDark })}
+            title="Light text (for dark backgrounds)"
+          >
+            <span className="text-[10px]">Aa</span>
+          </ToolbarBtn>
+          <button
+            onClick={() => onWrapperChange({ ...ws, backgroundColor: "none", backgroundPadding: 0, backgroundRadius: 0, textOnDark: false })}
+            className="text-[10px] text-red-500 hover:text-red-700 px-1"
+            title="Remove background"
+          >
+            &times;
+          </button>
+        </>
+      )}
     </div>
   );
 }
@@ -436,13 +485,36 @@ export default function SignatureEditor({
   return (
     <div className="space-y-3">
       {/* Toolbar */}
-      <EditorToolbar editor={editor} />
+      <EditorToolbar editor={editor} wrapperSettings={ws} onWrapperChange={onWrapperSettingsChange} />
 
-      {/* Editor area — looks like the signature */}
-      <div
-        className="rounded-b-xl border border-slate-200 shadow-sm overflow-hidden"
-        style={editorWrapperStyle}
-      >
+      {/* Mock email compose window */}
+      <div className="rounded-b-xl border border-slate-200 shadow-sm overflow-hidden">
+        {/* Email chrome header */}
+        <div className="border-b border-slate-100 bg-slate-50 px-4 py-2.5 flex items-center gap-2">
+          <div className="flex gap-1.5">
+            <span className="h-3 w-3 rounded-full bg-red-400" />
+            <span className="h-3 w-3 rounded-full bg-amber-400" />
+            <span className="h-3 w-3 rounded-full bg-emerald-400" />
+          </div>
+          <span className="ml-2 text-xs text-slate-400 font-medium">New Message</span>
+        </div>
+        {/* Email fields */}
+        <div className="border-b border-slate-100 px-4 py-1.5">
+          <span className="text-xs text-slate-400">To: </span>
+          <span className="text-xs text-slate-600">recipient@company.com</span>
+        </div>
+        <div className="border-b border-slate-100 px-4 py-1.5">
+          <span className="text-xs text-slate-400">Subject: </span>
+          <span className="text-xs text-slate-600">Quick follow up</span>
+        </div>
+        {/* Email body with typed message */}
+        <div className="px-4 pt-3 pb-2">
+          <p className="text-sm text-slate-500">Hi there,</p>
+          <p className="text-sm text-slate-500 mt-1">Just wanted to follow up on our conversation. Let me know if you have any questions.</p>
+          <p className="text-sm text-slate-500 mt-1">Best regards,</p>
+        </div>
+        {/* Signature area */}
+        <div className="px-4 pb-4" style={editorWrapperStyle}>
         <div style={{
           display: "flex",
           gap: 14,
@@ -466,6 +538,7 @@ export default function SignatureEditor({
             <EditorContent editor={editor} />
             <SocialRow data={data} plan={plan} />
           </div>
+        </div>
         </div>
       </div>
 
