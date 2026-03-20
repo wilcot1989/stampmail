@@ -115,8 +115,8 @@ function ProTemplateSelector({
 }: ProTemplateSelectorProps) {
   return (
     <div>
-      <h3 className="text-sm font-semibold text-foreground mb-3">Choose a Template</h3>
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <h3 className="text-sm font-semibold text-foreground mb-2">Choose a Template</h3>
+      <div className="grid grid-cols-4 gap-2 sm:grid-cols-8">
         {TEMPLATES.map((template) => {
           const isSelected = selectedTemplate === template.id;
           const locked = template.isPro && !isPro;
@@ -133,7 +133,7 @@ function ProTemplateSelector({
                   onSelect(template.id);
                 }
               }}
-              className={`relative rounded-lg border-2 p-3 text-left transition-all ${
+              className={`relative rounded-lg border-2 p-2 text-left transition-all ${
                 isSelected
                   ? "border-primary bg-blue-50"
                   : locked
@@ -142,25 +142,24 @@ function ProTemplateSelector({
               }`}
             >
               {locked && (
-                <span className="absolute -top-2 -right-2 z-10 rounded-full bg-amber-500 px-2 py-0.5 text-[10px] font-bold text-white shadow">
+                <span className="absolute -top-1.5 -right-1.5 z-10 rounded-full bg-amber-500 px-1.5 py-0.5 text-[9px] font-bold text-white shadow">
                   PRO
                 </span>
               )}
               {locked && (
                 <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-white/60">
-                  <svg className="h-5 w-5 text-slate-500" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                  <svg className="h-4 w-4 text-slate-500" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
                   </svg>
                 </div>
               )}
               <div
-                className="mb-2 max-h-20 overflow-hidden pointer-events-none"
-                style={{ transform: "scale(0.35)", transformOrigin: "top left", width: "280%", height: "57px" }}
+                className="mb-1 max-h-12 overflow-hidden pointer-events-none"
+                style={{ transform: "scale(0.25)", transformOrigin: "top left", width: "400%", height: "48px" }}
               >
                 <div dangerouslySetInnerHTML={{ __html: previewHtml }} />
               </div>
-              <p className="text-xs font-semibold text-foreground">{template.name}</p>
-              <p className="text-[10px] text-muted">{template.description}</p>
+              <p className="text-[11px] font-semibold text-foreground truncate">{template.name}</p>
             </button>
           );
         })}
@@ -190,7 +189,7 @@ function FormSection({
 }) {
   return (
     <details open={defaultOpen} className="group">
-      <summary className="flex cursor-pointer items-center justify-between rounded-lg bg-surface px-4 py-3 text-sm font-semibold text-foreground hover:bg-gray-100 transition-colors">
+      <summary className="flex cursor-pointer items-center justify-between rounded-lg bg-surface px-3 py-2 text-xs font-semibold text-foreground hover:bg-gray-100 transition-colors">
         {title}
         <svg
           className="h-4 w-4 text-muted transition-transform group-open:rotate-180"
@@ -202,7 +201,7 @@ function FormSection({
           <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
         </svg>
       </summary>
-      <div className="mt-3 space-y-3 px-1">{children}</div>
+      <div className="mt-2 space-y-2 px-1">{children}</div>
     </details>
   );
 }
@@ -224,14 +223,14 @@ function InputField({
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium text-muted mb-1">{label}</label>
+      <label className="block text-[11px] font-medium text-muted mb-0.5">{label}</label>
       <input
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         disabled={disabled}
-        className="w-full rounded-md border border-border bg-white px-3 py-2 text-sm text-foreground placeholder:text-muted-light focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
+        className="w-full rounded-md border border-border bg-white px-2.5 py-1.5 text-xs text-foreground placeholder:text-muted-light focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
       />
     </div>
   );
@@ -249,16 +248,16 @@ function ColorField({
   disabled?: boolean;
 }) {
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-2">
       <input
         type="color"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         disabled={disabled}
-        className="h-8 w-8 cursor-pointer rounded border border-border disabled:cursor-not-allowed disabled:opacity-50"
+        className="h-7 w-7 cursor-pointer rounded border border-border disabled:cursor-not-allowed disabled:opacity-50"
       />
       <div>
-        <label className="block text-xs font-medium text-muted">{label}</label>
+        <label className="block text-[11px] font-medium text-muted">{label}</label>
         <input
           type="text"
           value={value}
@@ -331,7 +330,7 @@ function ProSignatureForm({ data, onChange, isPro }: ProSignatureFormProps) {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <FormSection title="Personal Information">
         <InputField label="Full Name" value={data.fullName} onChange={(v) => update("fullName", v)} placeholder="John Doe" />
         <InputField label="Job Title" value={data.jobTitle} onChange={(v) => update("jobTitle", v)} placeholder="Marketing Manager" />
@@ -348,25 +347,25 @@ function ProSignatureForm({ data, onChange, isPro }: ProSignatureFormProps) {
 
       <FormSection title="Photo" defaultOpen={false}>
         <div>
-          <label className="block text-xs font-medium text-muted mb-2">Profile Photo or Logo</label>
+          <label className="block text-[11px] font-medium text-muted mb-1">Profile Photo or Logo</label>
           {data.photoUrl ? (
-            <div className="flex items-center gap-3">
-              <img src={data.photoUrl} alt="Preview" className="h-16 w-16 rounded-full object-cover border border-border" />
-              <button onClick={() => update("photoUrl", "")} className="text-xs text-red-500 hover:text-red-700">Remove</button>
+            <div className="flex items-center gap-2">
+              <img src={data.photoUrl} alt="Preview" className="h-12 w-12 rounded-full object-cover border border-border" />
+              <button onClick={() => update("photoUrl", "")} className="text-[11px] text-red-500 hover:text-red-700">Remove</button>
             </div>
           ) : (
-            <label className="flex cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-border bg-surface px-4 py-6 text-sm text-muted hover:border-primary hover:text-primary transition-colors">
+            <label className="flex cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-border bg-surface px-3 py-4 text-xs text-muted hover:border-primary hover:text-primary transition-colors">
               <span>Click to upload (max 2MB)</span>
               <input type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" />
             </label>
           )}
-          <p className="mt-1 text-xs text-muted-light">Or paste an image URL:</p>
+          <p className="mt-1 text-[11px] text-muted-light">Or paste an image URL:</p>
           <input
             type="text"
             value={data.photoUrl.startsWith("data:") ? "" : data.photoUrl}
             onChange={(e) => update("photoUrl", e.target.value)}
             placeholder="https://example.com/photo.jpg"
-            className="mt-1 w-full rounded-md border border-border bg-white px-3 py-2 text-sm placeholder:text-muted-light focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            className="mt-1 w-full rounded-md border border-border bg-white px-2.5 py-1.5 text-xs placeholder:text-muted-light focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
           />
         </div>
       </FormSection>
@@ -381,8 +380,8 @@ function ProSignatureForm({ data, onChange, isPro }: ProSignatureFormProps) {
 
           if (shouldLock) {
             return (
-              <div key={field} className="rounded-lg border border-dashed border-amber-200 bg-amber-50 px-3 py-2.5 flex items-center justify-between gap-2">
-                <span className="text-xs text-amber-700 font-medium">{socialLabels[field]}</span>
+              <div key={field} className="rounded-lg border border-dashed border-amber-200 bg-amber-50 px-2.5 py-2 flex items-center justify-between gap-2">
+                <span className="text-[11px] text-amber-700 font-medium">{socialLabels[field]}</span>
                 <div className="flex items-center gap-2">
                   <ProBadge label="Pro for unlimited links" />
                   <Link href="/pricing" className="text-xs text-amber-600 underline hover:text-amber-800">Upgrade</Link>
@@ -455,7 +454,7 @@ function ProSignatureForm({ data, onChange, isPro }: ProSignatureFormProps) {
             <textarea
               disabled={!isPro}
               placeholder="Confidentiality notice or legal disclaimer..."
-              className="w-full rounded-md border border-border bg-white px-3 py-2 text-sm text-foreground placeholder:text-muted-light focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:cursor-not-allowed disabled:opacity-50 resize-none"
+              className="w-full rounded-md border border-border bg-white px-2.5 py-1.5 text-xs text-foreground placeholder:text-muted-light focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:cursor-not-allowed disabled:opacity-50 resize-none"
               rows={2}
             />
           </div>
