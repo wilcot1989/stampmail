@@ -228,7 +228,7 @@ function safeBool(val: unknown, fallback: boolean): boolean {
 // Template style system
 // ---------------------------------------------------------------------------
 
-interface TemplateStyle {
+export interface TemplateStyle {
   fontFamily: string;
   baseFontSize: number;
   // Name block
@@ -260,7 +260,8 @@ interface TemplateStyle {
   // Layout
   outerBorderTop: string;
   contentBorderLeft: string;
-  outerBackground: "none" | "primary";
+  outerBackground: string; // "none", "primary", or a custom hex color
+  nameBarBackground: string; // background color for the name/photo section (e.g. executive dark header)
   textOnDark: boolean;
   // CTA
   ctaStyle: "standard" | "inverted" | "gradient-pill" | "accent";
@@ -296,6 +297,7 @@ function getTemplateStyle(template: TemplateName, data: SignatureData): Template
     outerBorderTop: "",
     contentBorderLeft: "",
     outerBackground: "none",
+    nameBarBackground: "",
     textOnDark: false,
     ctaStyle: "standard",
   };
@@ -417,14 +419,14 @@ function getTemplateStyle(template: TemplateName, data: SignatureData): Template
     case "executive":
       return {
         ...base,
-        nameSize: 18,
+        nameSize: 20,
         nameColor: "dark",
         titleColor: "accent",
-        companyDisplay: "separate",
-        dividerStyle: "solid",
-        dividerThickness: 1,
-        dividerColor: "grey",
+        companyDisplay: "separate-uppercase",
+        dividerStyle: "none",
         contactLayout: "stacked",
+        contentBorderLeft: `3px solid ${pc}`,
+        nameBarBackground: "#1e293b",
         photoSize: 85,
         photoShape: "rounded",
       };
@@ -564,14 +566,14 @@ function getTemplateStyle(template: TemplateName, data: SignatureData): Template
         ...base,
         nameSize: 18,
         nameColor: "dark",
-        titleColor: "white-alpha",
-        companyDisplay: "merged-title",
+        titleColor: "accent",
+        companyDisplay: "separate",
         dividerStyle: "none",
         socialColor: "white-alpha",
-        photoSize: 80,
+        photoSize: 76,
         photoShape: "rounded",
-        photoBorder: "2px solid rgba(255,255,255,0.2)",
-        outerBackground: "primary",
+        photoBorder: "2px solid #ffffff",
+        outerBackground: "#111827",
         textOnDark: true,
         ctaStyle: "inverted",
       };
@@ -919,18 +921,20 @@ function renderDivider(_block: Block, ts: TemplateStyle, data: SignatureData): s
   const pc = data.primaryColor || "#2563eb";
   const ac = data.accentColor || "#f59e0b";
 
-  if (ts.dividerStyle === "none") return "";
+  // If template has no divider style, render a subtle default line
+  // (the user explicitly enabled this block, so show something)
+  const style = ts.dividerStyle === "none" ? "solid" : ts.dividerStyle;
+  const thickness = ts.dividerStyle === "none" ? 1 : ts.dividerThickness;
 
   const color = ts.dividerColor === "accent" ? ac : ts.dividerColor === "grey" ? "#eeeeee" : pc;
 
-  if (ts.dividerStyle === "decorative") {
-    // Elegant: long dash + short dash pattern
+  if (style === "decorative") {
     return `<tr><td style="padding-top:4px;padding-bottom:4px;">
   <table cellpadding="0" cellspacing="0" border="0"><tr><td style="width:40px;height:1px;background:${color};"></td><td style="width:8px;"></td><td style="width:8px;height:1px;background:${color};"></td></tr></table>
 </td></tr>`;
   }
 
-  if (ts.dividerStyle === "thin-grey") {
+  if (style === "thin-grey") {
     return `<tr><td style="padding-top:4px;padding-bottom:4px;">
   <table cellpadding="0" cellspacing="0" border="0" width="100%">
     <tr><td style="font-size:0;line-height:0;border-top:1px solid #eeeeee;">&nbsp;</td></tr>
@@ -938,10 +942,10 @@ function renderDivider(_block: Block, ts: TemplateStyle, data: SignatureData): s
 </td></tr>`;
   }
 
-  const lineStyle = ts.dividerStyle === "dashed" ? "dashed" : "solid";
+  const lineStyle = style === "dashed" ? "dashed" : "solid";
   return `<tr><td style="padding-top:4px;padding-bottom:4px;">
   <table cellpadding="0" cellspacing="0" border="0" width="100%">
-    <tr><td style="font-size:0;line-height:0;border-top:${ts.dividerThickness}px ${lineStyle} ${color};">&nbsp;</td></tr>
+    <tr><td style="font-size:0;line-height:0;border-top:${thickness}px ${lineStyle} ${color};">&nbsp;</td></tr>
   </table>
 </td></tr>`;
 }
@@ -1056,18 +1060,64 @@ export function generateHtmlFromBlocks(
     const src = esc(data.photoUrl);
     const borderStyle = ts.photoBorder ? `border:${ts.photoBorder};` : "";
 
-    const photoTd = `<td style="vertical-align:top;padding-${photoPosition === "left" ? "right" : "left"}:14px;width:${size}px;">
-      <img src="${src}" alt="${esc(data.fullName)}" width="${size}" height="${size}" style="width:${size}px;height:${size}px;border-radius:${borderRadius};object-fit:cover;display:block;${borderStyle}" />
-    </td>`;
+    // If nameBarBackground is set (executive style), split into header bar + contact section
+    if (ts.nameBarBackground) {
+      // Separate name block from contact/social/divider blocks
+      const nameBlock = contentBlocks.find((b) => b.type === "name");
+      const otherBlocks = contentBlocks.filter((b) => b.type !== "name");
 
-    const contentBorderStyle = ts.contentBorderLeft ? `border-left:${ts.contentBorderLeft};padding-left:14px;` : "";
-    const contentTd = `<td style="vertical-align:top;${contentBorderStyle}">
-      <table cellpadding="0" cellspacing="0" border="0" style="font-family:${ts.fontFamily};font-size:${ts.baseFontSize}px;color:${ts.textOnDark ? "#ffffff" : "#333"};">
-        ${contentRows}
-      </table>
-    </td>`;
+      const nameHtml = nameBlock ? renderName(nameBlock, data, { ...ts, nameColor: "dark", titleColor: "accent" } as TemplateStyle) : "";
 
-    rows = `<tr>${photoPosition === "left" ? photoTd + contentTd : contentTd + photoTd}</tr>`;
+      const otherRows = otherBlocks
+        .map((b) => {
+          switch (b.type) {
+            case "contact": return renderContact(b, data, ts);
+            case "social": return renderSocial(b, data, ts, plan);
+            case "divider": return renderDivider(b, ts, data);
+            case "cta": return isPro ? renderCta(b, ts, data) : "";
+            case "disclaimer": return isPro ? renderDisclaimer(b, ts) : "";
+            case "spacer": return renderSpacer(b);
+            default: return "";
+          }
+        })
+        .filter(Boolean)
+        .join("\n");
+
+      const photoTd = `<td style="vertical-align:middle;padding-right:14px;width:${size}px;">
+        <img src="${src}" alt="${esc(data.fullName)}" width="${size}" height="${size}" style="width:${size}px;height:${size}px;border-radius:${borderRadius};object-fit:cover;display:block;${borderStyle}" />
+      </td>`;
+      const nameTd = `<td style="vertical-align:middle;">
+        <table cellpadding="0" cellspacing="0" border="0" style="font-family:${ts.fontFamily};font-size:${ts.baseFontSize}px;color:#ffffff;">
+          ${nameHtml}
+        </table>
+      </td>`;
+
+      const headerRow = `<tr><td style="background-color:${ts.nameBarBackground};padding:14px 18px;">
+        <table cellpadding="0" cellspacing="0" border="0"><tr>${photoTd}${nameTd}</tr></table>
+      </td></tr>`;
+
+      const contentBorderStyle = ts.contentBorderLeft ? `border-left:${ts.contentBorderLeft};padding-left:14px;` : "";
+      const contactRow = otherRows ? `<tr><td style="padding:12px 18px;${contentBorderStyle}">
+        <table cellpadding="0" cellspacing="0" border="0" style="font-family:${ts.fontFamily};font-size:${ts.baseFontSize}px;color:#333;">
+          ${otherRows}
+        </table>
+      </td></tr>` : "";
+
+      rows = headerRow + contactRow;
+    } else {
+      const photoTd = `<td style="vertical-align:top;padding-${photoPosition === "left" ? "right" : "left"}:14px;width:${size}px;">
+        <img src="${src}" alt="${esc(data.fullName)}" width="${size}" height="${size}" style="width:${size}px;height:${size}px;border-radius:${borderRadius};object-fit:cover;display:block;${borderStyle}" />
+      </td>`;
+
+      const contentBorderStyle = ts.contentBorderLeft ? `border-left:${ts.contentBorderLeft};padding-left:14px;` : "";
+      const contentTd = `<td style="vertical-align:top;${contentBorderStyle}">
+        <table cellpadding="0" cellspacing="0" border="0" style="font-family:${ts.fontFamily};font-size:${ts.baseFontSize}px;color:${ts.textOnDark ? "#ffffff" : "#333"};">
+          ${contentRows}
+        </table>
+      </td>`;
+
+      rows = `<tr>${photoPosition === "left" ? photoTd + contentTd : contentTd + photoTd}</tr>`;
+    }
   } else {
     rows = contentRows;
   }
@@ -1088,7 +1138,11 @@ export function generateHtmlFromBlocks(
     `color:${ts.textOnDark ? "#ffffff" : "#333333"}`,
   ];
   if (ts.outerBorderTop) outerStyles.push(`border-top:${ts.outerBorderTop}`, "padding-top:12px");
-  if (ts.outerBackground === "primary") outerStyles.push(`background-color:${pc}`, "border-radius:8px", "padding:16px");
+  if (ts.outerBackground === "primary") {
+    outerStyles.push(`background-color:${pc}`, "border-radius:8px", "padding:16px");
+  } else if (ts.outerBackground !== "none") {
+    outerStyles.push(`background-color:${ts.outerBackground}`, "border-radius:8px", "padding:16px");
+  }
 
   return `<table cellpadding="0" cellspacing="0" border="0" style="${outerStyles.join(";") + ";"}">
 ${rows}
