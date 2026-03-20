@@ -116,11 +116,18 @@ function ProTemplateSelector({
   return (
     <div>
       <h3 className="text-sm font-semibold text-foreground mb-2">Choose a Template</h3>
-      <div className="grid grid-cols-4 gap-2 sm:grid-cols-8">
+      <div className="grid grid-cols-4 gap-2 sm:grid-cols-5 lg:grid-cols-10">
         {TEMPLATES.map((template) => {
           const isSelected = selectedTemplate === template.id;
           const locked = template.isPro && !isPro;
-          const previewData = { ...data, template: template.id as TemplateName };
+          const previewData: SignatureData = {
+            ...DEFAULT_SIGNATURE_DATA,
+            template: template.id as TemplateName,
+            fullName: template.previewName || DEFAULT_SIGNATURE_DATA.fullName,
+            jobTitle: template.previewTitle || DEFAULT_SIGNATURE_DATA.jobTitle,
+            company: template.previewCompany || DEFAULT_SIGNATURE_DATA.company,
+            photoUrl: template.previewPhoto ? `https://neatstamp.com${template.previewPhoto}` : "",
+          };
           const previewHtml = generateSignatureHtml(previewData);
 
           return (

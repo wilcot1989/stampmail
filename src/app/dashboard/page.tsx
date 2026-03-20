@@ -4,7 +4,7 @@ import { useSession, signOut } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, useRef, Suspense } from "react";
 import Link from "next/link";
-import { SignatureData, DEFAULT_SIGNATURE_DATA, TemplateName } from "@/lib/types";
+import { SignatureData, DEFAULT_SIGNATURE_DATA, TemplateName, TEMPLATES } from "@/lib/types";
 import { Block, getDefaultBlocks } from "@/lib/blocks";
 import BlockEditor from "@/components/BlockEditor";
 import { generateSignatureHtml } from "@/lib/generateSignature";
@@ -1364,10 +1364,19 @@ function DashboardContent() {
               <div>
                 <h3 className="text-sm font-semibold text-foreground mb-3">Choose a template</h3>
                 <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-thin">
-                  {(["minimal", "modern", "corporate", "creative", "bold", "elegant", "startup", "compact"] as const).map((t) => {
+                  {TEMPLATES.map((tpl) => {
+                    const t = tpl.id;
                     const isSelected = editorData.template === t;
-                    const isLocked = !isPro && !["minimal", "modern"].includes(t);
-                    const previewHtml = generateSignatureHtml({ ...DEFAULT_SIGNATURE_DATA, template: t });
+                    const isLocked = tpl.isPro && !isPro;
+                    const previewData: SignatureData = {
+                      ...DEFAULT_SIGNATURE_DATA,
+                      template: t,
+                      fullName: tpl.previewName || DEFAULT_SIGNATURE_DATA.fullName,
+                      jobTitle: tpl.previewTitle || DEFAULT_SIGNATURE_DATA.jobTitle,
+                      company: tpl.previewCompany || DEFAULT_SIGNATURE_DATA.company,
+                      photoUrl: tpl.previewPhoto ? `https://neatstamp.com${tpl.previewPhoto}` : "",
+                    };
+                    const previewHtml = generateSignatureHtml(previewData);
                     return (
                       <button
                         key={t}
@@ -1394,7 +1403,6 @@ function DashboardContent() {
                             }}
                             dangerouslySetInnerHTML={{ __html: previewHtml }}
                           />
-                          {/* Locked overlay */}
                           {isLocked && (
                             <div className="absolute inset-0 bg-slate-100/70 flex items-center justify-center">
                               <svg className="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
@@ -1403,10 +1411,9 @@ function DashboardContent() {
                             </div>
                           )}
                         </div>
-                        {/* Template name */}
                         <div className={`px-2 py-1.5 border-t flex items-center justify-between ${isSelected ? "border-primary/20 bg-blue-50" : "border-border"}`}>
-                          <span className={`text-xs font-medium capitalize ${isSelected ? "text-primary" : isLocked ? "text-slate-400" : "text-slate-700"}`}>
-                            {t}
+                          <span className={`text-xs font-medium ${isSelected ? "text-primary" : isLocked ? "text-slate-400" : "text-slate-700"}`}>
+                            {tpl.name}
                           </span>
                           {isLocked && (
                             <span className="inline-flex items-center rounded-full bg-amber-100 px-1.5 py-0.5 text-[9px] font-bold text-amber-700">PRO</span>
@@ -1422,7 +1429,7 @@ function DashboardContent() {
                   })}
                 </div>
                 {!isPro && (
-                  <p className="mt-2 text-xs text-muted">2 of 8 templates available</p>
+                  <p className="mt-2 text-xs text-muted">2 of {TEMPLATES.length} templates available</p>
                 )}
               </div>
 

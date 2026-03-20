@@ -392,6 +392,445 @@ function generateCompact(data: SignatureData, options?: GenerateOptions): string
 </table>`;
 }
 
+function generateExecutive(data: SignatureData, options?: GenerateOptions): string {
+  const c = data.primaryColor;
+  const a = data.accentColor;
+  const isPro = options?.plan === "pro" || options?.plan === "team";
+  return `<table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#333;">
+  <tr>
+    <td style="background-color:#1e293b;padding:14px 18px;vertical-align:middle;">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          ${photoCell(data, 85, "8px", options)}
+          <td style="vertical-align:middle;padding-left:4px;">
+            <table cellpadding="0" cellspacing="0" border="0">
+              <tr><td style="font-size:20px;font-weight:bold;color:#ffffff;white-space:nowrap;">${escapeHtml(data.fullName)}${data.pronouns ? ` <span style="font-size:11px;font-weight:normal;color:rgba(255,255,255,0.5);">(${escapeHtml(data.pronouns)})</span>` : ""}</td></tr>
+              ${data.jobTitle ? `<tr><td style="font-size:13px;color:${a};font-weight:bold;padding-top:3px;letter-spacing:0.3px;">${escapeHtml(data.jobTitle)}</td></tr>` : ""}
+              ${data.company ? `<tr><td style="font-size:12px;color:rgba(255,255,255,0.6);padding-top:2px;letter-spacing:0.5px;text-transform:uppercase;">${escapeHtml(data.company)}</td></tr>` : ""}
+            </table>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <tr><td style="padding:12px 18px;border-left:3px solid ${c};">
+    <table cellpadding="0" cellspacing="0" border="0" style="font-size:12px;color:#555;">
+      ${data.email ? `<tr><td style="padding-bottom:3px;border-bottom:1px solid #f0f0f0;padding-top:3px;"><a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;">${escapeHtml(data.email)}</a></td></tr>` : ""}
+      ${data.phone ? `<tr><td style="padding-bottom:3px;border-bottom:1px solid #f0f0f0;padding-top:3px;"><a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:#555;text-decoration:none;">${escapeHtml(data.phone)}</a></td></tr>` : ""}
+      ${data.website ? `<tr><td style="padding-bottom:3px;border-bottom:1px solid #f0f0f0;padding-top:3px;"><a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${c};text-decoration:none;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a></td></tr>` : ""}
+      ${data.address ? `<tr><td style="padding-top:3px;color:#888;">${escapeHtml(data.address)}</td></tr>` : ""}
+    </table>
+    <table cellpadding="0" cellspacing="0" border="0">
+      ${socialLinks(data)}
+      ${calendlyButton(data, c)}
+      ${ctaBanner(data)}
+      ${!isPro ? neatstampBranding() : ""}
+      ${!isPro && options?.signatureId ? trackingPixel(options.signatureId) : ""}
+    </table>
+  </td></tr>
+</table>`;
+}
+
+function generateGradient(data: SignatureData, options?: GenerateOptions): string {
+  const c = data.primaryColor;
+  const a = data.accentColor;
+  const isPro = options?.plan === "pro" || options?.plan === "team";
+  return `<table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#333;">
+  <tr>
+    <td style="width:8px;background-color:${c};border-radius:4px 0 0 0;">&nbsp;</td>
+    <td style="width:4px;background-color:${a};border-radius:0;">&nbsp;</td>
+    <td style="padding:12px 16px;background-color:#f8fafc;border-radius:0 4px 4px 0;">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          ${photoCell(data, 70, "50%", options)}
+          <td style="vertical-align:top;">
+            <table cellpadding="0" cellspacing="0" border="0">
+              <tr><td style="font-size:19px;font-weight:bold;color:${c};">${escapeHtml(data.fullName)}${data.pronouns ? ` <span style="font-size:11px;font-weight:normal;color:#888;">(${escapeHtml(data.pronouns)})</span>` : ""}</td></tr>
+              ${data.jobTitle ? `<tr><td style="font-size:13px;color:${a};font-weight:bold;padding-top:2px;">${escapeHtml(data.jobTitle)}</td></tr>` : ""}
+              ${data.company ? `<tr><td style="font-size:12px;color:#555;padding-top:1px;">${escapeHtml(data.company)}</td></tr>` : ""}
+              <tr><td style="padding-top:8px;">
+                <table cellpadding="0" cellspacing="0" border="0" style="font-size:12px;">
+                  <tr>
+                    ${data.email ? `<td style="padding-right:14px;"><a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;">${escapeHtml(data.email)}</a></td>` : ""}
+                    ${data.phone ? `<td style="padding-right:14px;color:#555;"><a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:#555;text-decoration:none;">${escapeHtml(data.phone)}</a></td>` : ""}
+                    ${data.website ? `<td><a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${a};text-decoration:none;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a></td>` : ""}
+                  </tr>
+                </table>
+              </td></tr>
+              ${data.address ? `<tr><td style="font-size:11px;color:#888;padding-top:2px;">${escapeHtml(data.address)}</td></tr>` : ""}
+              ${socialLinks(data)}
+              ${calendlyButton(data, c)}
+              ${ctaBanner(data)}
+              ${!isPro ? neatstampBranding() : ""}
+              ${!isPro && options?.signatureId ? trackingPixel(options.signatureId) : ""}
+            </table>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>`;
+}
+
+function generateDeveloper(data: SignatureData, options?: GenerateOptions): string {
+  const c = data.primaryColor;
+  const a = data.accentColor;
+  const isPro = options?.plan === "pro" || options?.plan === "team";
+  return `<table cellpadding="0" cellspacing="0" border="0" style="font-family:'Courier New',Courier,monospace;font-size:13px;color:#333;border-bottom:2px solid #e2e8f0;padding-bottom:10px;">
+  <tr>
+    ${photoCell(data, 64, "4px", options)}
+    <td style="vertical-align:top;">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr><td style="font-size:15px;font-weight:bold;color:${c};font-family:'Courier New',Courier,monospace;">// ${escapeHtml(data.fullName)}${data.pronouns ? ` <span style="font-size:11px;color:#888;">(${escapeHtml(data.pronouns)})</span>` : ""}</td></tr>
+        ${data.jobTitle ? `<tr><td style="font-size:12px;color:${a};padding-top:2px;font-family:'Courier New',Courier,monospace;">/* ${escapeHtml(data.jobTitle)}${data.company ? ` @ ${escapeHtml(data.company)}` : ""} */</td></tr>` : ""}
+        <tr><td style="padding-top:8px;">
+          <table cellpadding="0" cellspacing="0" border="0" style="font-size:12px;font-family:'Courier New',Courier,monospace;">
+            ${data.email ? `<tr><td style="padding-bottom:2px;color:#555;">&gt; <a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;">${escapeHtml(data.email)}</a></td></tr>` : ""}
+            ${data.phone ? `<tr><td style="padding-bottom:2px;color:#555;">&gt; <a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:#555;text-decoration:none;">${escapeHtml(data.phone)}</a></td></tr>` : ""}
+            ${data.website ? `<tr><td style="padding-bottom:2px;color:#555;">&gt; <a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${c};text-decoration:none;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a></td></tr>` : ""}
+            ${data.github ? `<tr><td style="padding-bottom:2px;"><a href="${escapeHtml(data.github.startsWith("http") ? data.github : `https://${data.github}`)}" target="_blank" rel="noopener noreferrer" style="color:${a};text-decoration:none;font-weight:bold;">&gt; github: ${escapeHtml(data.github.replace(/^https?:\/\/(www\.)?github\.com\//, ""))}</a></td></tr>` : ""}
+            ${data.address ? `<tr><td style="padding-bottom:2px;color:#888;"># ${escapeHtml(data.address)}</td></tr>` : ""}
+          </table>
+        </td></tr>
+        ${socialLinks(data)}
+        ${calendlyButton(data, c)}
+        ${ctaBanner(data)}
+        ${!isPro ? neatstampBranding() : ""}
+        ${!isPro && options?.signatureId ? trackingPixel(options.signatureId) : ""}
+      </table>
+    </td>
+  </tr>
+</table>`;
+}
+
+function generateSales(data: SignatureData, options?: GenerateOptions): string {
+  const c = data.primaryColor;
+  const a = data.accentColor;
+  const isPro = options?.plan === "pro" || options?.plan === "team";
+  return `<table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#333;">
+  <tr>
+    ${photoCell(data, 72, "50%", options)}
+    <td style="vertical-align:top;">
+      <table cellpadding="0" cellspacing="0" border="0">
+        ${data.phone ? `<tr><td style="font-size:20px;font-weight:bold;color:#16a34a;padding-bottom:4px;"><a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:#16a34a;text-decoration:none;">${escapeHtml(data.phone)}</a></td></tr>` : ""}
+        <tr><td style="font-size:16px;font-weight:bold;color:#1a1a1a;">${escapeHtml(data.fullName)}${data.pronouns ? ` <span style="font-size:11px;font-weight:normal;color:#888;">(${escapeHtml(data.pronouns)})</span>` : ""}</td></tr>
+        ${data.jobTitle ? `<tr><td style="font-size:13px;color:${c};font-weight:600;padding-top:1px;">${escapeHtml(data.jobTitle)}${data.company ? ` &mdash; ${escapeHtml(data.company)}` : ""}</td></tr>` : ""}
+        <tr><td style="padding-top:8px;">
+          <table cellpadding="0" cellspacing="0" border="0" style="font-size:12px;color:#555;">
+            ${data.email ? `<tr><td style="padding-bottom:3px;"><a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;">${escapeHtml(data.email)}</a></td></tr>` : ""}
+            ${data.website ? `<tr><td style="padding-bottom:3px;"><a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${c};text-decoration:none;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a></td></tr>` : ""}
+            ${data.address ? `<tr><td style="color:#888;">${escapeHtml(data.address)}</td></tr>` : ""}
+          </table>
+        </td></tr>
+        ${socialLinks(data)}
+        ${data.calendlyUrl ? `<tr><td style="padding-top:10px;"><a href="${escapeHtml(data.calendlyUrl.startsWith("http") ? data.calendlyUrl : `https://${data.calendlyUrl}`)}" target="_blank" rel="noopener noreferrer" style="display:inline-block;padding:8px 20px;background-color:#16a34a;color:#ffffff;text-decoration:none;font-size:13px;font-family:Arial,sans-serif;border-radius:4px;font-weight:bold;">&#128197; Schedule a Call</a></td></tr>` : ""}
+        ${ctaBanner(data)}
+        ${!isPro ? neatstampBranding() : ""}
+        ${!isPro && options?.signatureId ? trackingPixel(options.signatureId) : ""}
+      </table>
+    </td>
+  </tr>
+</table>`;
+}
+
+function generateMedical(data: SignatureData, options?: GenerateOptions): string {
+  const c = "#0d9488";
+  const isPro = options?.plan === "pro" || options?.plan === "team";
+
+  let src = "";
+  if (data.photoUrl) {
+    src = escapeHtml(data.photoUrl);
+    if (!isPro && options?.signatureId && !data.photoUrl.startsWith("https://neatstamp.com")) {
+      src = `https://neatstamp.com/api/images/${escapeHtml(options.signatureId)}/photo`;
+    }
+  }
+
+  return `<table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#1a1a1a;border-top:3px solid ${c};padding-top:12px;">
+  <tr>
+    ${src ? `<td style="vertical-align:top;padding-right:16px;"><img src="${src}" alt="${escapeHtml(data.fullName)}" width="72" height="72" style="width:72px;height:72px;border-radius:50%;object-fit:cover;display:block;border:2px solid ${c};" /></td>` : ""}
+    <td style="vertical-align:top;">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr><td style="font-size:17px;font-weight:bold;color:#1a1a1a;">${escapeHtml(data.fullName)}</td></tr>
+        ${data.jobTitle ? `<tr><td style="font-size:13px;color:${c};font-weight:600;padding-top:2px;">${escapeHtml(data.jobTitle)}</td></tr>` : ""}
+        ${data.company ? `<tr><td style="font-size:12px;color:#555;padding-top:1px;">${escapeHtml(data.company)}</td></tr>` : ""}
+        ${data.pronouns ? `<tr><td style="font-size:11px;color:#888;padding-top:1px;">${escapeHtml(data.pronouns)}</td></tr>` : ""}
+        <tr><td style="padding-top:8px;">
+          <table cellpadding="0" cellspacing="0" border="0" style="font-size:12px;color:#555;">
+            ${data.phone ? `<tr><td style="padding-bottom:2px;"><a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:#333;text-decoration:none;">${escapeHtml(data.phone)}</a></td></tr>` : ""}
+            ${data.email ? `<tr><td style="padding-bottom:2px;"><a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;">${escapeHtml(data.email)}</a></td></tr>` : ""}
+            ${data.website ? `<tr><td style="padding-bottom:2px;"><a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${c};text-decoration:none;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a></td></tr>` : ""}
+            ${data.address ? `<tr><td style="color:#888;">${escapeHtml(data.address)}</td></tr>` : ""}
+          </table>
+        </td></tr>
+        ${socialLinks(data)}
+        ${calendlyButton(data, c)}
+        ${ctaBanner(data)}
+        ${!isPro ? neatstampBranding() : ""}
+        ${!isPro && options?.signatureId ? trackingPixel(options.signatureId) : ""}
+      </table>
+    </td>
+  </tr>
+</table>`;
+}
+
+function generateLegal(data: SignatureData, options?: GenerateOptions): string {
+  const c = data.primaryColor;
+  const isPro = options?.plan === "pro" || options?.plan === "team";
+  return `<table cellpadding="0" cellspacing="0" border="0" style="font-family:Georgia,'Times New Roman',serif;font-size:14px;color:#1a1a1a;border-bottom:3px solid #1a1a1a;padding-bottom:14px;">
+  <tr>
+    ${photoCell(data, 72, "4px", options)}
+    <td style="vertical-align:top;">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr><td style="font-size:17px;font-weight:bold;color:#1a1a1a;letter-spacing:2px;text-transform:uppercase;font-family:Georgia,'Times New Roman',serif;">${escapeHtml(data.fullName)}</td></tr>
+        ${data.pronouns ? `<tr><td style="font-size:11px;color:#888;font-style:italic;padding-top:1px;">${escapeHtml(data.pronouns)}</td></tr>` : ""}
+        ${data.jobTitle ? `<tr><td style="font-size:13px;color:${c};font-style:italic;padding-top:3px;font-family:Georgia,'Times New Roman',serif;">${escapeHtml(data.jobTitle)}</td></tr>` : ""}
+        ${data.company ? `<tr><td style="font-size:13px;color:#333;font-weight:bold;padding-top:2px;font-family:Georgia,'Times New Roman',serif;">${escapeHtml(data.company)}</td></tr>` : ""}
+        <tr><td style="padding-top:10px;padding-bottom:10px;border-top:1px solid #ccc;margin-top:8px;">
+          <table cellpadding="0" cellspacing="0" border="0" style="font-size:12px;font-family:Arial,Helvetica,sans-serif;color:#555;">
+            ${data.phone ? `<tr><td style="padding-bottom:3px;">T: <a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:#333;text-decoration:none;">${escapeHtml(data.phone)}</a></td></tr>` : ""}
+            ${data.email ? `<tr><td style="padding-bottom:3px;">E: <a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;">${escapeHtml(data.email)}</a></td></tr>` : ""}
+            ${data.website ? `<tr><td style="padding-bottom:3px;">W: <a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${c};text-decoration:none;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a></td></tr>` : ""}
+            ${data.address ? `<tr><td style="color:#888;">${escapeHtml(data.address)}</td></tr>` : ""}
+          </table>
+        </td></tr>
+        ${socialLinks(data)}
+        ${calendlyButton(data, c)}
+        ${ctaBanner(data)}
+        ${!isPro ? neatstampBranding() : ""}
+        ${!isPro && options?.signatureId ? trackingPixel(options.signatureId) : ""}
+      </table>
+    </td>
+  </tr>
+</table>`;
+}
+
+function generateAcademic(data: SignatureData, options?: GenerateOptions): string {
+  const c = data.primaryColor;
+  const a = data.accentColor;
+  const isPro = options?.plan === "pro" || options?.plan === "team";
+  return `<table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#333;">
+  <tr>
+    ${photoCell(data, 68, "4px", options)}
+    <td style="vertical-align:middle;">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr><td style="font-size:18px;font-weight:bold;color:#1e3a5f;">${escapeHtml(data.fullName)}${data.pronouns ? ` <span style="font-size:11px;font-weight:normal;color:#888;">(${escapeHtml(data.pronouns)})</span>` : ""}</td></tr>
+        ${data.jobTitle ? `<tr><td style="font-size:13px;color:${c};padding-top:2px;font-style:italic;">${escapeHtml(data.jobTitle)}</td></tr>` : ""}
+        ${data.company ? `<tr><td style="font-size:13px;color:#1e3a5f;font-weight:bold;padding-top:2px;">${escapeHtml(data.company)}</td></tr>` : ""}
+      </table>
+    </td>
+  </tr>
+  <tr><td colspan="2" style="padding-top:10px;border-top:1px solid #cbd5e1;">
+    <table cellpadding="0" cellspacing="0" border="0" style="font-size:12px;color:#555;width:100%;">
+      <tr>
+        ${data.email ? `<td style="padding-right:16px;padding-top:4px;"><a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;">${escapeHtml(data.email)}</a></td>` : ""}
+        ${data.phone ? `<td style="padding-right:16px;padding-top:4px;"><a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:#555;text-decoration:none;">${escapeHtml(data.phone)}</a></td>` : ""}
+        ${data.website ? `<td style="padding-top:4px;"><a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${a};text-decoration:none;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a></td>` : ""}
+      </tr>
+      ${data.address ? `<tr><td colspan="3" style="color:#888;padding-top:4px;">${escapeHtml(data.address)}</td></tr>` : ""}
+    </table>
+    <table cellpadding="0" cellspacing="0" border="0">
+      ${socialLinks(data)}
+      ${calendlyButton(data, c)}
+      ${ctaBanner(data)}
+      ${!isPro ? neatstampBranding() : ""}
+      ${!isPro && options?.signatureId ? trackingPixel(options.signatureId) : ""}
+    </table>
+  </td></tr>
+</table>`;
+}
+
+function generateRealtor(data: SignatureData, options?: GenerateOptions): string {
+  const c = data.primaryColor;
+  const a = data.accentColor;
+  const isPro = options?.plan === "pro" || options?.plan === "team";
+
+  let src = "";
+  if (data.photoUrl) {
+    src = escapeHtml(data.photoUrl);
+    if (!isPro && options?.signatureId && !data.photoUrl.startsWith("https://neatstamp.com")) {
+      src = `https://neatstamp.com/api/images/${escapeHtml(options.signatureId)}/photo`;
+    }
+  }
+
+  return `<table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#333;">
+  <tr>
+    ${src ? `<td style="vertical-align:top;padding-right:18px;"><img src="${src}" alt="${escapeHtml(data.fullName)}" width="100" height="100" style="width:100px;height:100px;border-radius:8px;object-fit:cover;display:block;border:3px solid ${c};" /></td>` : ""}
+    <td style="vertical-align:top;border-left:3px solid ${c};padding-left:16px;">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr><td style="font-size:22px;font-weight:bold;color:#1a1a1a;">${escapeHtml(data.fullName)}${data.pronouns ? ` <span style="font-size:12px;font-weight:normal;color:#888;">(${escapeHtml(data.pronouns)})</span>` : ""}</td></tr>
+        ${data.jobTitle ? `<tr><td style="font-size:13px;color:${c};font-weight:bold;padding-top:2px;">${escapeHtml(data.jobTitle)}</td></tr>` : ""}
+        ${data.company ? `<tr><td style="font-size:14px;color:#333;font-weight:bold;padding-top:2px;">${escapeHtml(data.company)}</td></tr>` : ""}
+        <tr><td style="padding-top:8px;">
+          <table cellpadding="0" cellspacing="0" border="0" style="font-size:13px;">
+            <tr>
+              ${data.phone ? `<td style="padding-right:20px;"><a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:#333;text-decoration:none;font-weight:bold;">${escapeHtml(data.phone)}</a></td>` : ""}
+              ${data.email ? `<td><a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;">${escapeHtml(data.email)}</a></td>` : ""}
+            </tr>
+          </table>
+        </td></tr>
+        ${data.website ? `<tr><td style="font-size:12px;padding-top:3px;"><a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${a};text-decoration:none;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a></td></tr>` : ""}
+        ${data.address ? `<tr><td style="font-size:11px;color:#888;padding-top:2px;">${escapeHtml(data.address)}</td></tr>` : ""}
+        ${socialLinks(data)}
+        ${calendlyButton(data, c)}
+        ${ctaBanner(data)}
+        ${!isPro ? neatstampBranding() : ""}
+        ${!isPro && options?.signatureId ? trackingPixel(options.signatureId) : ""}
+      </table>
+    </td>
+  </tr>
+</table>`;
+}
+
+function generateInfluencer(data: SignatureData, options?: GenerateOptions): string {
+  const c = data.primaryColor;
+  const a = data.accentColor;
+  const isPro = options?.plan === "pro" || options?.plan === "team";
+
+  let src = "";
+  if (data.photoUrl) {
+    src = escapeHtml(data.photoUrl);
+    if (!isPro && options?.signatureId && !data.photoUrl.startsWith("https://neatstamp.com")) {
+      src = `https://neatstamp.com/api/images/${escapeHtml(options.signatureId)}/photo`;
+    }
+  }
+
+  const socialRow = [
+    data.instagram ? `<a href="${escapeHtml(data.instagram.startsWith("http") ? data.instagram : `https://${data.instagram}`)}" target="_blank" rel="noopener noreferrer" style="display:inline-block;margin-right:10px;text-decoration:none;"><img src="https://neatstamp.com/icons/instagram.svg" alt="Instagram" width="26" height="26" style="width:26px;height:26px;display:block;border:0;" /></a>` : "",
+    data.twitter ? `<a href="${escapeHtml(data.twitter.startsWith("http") ? data.twitter : `https://${data.twitter}`)}" target="_blank" rel="noopener noreferrer" style="display:inline-block;margin-right:10px;text-decoration:none;"><img src="https://neatstamp.com/icons/twitter.svg" alt="Twitter" width="26" height="26" style="width:26px;height:26px;display:block;border:0;" /></a>` : "",
+    data.youtube ? `<a href="${escapeHtml(data.youtube.startsWith("http") ? data.youtube : `https://${data.youtube}`)}" target="_blank" rel="noopener noreferrer" style="display:inline-block;margin-right:10px;text-decoration:none;"><img src="https://neatstamp.com/icons/youtube.svg" alt="YouTube" width="26" height="26" style="width:26px;height:26px;display:block;border:0;" /></a>` : "",
+    data.facebook ? `<a href="${escapeHtml(data.facebook.startsWith("http") ? data.facebook : `https://${data.facebook}`)}" target="_blank" rel="noopener noreferrer" style="display:inline-block;margin-right:10px;text-decoration:none;"><img src="https://neatstamp.com/icons/facebook.svg" alt="Facebook" width="26" height="26" style="width:26px;height:26px;display:block;border:0;" /></a>` : "",
+  ].filter(Boolean).join("");
+
+  return `<table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#333;">
+  <tr>
+    ${src ? `<td style="vertical-align:top;padding-right:16px;"><img src="${src}" alt="${escapeHtml(data.fullName)}" width="78" height="78" style="width:78px;height:78px;border-radius:50%;object-fit:cover;display:block;border:3px solid ${c};" /></td>` : ""}
+    <td style="vertical-align:top;">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr><td style="font-size:21px;font-weight:bold;color:${c};">${escapeHtml(data.fullName)}</td></tr>
+        ${data.jobTitle ? `<tr><td style="font-size:13px;color:${a};font-weight:bold;padding-top:2px;">${escapeHtml(data.jobTitle)}</td></tr>` : ""}
+        ${data.company ? `<tr><td style="font-size:12px;color:#888;padding-top:1px;">@${escapeHtml(data.company)}</td></tr>` : ""}
+        ${socialRow ? `<tr><td style="padding-top:10px;padding-bottom:6px;">${socialRow}</td></tr>` : ""}
+        <tr><td style="padding-top:4px;">
+          <table cellpadding="0" cellspacing="0" border="0" style="font-size:12px;color:#555;">
+            ${data.email ? `<tr><td style="padding-bottom:2px;"><a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;">${escapeHtml(data.email)}</a></td></tr>` : ""}
+            ${data.website ? `<tr><td style="padding-bottom:2px;"><a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${c};text-decoration:none;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a></td></tr>` : ""}
+          </table>
+        </td></tr>
+        ${calendlyButton(data, c)}
+        ${ctaBanner(data)}
+        ${!isPro ? neatstampBranding() : ""}
+        ${!isPro && options?.signatureId ? trackingPixel(options.signatureId) : ""}
+      </table>
+    </td>
+  </tr>
+</table>`;
+}
+
+function generatePhotographer(data: SignatureData, options?: GenerateOptions): string {
+  const c = data.primaryColor;
+  const isPro = options?.plan === "pro" || options?.plan === "team";
+
+  let src = "";
+  if (data.photoUrl) {
+    src = escapeHtml(data.photoUrl);
+    if (!isPro && options?.signatureId && !data.photoUrl.startsWith("https://neatstamp.com")) {
+      src = `https://neatstamp.com/api/images/${escapeHtml(options.signatureId)}/photo`;
+    }
+  }
+
+  return `<table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#333;">
+  <tr>
+    ${src ? `<td style="vertical-align:top;padding-right:20px;"><img src="${src}" alt="${escapeHtml(data.fullName)}" width="60" height="60" style="width:60px;height:60px;border-radius:0;object-fit:cover;display:block;" /></td>` : ""}
+    <td style="vertical-align:top;padding-top:4px;">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tr><td style="font-size:18px;font-weight:300;color:#1a1a1a;letter-spacing:1px;">${escapeHtml(data.fullName)}${data.pronouns ? ` <span style="font-size:11px;color:#bbb;">(${escapeHtml(data.pronouns)})</span>` : ""}</td></tr>
+        ${data.jobTitle ? `<tr><td style="font-size:12px;color:#888;padding-top:3px;letter-spacing:0.5px;">${escapeHtml(data.jobTitle)}${data.company ? ` &bull; ${escapeHtml(data.company)}` : ""}</td></tr>` : ""}
+        <tr><td style="padding-top:10px;">
+          <table cellpadding="0" cellspacing="0" border="0" style="font-size:12px;color:#777;">
+            ${data.email ? `<tr><td style="padding-bottom:2px;"><a href="mailto:${escapeHtml(data.email)}" style="color:#555;text-decoration:none;">${escapeHtml(data.email)}</a></td></tr>` : ""}
+            ${data.phone ? `<tr><td style="padding-bottom:2px;"><a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:#777;text-decoration:none;">${escapeHtml(data.phone)}</a></td></tr>` : ""}
+            ${data.website ? `<tr><td style="padding-bottom:2px;"><a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${c};text-decoration:underline;font-style:italic;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a></td></tr>` : ""}
+            ${data.address ? `<tr><td style="color:#bbb;">${escapeHtml(data.address)}</td></tr>` : ""}
+          </table>
+        </td></tr>
+        ${socialLinks(data)}
+        ${calendlyButton(data, c)}
+        ${ctaBanner(data)}
+        ${!isPro ? neatstampBranding() : ""}
+        ${!isPro && options?.signatureId ? trackingPixel(options.signatureId) : ""}
+      </table>
+    </td>
+  </tr>
+</table>`;
+}
+
+function generateDark(data: SignatureData, options?: GenerateOptions): string {
+  const c = data.primaryColor;
+  const a = data.accentColor;
+  const isPro = options?.plan === "pro" || options?.plan === "team";
+
+  let src = "";
+  if (data.photoUrl) {
+    src = escapeHtml(data.photoUrl);
+    if (!isPro && options?.signatureId && !data.photoUrl.startsWith("https://neatstamp.com")) {
+      src = `https://neatstamp.com/api/images/${escapeHtml(options.signatureId)}/photo`;
+    }
+  }
+
+  return `<table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#f1f5f9;background-color:#111827;border-radius:8px;">
+  <tr><td style="padding:16px 20px;">
+    <table cellpadding="0" cellspacing="0" border="0">
+      <tr>
+        ${src ? `<td style="vertical-align:top;padding-right:16px;"><img src="${src}" alt="${escapeHtml(data.fullName)}" width="76" height="76" style="width:76px;height:76px;border-radius:8px;object-fit:cover;display:block;border:2px solid #ffffff;" /></td>` : ""}
+        <td style="vertical-align:top;">
+          <table cellpadding="0" cellspacing="0" border="0">
+            <tr><td style="font-size:19px;font-weight:bold;color:#f1f5f9;">${escapeHtml(data.fullName)}${data.pronouns ? ` <span style="font-size:11px;font-weight:normal;color:rgba(255,255,255,0.4);">(${escapeHtml(data.pronouns)})</span>` : ""}</td></tr>
+            ${data.jobTitle ? `<tr><td style="font-size:13px;color:${a};font-weight:bold;padding-top:2px;">${escapeHtml(data.jobTitle)}</td></tr>` : ""}
+            ${data.company ? `<tr><td style="font-size:12px;color:rgba(255,255,255,0.5);padding-top:1px;">${escapeHtml(data.company)}</td></tr>` : ""}
+            <tr><td style="padding-top:10px;">
+              <table cellpadding="0" cellspacing="0" border="0" style="font-size:12px;">
+                ${data.email ? `<tr><td style="padding-bottom:3px;"><a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;">${escapeHtml(data.email)}</a></td></tr>` : ""}
+                ${data.phone ? `<tr><td style="padding-bottom:3px;"><a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:rgba(255,255,255,0.7);text-decoration:none;">${escapeHtml(data.phone)}</a></td></tr>` : ""}
+                ${data.website ? `<tr><td style="padding-bottom:3px;"><a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${c};text-decoration:none;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a></td></tr>` : ""}
+                ${data.address ? `<tr><td style="color:rgba(255,255,255,0.4);">${escapeHtml(data.address)}</td></tr>` : ""}
+              </table>
+            </td></tr>
+            ${socialLinks(data)}
+            ${data.calendlyUrl ? `<tr><td style="padding-top:10px;"><a href="${escapeHtml(data.calendlyUrl.startsWith("http") ? data.calendlyUrl : `https://${data.calendlyUrl}`)}" target="_blank" rel="noopener noreferrer" style="display:inline-block;padding:6px 16px;background-color:${c};color:#111827;text-decoration:none;font-size:12px;font-family:Arial,sans-serif;border-radius:4px;font-weight:bold;">Book a Meeting</a></td></tr>` : ""}
+          </table>
+        </td>
+      </tr>
+    </table>
+    <table cellpadding="0" cellspacing="0" border="0">
+      ${ctaBanner(data)}
+      ${!isPro ? `<tr><td style="padding-top:8px;"><a href="https://neatstamp.com?ref=sig" target="_blank" rel="noopener noreferrer" style="color:rgba(255,255,255,0.25);font-size:10px;font-family:Arial,sans-serif;text-decoration:none;">Made with NeatStamp</a></td></tr>` : ""}
+      ${!isPro && options?.signatureId ? trackingPixel(options.signatureId) : ""}
+    </table>
+  </td></tr>
+</table>`;
+}
+
+function generateSimple(data: SignatureData, options?: GenerateOptions): string {
+  const c = data.primaryColor;
+  const isPro = options?.plan === "pro" || options?.plan === "team";
+  return `<table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#333;">
+  <tr><td>
+    <strong style="font-size:14px;color:#1a1a1a;">${escapeHtml(data.fullName)}</strong>${data.jobTitle ? ` <span style="color:#888;">|</span> <span style="color:${c};">${escapeHtml(data.jobTitle)}</span>` : ""}${data.company ? ` <span style="color:#888;">|</span> ${escapeHtml(data.company)}` : ""}${data.pronouns ? ` <span style="font-size:11px;color:#aaa;">(${escapeHtml(data.pronouns)})</span>` : ""}
+  </td></tr>
+  <tr><td style="font-size:12px;padding-top:3px;color:#555;">
+    ${[
+      data.email ? `<a href="mailto:${escapeHtml(data.email)}" style="color:${c};text-decoration:none;">${escapeHtml(data.email)}</a>` : "",
+      data.phone ? `<a href="tel:${escapeHtml(data.phone.replace(/\s/g, ""))}" style="color:#555;text-decoration:none;">${escapeHtml(data.phone)}</a>` : "",
+      data.website ? `<a href="https://${escapeHtml(data.website.replace(/^https?:\/\//, ""))}" style="color:${c};text-decoration:none;">${escapeHtml(data.website.replace(/^https?:\/\//, ""))}</a>` : "",
+    ].filter(Boolean).join(" &middot; ")}
+  </td></tr>
+  ${calendlyButton(data, c)}
+  ${ctaBanner(data)}
+  ${!isPro ? neatstampBranding() : ""}
+  ${!isPro && options?.signatureId ? trackingPixel(options.signatureId) : ""}
+</table>`;
+}
+
 // ============================================================
 // MAIN EXPORT
 // ============================================================
@@ -408,6 +847,18 @@ const templateGenerators: Record<
   elegant: generateElegant,
   startup: generateStartup,
   compact: generateCompact,
+  executive: generateExecutive,
+  gradient: generateGradient,
+  developer: generateDeveloper,
+  sales: generateSales,
+  medical: generateMedical,
+  legal: generateLegal,
+  academic: generateAcademic,
+  realtor: generateRealtor,
+  influencer: generateInfluencer,
+  photographer: generatePhotographer,
+  dark: generateDark,
+  simple: generateSimple,
 };
 
 // Preview HTML — always shows the full editable signature (for the editor preview)

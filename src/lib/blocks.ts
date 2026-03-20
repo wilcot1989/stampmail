@@ -370,6 +370,180 @@ function getTemplateStyle(template: TemplateName, data: SignatureData): Template
         photoShape: "none",
       };
 
+    case "executive":
+      return {
+        ...base,
+        nameSize: 18,
+        nameColor: "dark",
+        titleColor: "accent",
+        companyDisplay: "separate",
+        dividerStyle: "solid",
+        dividerThickness: 1,
+        dividerColor: "grey",
+        contactLayout: "stacked",
+        photoSize: 85,
+        photoShape: "rounded",
+      };
+
+    case "gradient":
+      return {
+        ...base,
+        nameSize: 18,
+        nameColor: "primary",
+        companyDisplay: "separate",
+        dividerStyle: "none",
+        contentBorderLeft: `8px solid ${pc}`,
+        contactLayout: "inline-pipes",
+        photoSize: 75,
+        photoShape: "circle",
+      };
+
+    case "developer":
+      return {
+        ...base,
+        fontFamily: "'Courier New',Courier,monospace",
+        nameSize: 16,
+        nameColor: "primary",
+        companyDisplay: "separate",
+        dividerStyle: "solid",
+        dividerThickness: 1,
+        dividerColor: "grey",
+        contactLayout: "stacked",
+        contactFontFamily: "'Courier New',Courier,monospace",
+        photoSize: 70,
+        photoShape: "rounded",
+      };
+
+    case "sales":
+      return {
+        ...base,
+        nameSize: 18,
+        titleColor: "muted",
+        companyDisplay: "separate",
+        dividerStyle: "solid",
+        dividerThickness: 2,
+        contactLayout: "stacked",
+        photoSize: 80,
+        photoShape: "circle",
+        ctaStyle: "standard",
+      };
+
+    case "medical":
+      return {
+        ...base,
+        nameSize: 17,
+        titleColor: "primary",
+        companyDisplay: "separate",
+        dividerStyle: "solid",
+        dividerThickness: 2,
+        contactLayout: "stacked",
+        photoSize: 75,
+        photoShape: "circle",
+        photoBorder: `2px solid ${pc}`,
+        outerBorderTop: `3px solid ${pc}`,
+      };
+
+    case "legal":
+      return {
+        ...base,
+        fontFamily: "Georgia,'Times New Roman',serif",
+        nameSize: 16,
+        nameLetterSpacing: "2px",
+        pronounsStyle: "separate",
+        titleColor: "muted",
+        titleFontStyle: "italic",
+        companyDisplay: "separate-bold",
+        dividerStyle: "solid",
+        dividerThickness: 2,
+        dividerColor: "grey",
+        contactLayout: "stacked-labeled",
+        contactFontFamily: "Arial,Helvetica,sans-serif",
+        photoSize: 70,
+        photoShape: "near-square",
+      };
+
+    case "academic":
+      return {
+        ...base,
+        nameSize: 17,
+        nameColor: "dark",
+        titleColor: "primary",
+        companyDisplay: "separate-bold",
+        dividerStyle: "thin-grey",
+        contactLayout: "stacked",
+        photoSize: 75,
+        photoShape: "circle",
+      };
+
+    case "realtor":
+      return {
+        ...base,
+        nameSize: 22,
+        nameColor: "dark",
+        companyDisplay: "separate",
+        dividerStyle: "solid",
+        dividerThickness: 2,
+        contactLayout: "partial-inline",
+        photoSize: 100,
+        photoShape: "rounded",
+        photoBorder: `3px solid ${pc}`,
+      };
+
+    case "influencer":
+      return {
+        ...base,
+        nameSize: 20,
+        nameColor: "primary",
+        companyDisplay: "separate",
+        dividerStyle: "none",
+        contactLayout: "stacked",
+        photoSize: 85,
+        photoShape: "circle",
+        photoBorder: `3px solid ${pc}`,
+      };
+
+    case "photographer":
+      return {
+        ...base,
+        nameSize: 18,
+        nameColor: "dark",
+        nameWeight: "300",
+        companyDisplay: "separate",
+        dividerStyle: "thin-grey",
+        contactLayout: "stacked",
+        photoSize: 60,
+        photoShape: "near-square",
+      };
+
+    case "dark":
+      return {
+        ...base,
+        nameSize: 18,
+        nameColor: "dark",
+        titleColor: "white-alpha",
+        companyDisplay: "merged-title",
+        dividerStyle: "none",
+        socialColor: "white-alpha",
+        photoSize: 80,
+        photoShape: "rounded",
+        photoBorder: "2px solid rgba(255,255,255,0.2)",
+        outerBackground: "primary",
+        textOnDark: true,
+        ctaStyle: "inverted",
+      };
+
+    case "simple":
+      return {
+        ...base,
+        baseFontSize: 13,
+        nameSize: 14,
+        companyDisplay: "inline-name",
+        dividerStyle: "none",
+        contactLayout: "inline-middot",
+        photoSize: 0,
+        photoShape: "none",
+      };
+
     default:
       return base;
   }
