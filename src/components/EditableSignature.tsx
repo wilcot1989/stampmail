@@ -69,41 +69,22 @@ function InlineEdit({
 function FloatingToolbar({
   block,
   wrapperSettings,
-  anchorRect,
   onSettingsChange,
   onWrapperChange,
   onClose,
 }: {
   block: Block;
   wrapperSettings: WrapperSettings;
-  anchorRect: DOMRect | null;
   onSettingsChange: (s: Record<string, unknown>) => void;
   onWrapperChange: (ws: WrapperSettings) => void;
   onClose: () => void;
 }) {
-  const toolbarRef = useRef<HTMLDivElement>(null);
   const s = block.settings;
   const set = (key: string, val: unknown) => onSettingsChange({ ...s, [key]: val });
 
-  // Position: fixed to viewport, to the right of anchor or below if no space
-  const [pos, setPos] = useState({ top: 0, left: 0 });
-
-  useEffect(() => {
-    if (!anchorRect) return;
-    const top = Math.max(8, anchorRect.top);
-    const left = anchorRect.right + 16;
-    if (left + 260 > window.innerWidth) {
-      setPos({ top: Math.min(anchorRect.bottom + 8, window.innerHeight - 300), left: Math.max(8, anchorRect.left) });
-    } else {
-      setPos({ top: Math.min(top, window.innerHeight - 300), left });
-    }
-  }, [anchorRect]);
-
   return (
     <div
-      ref={toolbarRef}
-      className="fixed z-50 rounded-xl border border-slate-200 bg-white shadow-2xl p-3 w-[240px]"
-      style={{ top: pos.top, left: pos.left }}
+      className="mt-3 rounded-xl border border-slate-200 bg-white shadow-lg p-3 w-full"
       onClick={(e) => e.stopPropagation()}
       onMouseDown={(e) => e.stopPropagation()}
     >
@@ -458,7 +439,6 @@ export default function EditableSignature({
   onWrapperSettingsChange,
 }: EditableSignatureProps) {
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
-  const [anchorRect, setAnchorRect] = useState<DOMRect | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Drag state
@@ -472,12 +452,10 @@ export default function EditableSignature({
   const handleSelect = useCallback((blockId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     setSelectedBlockId(blockId);
-    setAnchorRect((e.currentTarget as HTMLElement).getBoundingClientRect());
   }, []);
 
   const handleDeselect = useCallback(() => {
     setSelectedBlockId(null);
-    setAnchorRect(null);
   }, []);
 
   const updateBlockSettings = useCallback((blockId: string, newSettings: Record<string, unknown>) => {
@@ -619,13 +597,12 @@ export default function EditableSignature({
         )}
       </div>
 
-      {/* Floating toolbar */}
-      {selectedBlock && anchorRect && (
+      {/* Toolbar — renders below the preview when a block is selected */}
+      {selectedBlock && (
         <div data-toolbar>
           <FloatingToolbar
             block={selectedBlock}
             wrapperSettings={wrapperSettings}
-            anchorRect={anchorRect}
             onSettingsChange={(s) => updateBlockSettings(selectedBlock.id, s)}
             onWrapperChange={onWrapperSettingsChange}
             onClose={handleDeselect}
