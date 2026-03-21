@@ -5,6 +5,9 @@ import { SignatureData, WrapperSettings, DEFAULT_WRAPPER_SETTINGS } from "@/lib/
 import { Block, SOCIAL_ICON_URLS, SOCIAL_LABELS } from "@/lib/blocks";
 import { GenerateOptions, generateSignatureHtml } from "@/lib/generateSignature";
 import { copySignatureToClipboard } from "@/lib/clipboard";
+import SignatureScore from "./SignatureScore";
+import QRCodeGenerator from "./QRCodeGenerator";
+import InstallGuide from "./InstallGuide";
 
 // ---------------------------------------------------------------------------
 // Props
@@ -1016,9 +1019,16 @@ export default function SignatureEditor({
             )}
           </button>
 
-          <p className="text-center text-xs text-slate-400">
-            Works in Gmail, Outlook, Apple Mail &amp; Yahoo
-          </p>
+          {/* Signature Score */}
+          <SignatureScore data={data} />
+
+          {/* Installation Guide */}
+          <InstallGuide />
+
+          {/* QR Code (if website is set) */}
+          {data.website && (
+            <QRCodeGenerator url={data.website.startsWith("http") ? data.website : `https://${data.website}`} />
+          )}
         </div>
       </div>
     </div>
