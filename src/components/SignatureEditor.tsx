@@ -15,6 +15,8 @@ import BannerScheduler from "./BannerScheduler";
 import DeliverabilityScore from "./DeliverabilityScore";
 import DarkModePreview from "./DarkModePreview";
 import OutlookPreviewTester from "./OutlookPreviewTester";
+import AISignatureGenerator from "./AISignatureGenerator";
+import TestimonialBlock from "./TestimonialBlock";
 
 // ---------------------------------------------------------------------------
 // Props
@@ -870,6 +872,7 @@ export default function SignatureEditor({
   const [contactOrder, setContactOrder] = useState<string[]>(["phone", "email", "website"]);
 
   const ws = wrapperSettings ?? DEFAULT_WRAPPER_SETTINGS;
+  const isPro = plan === "pro" || plan === "team";
   const photoBlock = blocks.find((b) => b.type === "photo" && b.visible);
 
   const cropPhotoToShape = (photoUrl: string, shape: string): Promise<string> => {
@@ -955,6 +958,9 @@ export default function SignatureEditor({
       ================================================================ */}
       <div className="lg:col-span-2 flex flex-col min-h-0">
 
+        {/* AI Signature Generator — FREE (viral acquisition) */}
+        <AISignatureGenerator onGenerate={(newData) => onDataChange(newData)} />
+
         {/* Tab switcher */}
         <div className="flex border-b border-slate-200 mb-5">
           {(["details", "design"] as const).map((tab) => (
@@ -1038,37 +1044,77 @@ export default function SignatureEditor({
             )}
           </button>
 
-          {/* Signature Score */}
+          {/* Signature Score — FREE (conversion trigger) */}
           <SignatureScore data={data} />
 
-          {/* Installation Guide */}
+          {/* Installation Guide — FREE (helps adoption) */}
           <InstallGuide />
 
-          {/* QR Code (if website is set) */}
-          {data.website && (
-            <QRCodeGenerator url={data.website.startsWith("http") ? data.website : `https://${data.website}`} />
+          {/* ====== PRO FEATURES BELOW ====== */}
+
+          {isPro ? (
+            <>
+              {/* Deliverability Score — PRO UNIQUE */}
+              <DeliverabilityScore data={data} plan={plan} />
+
+              {/* Outlook Compatibility Tester — PRO UNIQUE */}
+              <OutlookPreviewTester data={data} plan={plan} />
+
+              {/* Dark Mode Preview — PRO UNIQUE */}
+              <DarkModePreview data={data} plan={plan} />
+
+              {/* Email Client Preview — PRO */}
+              <EmailClientPreview data={data} plan={plan} />
+
+              {/* QR Code Generator — PRO */}
+              {data.website && (
+                <QRCodeGenerator url={data.website.startsWith("http") ? data.website : `https://${data.website}`} />
+              )}
+
+              {/* Reply/Forward Signature — PRO */}
+              <ReplySignature data={data} plan={plan} />
+
+              {/* Dynamic Signatures — PRO */}
+              <DynamicSignature data={data} plan={plan} onDataChange={onDataChange} />
+
+              {/* Testimonial/Social Proof — PRO */}
+              <TestimonialBlock data={data} plan={plan} onDataChange={onDataChange} />
+
+              {/* Banner Scheduling — PRO */}
+              <BannerScheduler plan={plan} onApplyBanner={(img, link) => onDataChange({ ...data, ctaBannerUrl: img, ctaBannerLink: link })} />
+            </>
+          ) : (
+            <div className="space-y-3">
+              {/* Pro upsell cards for free users */}
+              <div className="rounded-xl border border-slate-200 bg-gradient-to-b from-white to-slate-50 p-5 text-center">
+                <h3 className="text-sm font-bold text-slate-800 mb-2">Unlock Pro Tools</h3>
+                <div className="grid grid-cols-2 gap-2 mb-4">
+                  {[
+                    { icon: "📬", name: "Deliverability Check" },
+                    { icon: "📋", name: "Outlook Tester" },
+                    { icon: "🌙", name: "Dark Mode Preview" },
+                    { icon: "📧", name: "Client Preview" },
+                    { icon: "📱", name: "QR Code Generator" },
+                    { icon: "↩️", name: "Reply Signature" },
+                    { icon: "🎯", name: "Dynamic Signatures" },
+                    { icon: "📅", name: "Banner Scheduling" },
+                  ].map((tool) => (
+                    <div key={tool.name} className="flex items-center gap-1.5 rounded-lg bg-white border border-slate-100 px-2.5 py-2 text-left">
+                      <span className="text-sm">{tool.icon}</span>
+                      <span className="text-[11px] text-slate-600">{tool.name}</span>
+                    </div>
+                  ))}
+                </div>
+                <a
+                  href="https://neatstamp.com/pricing"
+                  className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 transition-colors"
+                >
+                  Upgrade to Pro — $5/month
+                </a>
+                <p className="text-[10px] text-slate-400 mt-2">30-day money-back guarantee · Cancel anytime</p>
+              </div>
+            </div>
           )}
-
-          {/* Email Client Preview (Pro) */}
-          <EmailClientPreview data={data} plan={plan} />
-
-          {/* Reply/Forward Signature (Pro) */}
-          <ReplySignature data={data} plan={plan} />
-
-          {/* Dynamic Signatures (Pro) */}
-          <DynamicSignature data={data} plan={plan} onDataChange={onDataChange} />
-
-          {/* Deliverability Score — UNIQUE feature */}
-          <DeliverabilityScore data={data} plan={plan} />
-
-          {/* Outlook Compatibility Tester — UNIQUE feature */}
-          <OutlookPreviewTester data={data} plan={plan} />
-
-          {/* Dark Mode Preview — UNIQUE feature */}
-          <DarkModePreview data={data} plan={plan} />
-
-          {/* Banner Scheduling (Pro) */}
-          <BannerScheduler plan={plan} onApplyBanner={(img, link) => onDataChange({ ...data, ctaBannerUrl: img, ctaBannerLink: link })} />
         </div>
       </div>
     </div>
