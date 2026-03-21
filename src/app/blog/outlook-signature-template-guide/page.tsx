@@ -636,11 +636,11 @@ export default function OutlookSignatureTemplateGuidePage() {
 
               <p className="text-slate-600 leading-relaxed mt-6">
                 For specific problems like your signature not showing up at all, the{" "}
-                <Link href="/email-signature-not-showing-outlook" className="text-blue-600 hover:underline">
+                <Link href="/blog/email-signature-not-showing-outlook" className="text-blue-600 hover:underline">
                   Outlook signature not showing guide
                 </Link>{" "}
                 and the{" "}
-                <Link href="/email-signature-keeps-disappearing" className="text-blue-600 hover:underline">
+                <Link href="/blog/email-signature-keeps-disappearing" className="text-blue-600 hover:underline">
                   signature keeps disappearing guide
                 </Link>{" "}
                 have dedicated troubleshooting steps.

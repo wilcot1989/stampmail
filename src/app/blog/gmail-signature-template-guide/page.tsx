@@ -705,7 +705,7 @@ export default function GmailSignatureTemplateGuidePage() {
 
               <p className="text-slate-600 leading-relaxed mt-6">
                 For Gmail-specific problems like your signature not working at all, the{" "}
-                <Link href="/gmail-signature-not-working" className="text-blue-600 hover:underline">
+                <Link href="/blog/gmail-signature-not-working" className="text-blue-600 hover:underline">
                   Gmail signature not working guide
                 </Link>{" "}
                 has a dedicated troubleshooting checklist.
