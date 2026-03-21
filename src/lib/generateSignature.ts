@@ -165,6 +165,18 @@ function orderedContact(data: SignatureData, separator: string, linkColor: strin
     .join(separator);
 }
 
+/**
+ * Returns HTML rows for name/title/company/pronouns in the order specified by data.fieldOrder.
+ * Only used by templates that opt in (currently: minimal).
+ */
+function orderedUserFields(
+  data: SignatureData,
+  renderers: Record<string, () => string>
+): string {
+  const order = data.fieldOrder ?? ["fullName", "jobTitle", "company", "pronouns"];
+  return order.map(key => renderers[key]?.() ?? "").filter(Boolean).join("\n        ");
+}
+
 // ----------------------------------------------------------------
 // Shared style-override helpers — called inside each template
 // ----------------------------------------------------------------
@@ -225,10 +237,16 @@ function generateMinimal(data: SignatureData, options?: GenerateOptions): string
     ? photoCellRight(data, 70, "50%", options)
     : photoCell(data, 70, "50%", options);
 
+  const minimalUserFields = orderedUserFields(data, {
+    fullName: () => `<tr><td style="${nameStyle(data, { size: 17, color: "#1a1a1a", bold: true })};padding-bottom:1px;">${escapeHtml(data.fullName)}${data.pronouns ? ` <span style="font-size:11px;font-weight:normal;color:#999;">(${escapeHtml(data.pronouns)})</span>` : ""}</td></tr>`,
+    jobTitle: () => data.jobTitle ? `<tr><td style="${titleStyle(data, { size: 12, color: "#666" })};padding-bottom:2px;">${escapeHtml(data.jobTitle)}</td></tr>` : "",
+    company: () => data.company ? `<tr><td style="${companyStyle(data, { size: 12, color: "#999" })};padding-bottom:4px;">${escapeHtml(data.company)}</td></tr>` : "",
+    pronouns: () => "", // pronouns are rendered inline with fullName above
+  });
+
   const contentTd = `<td style="vertical-align:middle;">
       <table cellpadding="0" cellspacing="0" border="0">
-        <tr><td style="${nameStyle(data, { size: 17, color: "#1a1a1a", bold: true })};padding-bottom:1px;">${escapeHtml(data.fullName)}${data.pronouns ? ` <span style="font-size:11px;font-weight:normal;color:#999;">(${escapeHtml(data.pronouns)})</span>` : ""}</td></tr>
-        ${(data.jobTitle || data.company) ? `<tr><td style="padding-bottom:6px;">${data.jobTitle ? `<span style="${titleStyle(data, { size: 12, color: "#666" })}">${escapeHtml(data.jobTitle)}</span>` : ""}${data.jobTitle && data.company ? " &mdash; " : ""}${data.company ? `<span style="${companyStyle(data, { size: 12, color: "#999" })}">${escapeHtml(data.company)}</span>` : ""}</td></tr>` : ""}
+        ${minimalUserFields}
         <tr><td style="border-top:1px solid #e5e7eb;padding-top:7px;font-size:12px;color:#555;">${contact}</td></tr>
         ${data.address ? `<tr><td style="font-size:11px;color:#aaa;padding-top:3px;">${escapeHtml(data.address)}</td></tr>` : ""}
         ${socialLinks(data)}
@@ -369,6 +387,7 @@ function generateCreative(data: SignatureData, options?: GenerateOptions): strin
       <table cellpadding="0" cellspacing="0" border="0">
         <tr><td style="${nameStyle(data, { size: 20, color: c, bold: true })};padding-bottom:2px;">${escapeHtml(data.fullName)}${data.pronouns ? ` <span style="font-size:11px;font-weight:normal;color:#aaa;">(${escapeHtml(data.pronouns)})</span>` : ""}</td></tr>
         ${data.jobTitle ? `<tr><td style="${titleStyle(data, { size: 13, color: "#555" })};padding-bottom:8px;">${escapeHtml(data.jobTitle)}</td></tr>` : ""}
+        ${data.company && !data.photoUrl ? `<tr><td style="${companyStyle(data, { size: 10, color: a })};text-transform:uppercase;letter-spacing:1px;padding-bottom:4px;">${escapeHtml(data.company)}</td></tr>` : ""}
         <tr><td>
           <table cellpadding="0" cellspacing="0" border="0">
             ${creativeContactRows}

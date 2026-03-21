@@ -225,6 +225,115 @@ const ARTICLES = [
     date: "March 2026",
     readTime: "10 min read",
   },
+  // Sub-niche: Outlook + Teams + Mobile (NEW)
+  {
+    slug: "outlook-signature-disappeared",
+    title: "Outlook Signature Disappeared? Here's How to Get It Back",
+    description:
+      "Your Outlook signature was there yesterday, now it's gone. Windows updates, New Outlook migration, roaming conflicts — every cause and fix explained.",
+    category: "Troubleshooting",
+    date: "March 2026",
+    readTime: "12 min read",
+  },
+  {
+    slug: "outlook-roaming-signatures",
+    title: "Outlook Roaming Signatures: What They Are and How to Fix Them",
+    description:
+      "Microsoft's roaming signatures feature causes more problems than it solves. What it is, how to check if it's enabled, and when to disable it.",
+    category: "Microsoft 365",
+    date: "March 2026",
+    readTime: "14 min read",
+  },
+  {
+    slug: "outlook-signature-not-saving",
+    title: "Outlook Signature Not Saving? 8 Fixes That Work",
+    description:
+      "You click save, close settings, and your Outlook signature is gone again. 8 actual causes — permissions, antivirus, roaming, registry — with step-by-step fixes.",
+    category: "Troubleshooting",
+    date: "March 2026",
+    readTime: "11 min read",
+  },
+  {
+    slug: "outlook-365-signature-setup",
+    title: "Outlook 365 Signature Setup: Complete Guide for 2026",
+    description:
+      "Set up email signatures in every version of Outlook 365 — classic desktop, new Outlook, OWA, and mobile. Plus admin deployment for your whole team.",
+    category: "Microsoft 365",
+    date: "March 2026",
+    readTime: "13 min read",
+  },
+  {
+    slug: "outlook-signature-multiple-accounts",
+    title: "Outlook Signature for Multiple Accounts: How to Set Different Signatures",
+    description:
+      "Different signature for work and personal accounts in Outlook? Classic makes it easy, New Outlook makes it hard. Here's how to handle both.",
+    category: "Guide",
+    date: "March 2026",
+    readTime: "10 min read",
+  },
+  {
+    slug: "microsoft-365-email-signature-management",
+    title: "Microsoft 365 Email Signature Management: The Complete Guide",
+    description:
+      "Managing signatures for 10-200 Microsoft 365 users. Exchange rules, PowerShell scripts, third-party tools — every approach compared with real costs.",
+    category: "IT Management",
+    date: "March 2026",
+    readTime: "15 min read",
+  },
+  {
+    slug: "new-outlook-signature-problems",
+    title: "New Outlook Signature Problems: Every Known Issue and Fix (2026)",
+    description:
+      "Microsoft's New Outlook broke signatures for millions of users. Every known problem — missing signatures, formatting issues, save bugs — with actual fixes.",
+    category: "Troubleshooting",
+    date: "March 2026",
+    readTime: "16 min read",
+  },
+  {
+    slug: "outlook-signature-best-practices-2026",
+    title: "Outlook Signature Best Practices for 2026",
+    description:
+      "The 12 rules that matter for Outlook signatures in 2026. Table-based HTML, hosted images, 500px width, dark mode testing, and what most people get wrong.",
+    category: "Best Practices",
+    date: "March 2026",
+    readTime: "13 min read",
+  },
+  {
+    slug: "outlook-vs-gmail-signature-differences",
+    title: "Outlook vs Gmail Signature: Key Differences You Need to Know",
+    description:
+      "Your signature looks perfect in Gmail but breaks in Outlook. Why it happens, what each client supports, and how to make one signature that works in both.",
+    category: "Technical",
+    date: "March 2026",
+    readTime: "10 min read",
+  },
+  {
+    slug: "email-signature-for-remote-teams-outlook",
+    title: "Email Signatures for Remote Teams Using Outlook",
+    description:
+      "Remote teams, multiple devices, no IT person walking to desks. Three strategies for keeping everyone's Outlook signature consistent across locations.",
+    category: "IT Management",
+    date: "March 2026",
+    readTime: "11 min read",
+  },
+  {
+    slug: "outlook-signature-deployment-guide",
+    title: "Outlook Signature Deployment Guide for Microsoft 365",
+    description:
+      "Every method to deploy signatures to Microsoft 365 mailboxes: Exchange rules, PowerShell, Group Policy, Intune. With actual code and step-by-step instructions.",
+    category: "IT Management",
+    date: "March 2026",
+    readTime: "18 min read",
+  },
+  {
+    slug: "email-signature-not-working-new-outlook",
+    title: "Email Signature Not Working in New Outlook? Complete Fix Guide",
+    description:
+      "Forced into New Outlook and your signature is gone? 7 specific fixes for missing, broken, or unsaved signatures in the new version.",
+    category: "Troubleshooting",
+    date: "March 2026",
+    readTime: "12 min read",
+  },
 ];
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -233,6 +342,10 @@ const CATEGORY_COLORS: Record<string, string> = {
   Troubleshooting: "bg-amber-100 text-amber-800",
   Guide: "bg-blue-100 text-blue-700",
   Review: "bg-pink-100 text-pink-700",
+  "Microsoft 365": "bg-indigo-100 text-indigo-700",
+  "IT Management": "bg-cyan-100 text-cyan-700",
+  Comparison: "bg-orange-100 text-orange-700",
+  "Team Management": "bg-teal-100 text-teal-700",
 };
 
 export default function BlogPage() {

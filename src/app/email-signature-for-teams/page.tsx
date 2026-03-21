@@ -547,17 +547,17 @@ export default function EmailSignatureForTeamsPage() {
           <h2 className="text-2xl font-bold text-slate-900 mb-6">Related guides</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {[
+              { href: "/outlook-signature-for-company", label: "Outlook Signature for Company" },
+              { href: "/blog/microsoft-365-email-signature-management", label: "M365 Signature Management" },
+              { href: "/blog/outlook-signature-deployment-guide", label: "Deployment Guide (PowerShell)" },
+              { href: "/blog/email-signature-for-remote-teams-outlook", label: "Remote Teams Outlook Guide" },
               { href: "/email-signature-for-business", label: "Business Email Signatures" },
               { href: "/email-signature-outlook-compatible", label: "Outlook Compatible Signatures" },
               { href: "/email-signature-outlook-365", label: "Outlook 365 Signature Setup" },
-              { href: "/email-signature-gmail", label: "Gmail Email Signature Guide" },
-              { href: "/email-signature-deliverability", label: "Email Signature Deliverability" },
-              { href: "/email-signature-dark-mode-compatible", label: "Dark Mode Compatible Signatures" },
+              { href: "/blog/email-signature-company-wide-management", label: "Company-Wide Management" },
+              { href: "/blog/email-signature-onboarding-employees", label: "Employee Onboarding Guide" },
               { href: "/email-signature-mobile-friendly", label: "Mobile Friendly Signatures" },
-              { href: "/professional-email-signature", label: "Professional Email Signatures" },
-              { href: "/blog/email-signature-best-practices", label: "Best Practices Guide" },
               { href: "/alternative-to-exclaimer", label: "Exclaimer Alternative" },
-              { href: "/alternative-to-wisestamp", label: "WiseStamp Alternative" },
               { href: "/pricing", label: "NeatStamp Team Pricing" },
             ].map(({ href, label }) => (
               <Link

@@ -5,9 +5,9 @@ import { generateSignatureHtml } from "@/lib/generateSignature";
 import { DEFAULT_SIGNATURE_DATA } from "@/lib/types";
 
 export const metadata: Metadata = {
-  title: "Free Email Signature Generator | NeatStamp — Actually Free",
+  title: "Outlook-Proof Email Signatures for Business Teams | NeatStamp",
   description:
-    "Create a professional email signature in 60 seconds. Free forever — no account, no credit card. Works in Gmail, Outlook & 30+ email clients.",
+    "Email signatures that work in Outlook Desktop, New Outlook, OWA, and mobile. Built for Microsoft 365 teams. Free to start — no account needed.",
   alternates: { canonical: "https://neatstamp.com" },
 };
 
@@ -80,36 +80,45 @@ export default function HomePage() {
         <div className="relative mx-auto max-w-screen-2xl px-4 py-24 sm:px-6 sm:py-32 lg:px-8 lg:py-40">
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <div>
-              <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-emerald-50 border border-emerald-200 px-4 py-1.5 text-sm font-medium text-emerald-700">
-                <span className="flex h-2 w-2 rounded-full bg-emerald-500" />
-                Free forever — no credit card required
+              <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-blue-50 border border-blue-200 px-4 py-1.5 text-sm font-medium text-blue-700">
+                <span className="flex h-2 w-2 rounded-full bg-blue-500" />
+                Built for Microsoft 365 teams
               </div>
               <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
-                Free email signature
+                Email signatures that work in Outlook.
                 <br />
                 <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                  generator.
+                  For your entire team.
                 </span>
               </h1>
               <p className="mt-6 max-w-lg text-lg leading-relaxed text-slate-600">
-                Create beautiful, Outlook-proof email signatures in 60 seconds.
-                No account needed. No paywall. Just paste and go.
+                Built for Microsoft 365. Mobile-safe. No more broken signatures.
               </p>
               <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
                 <Link
                   href="/editor"
                   className="inline-flex items-center justify-center rounded-full bg-blue-600 px-8 py-4 text-base font-semibold text-white shadow-lg shadow-blue-600/25 hover:bg-blue-700 hover:shadow-xl hover:shadow-blue-600/30 transition-all"
                 >
-                  Create Your Signature
+                  Create your Outlook-proof signature — Free
                   <svg className="ml-2 h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
                   </svg>
                 </Link>
-                <span className="text-sm text-slate-500">
-                  Free forever. Ready in 60 seconds.
-                </span>
               </div>
-              <div className="mt-10 flex items-center gap-4">
+              {/* Trust indicators */}
+              <div className="mt-8 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-4">
+                {[
+                  "Tested on Outlook Desktop, New Outlook, Outlook Mobile, OWA",
+                  "Used by teams on Microsoft 365",
+                  "Outlook Compatibility Score: check before you send",
+                ].map((item) => (
+                  <span key={item} className="inline-flex items-center gap-1.5 text-sm text-slate-500">
+                    <CheckIcon className="h-4 w-4 text-emerald-500 flex-shrink-0" />
+                    {item}
+                  </span>
+                ))}
+              </div>
+              <div className="mt-8 flex items-center gap-4">
                 <div className="flex -space-x-2">
                   {["/images/social-1.jpg", "/images/social-2.jpg", "/images/social-3.jpg", "/images/social-4.jpg"].map((src) => (
                     <img
@@ -144,7 +153,7 @@ export default function HomePage() {
                     </div>
                     <div>
                       <p className="text-sm font-semibold text-slate-900">Outlook-proof</p>
-                      <p className="text-xs text-slate-500">Works in 30+ email clients</p>
+                      <p className="text-xs text-slate-500">Desktop, New Outlook, OWA &amp; Mobile</p>
                     </div>
                   </div>
                 </div>
@@ -225,11 +234,59 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* OUTLOOK PROBLEMS WE SOLVE */}
+      <section className="py-20 bg-slate-50">
+        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <p className="text-sm font-semibold text-blue-600 uppercase tracking-widest mb-3">Outlook problems we solve</p>
+            <h2 className="text-3xl font-extrabold text-slate-900 sm:text-4xl">
+              Sound familiar?
+            </h2>
+            <p className="mt-3 text-lg text-slate-500">The most common Outlook signature headaches — fixed.</p>
+          </div>
+          <div className="grid gap-5 sm:grid-cols-2">
+            {[
+              {
+                problem: "Signature disappeared after an Outlook update?",
+                solution: "We keep yours safe in the cloud. One link restores it instantly on any device.",
+                href: "/blog/outlook-signature-disappeared",
+              },
+              {
+                problem: "Broken formatting in New Outlook?",
+                solution: "Our HTML is tested for both Classic Outlook and the New Outlook. Both render perfectly.",
+                href: "/blog/new-outlook-signature-broken",
+              },
+              {
+                problem: "Images showing as attachments?",
+                solution: "We host all signature images on our CDN automatically. No more paperclip icons.",
+                href: "/blog/outlook-signature-images-as-attachments",
+              },
+              {
+                problem: "Different signature on every device?",
+                solution: "One signature, synced everywhere. Works on Outlook Desktop, OWA, and Outlook Mobile.",
+                href: "/blog/outlook-signature-different-on-each-device",
+              },
+            ].map((item) => (
+              <div
+                key={item.problem}
+                className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-100 hover:shadow-md transition-shadow"
+              >
+                <p className="font-semibold text-slate-900 mb-2">{item.problem}</p>
+                <p className="text-sm text-slate-500 leading-relaxed mb-3">{item.solution}</p>
+                <Link href={item.href} className="text-sm font-medium text-blue-600 hover:underline">
+                  Read more →
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* TRUSTED BY / EMAIL CLIENTS */}
       <section className="border-y border-slate-100 bg-white py-12">
         <div className="mx-auto max-w-screen-2xl px-4 sm:px-6 lg:px-8">
           <p className="text-center text-sm font-medium text-slate-400 uppercase tracking-widest mb-8">
-            Works perfectly in every email client
+            Tested and verified in every major email client — including all Outlook versions
           </p>
           <EmailClientGrid />
         </div>
@@ -307,14 +364,14 @@ export default function HomePage() {
           </div>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
             {[
+              "Works in Outlook — guaranteed",
+              "Your whole team in 5 minutes",
+              "Mobile-safe output",
+              "Outlook-proof HTML",
               "5 professional templates",
               "Custom brand colors",
               "Photo & logo upload",
               "Social media links",
-              "Outlook-proof HTML",
-              "One-click copy",
-              "Mobile responsive",
-              "No account needed",
             ].map((item) => (
               <div
                 key={item}
@@ -409,11 +466,13 @@ export default function HomePage() {
                   { feature: "Free tier (no catch)", us: true, wise: false, my: false },
                   { feature: "No account required", us: true, wise: false, my: false },
                   { feature: "Outlook-proof guaranteed", us: true, wise: false, my: false },
+                  { feature: "Outlook Compatibility Tester", us: true, wise: false, my: false },
+                  { feature: "New Outlook Migration Checker", us: true, wise: false, my: false },
+                  { feature: "Mobile-safe output", us: true, wise: false, my: false },
                   { feature: "Privacy-first (client-side)", us: true, wise: false, my: false },
                   { feature: "Cancel in 2 clicks", us: true, wise: false, my: true },
                   { feature: "Multiple templates", us: true, wise: true, my: true },
                   { feature: "Social media links", us: true, wise: true, my: true },
-                  { feature: "Mobile responsive", us: true, wise: false, my: false },
                   { feature: "Free price", us: "$0", wise: "$0*", my: "$0*" },
                   { feature: "Pro price", us: "$5/mo", wise: "$6-10/mo", my: "$4-8/mo" },
                 ].map((row, i) => (
@@ -552,15 +611,19 @@ export default function HomePage() {
               </Link>
             </div>
             {/* Team */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-7 shadow-sm">
-              <p className="text-sm font-semibold text-slate-500 uppercase tracking-widest mb-1">Team</p>
-              <p className="text-4xl font-extrabold text-slate-900 mb-1">$3<span className="text-xl font-medium text-slate-400">/user/mo</span></p>
-              <p className="text-sm text-slate-400 mb-6">Minimum 3 users</p>
+            <div className="rounded-2xl border-2 border-indigo-200 bg-indigo-50/40 p-7 shadow-sm relative">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-indigo-600 px-4 py-1 text-xs font-bold text-white shadow whitespace-nowrap">
+                Built for Microsoft 365 teams
+              </div>
+              <p className="text-sm font-semibold text-indigo-600 uppercase tracking-widest mb-1">Team</p>
+              <p className="text-4xl font-extrabold text-slate-900 mb-1">$29<span className="text-xl font-medium text-slate-400">/mo</span></p>
+              <p className="text-sm text-slate-500 mb-6">Flat fee — up to 25 users</p>
               <ul className="space-y-3 mb-8">
                 {[
                   "Everything in Pro",
                   "Centralized team management",
                   "Brand consistency controls",
+                  "Outlook Compatibility Score for all members",
                   "Priority support",
                 ].map((f) => (
                   <li key={f} className="flex items-start gap-2.5 text-sm text-slate-600">
@@ -571,7 +634,7 @@ export default function HomePage() {
               </ul>
               <Link
                 href="/pricing"
-                className="block text-center rounded-full border border-slate-300 px-5 py-2.5 text-sm font-semibold text-slate-700 hover:border-slate-400 hover:bg-slate-50 transition-all"
+                className="block text-center rounded-full border-2 border-indigo-600 px-5 py-2.5 text-sm font-semibold text-indigo-700 hover:bg-indigo-600 hover:text-white transition-all"
               >
                 See Team Plans
               </Link>

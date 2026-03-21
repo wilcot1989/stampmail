@@ -15,8 +15,10 @@ import BannerScheduler from "./BannerScheduler";
 import DeliverabilityScore from "./DeliverabilityScore";
 import DarkModePreview from "./DarkModePreview";
 import OutlookPreviewTester from "./OutlookPreviewTester";
+import NewOutlookMigrationChecker from "./NewOutlookMigrationChecker";
 import AISignatureGenerator from "./AISignatureGenerator";
 import TestimonialBlock from "./TestimonialBlock";
+import OutlookPushButton from "./OutlookPushButton";
 
 // ---------------------------------------------------------------------------
 // Props
@@ -898,6 +900,56 @@ function DesignPanel({
 // Live Preview — email chrome + rendered signature
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// Collapsible tool section — keeps right panel clean
+// ---------------------------------------------------------------------------
+
+function ToolSection({
+  title,
+  badge,
+  defaultOpen = false,
+  children,
+}: {
+  title: string;
+  badge?: string;
+  defaultOpen?: boolean;
+  children: React.ReactNode;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-slate-50 transition-colors"
+      >
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-semibold text-slate-800">{title}</span>
+          {badge && (
+            <span className="rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-bold text-blue-700">
+              {badge}
+            </span>
+          )}
+        </div>
+        <svg
+          className={`h-4 w-4 text-slate-400 transition-transform ${open ? "rotate-180" : ""}`}
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={2}
+          stroke="currentColor"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+        </svg>
+      </button>
+      {open && <div className="px-4 pb-4">{children}</div>}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Live preview in email chrome mockup
+// ---------------------------------------------------------------------------
+
 function LivePreview({
   data,
   plan,
@@ -973,6 +1025,7 @@ export default function SignatureEditor({
 
   const ws = wrapperSettings ?? DEFAULT_WRAPPER_SETTINGS;
   const isPro = plan === "pro" || plan === "team";
+  const previewHtml = generateSignatureHtml(data, { plan });
   const photoBlock = blocks.find((b) => b.type === "photo" && b.visible);
 
   const cropPhotoToShape = (photoUrl: string, shape: string): Promise<string> => {
@@ -1144,76 +1197,107 @@ export default function SignatureEditor({
             )}
           </button>
 
-          {/* Signature Score — FREE (conversion trigger) */}
-          <SignatureScore data={data} />
+          {/* Push to Outlook — one-click integration */}
+          <OutlookPushButton signatureHtml={previewHtml} />
 
-          {/* Installation Guide — FREE (helps adoption) */}
-          <InstallGuide />
-
-          {/* ====== PRO FEATURES BELOW ====== */}
+          {/* ================================================================
+              TOOLS — organized in collapsible groups for clarity
+          ================================================================ */}
+          <ToolSection title="Signature Score" defaultOpen>
+            <SignatureScore data={data} />
+          </ToolSection>
 
           {isPro ? (
             <>
-              {/* Deliverability Score — PRO UNIQUE */}
-              <DeliverabilityScore data={data} plan={plan} />
+              <ToolSection title="Outlook Compatibility" badge="Pro" defaultOpen>
+                <div className="space-y-3">
+                  <OutlookPreviewTester data={data} plan={plan} />
+                  <NewOutlookMigrationChecker signatureHtml={previewHtml} isPro={isPro} />
+                </div>
+              </ToolSection>
 
-              {/* Outlook Compatibility Tester — PRO UNIQUE */}
-              <OutlookPreviewTester data={data} plan={plan} />
+              <ToolSection title="Preview & Test" badge="Pro">
+                <div className="space-y-3">
+                  <EmailClientPreview data={data} plan={plan} />
+                  <DarkModePreview data={data} plan={plan} />
+                </div>
+              </ToolSection>
 
-              {/* Dark Mode Preview — PRO UNIQUE */}
-              <DarkModePreview data={data} plan={plan} />
+              <ToolSection title="Deliverability" badge="Pro">
+                <DeliverabilityScore data={data} plan={plan} />
+              </ToolSection>
 
-              {/* Email Client Preview — PRO */}
-              <EmailClientPreview data={data} plan={plan} />
+              <ToolSection title="Install & Export">
+                <div className="space-y-3">
+                  <InstallGuide />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const blob = new Blob([previewHtml], { type: "text/html" });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement("a");
+                      a.href = url;
+                      a.download = `signature-${data.fullName?.replace(/\s+/g, "-").toLowerCase() || "backup"}.html`;
+                      a.click();
+                      URL.revokeObjectURL(url);
+                    }}
+                    className="w-full flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                  >
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                    </svg>
+                    Download HTML Backup
+                  </button>
+                </div>
+              </ToolSection>
 
-              {/* QR Code Generator — PRO */}
-              {data.website && (
-                <QRCodeGenerator url={data.website.startsWith("http") ? data.website : `https://${data.website}`} />
-              )}
-
-              {/* Reply/Forward Signature — PRO */}
-              <ReplySignature data={data} plan={plan} />
-
-              {/* Dynamic Signatures — PRO */}
-              <DynamicSignature data={data} plan={plan} onDataChange={onDataChange} />
-
-              {/* Testimonial/Social Proof — PRO */}
-              <TestimonialBlock data={data} plan={plan} onDataChange={onDataChange} />
-
-              {/* Banner Scheduling — PRO */}
-              <BannerScheduler plan={plan} onApplyBanner={(img, link) => onDataChange({ ...data, ctaBannerUrl: img, ctaBannerLink: link })} />
+              <ToolSection title="Advanced Features" badge="Pro">
+                <div className="space-y-3">
+                  {data.website && (
+                    <QRCodeGenerator url={data.website.startsWith("http") ? data.website : `https://${data.website}`} />
+                  )}
+                  <ReplySignature data={data} plan={plan} />
+                  <DynamicSignature data={data} plan={plan} onDataChange={onDataChange} />
+                  <TestimonialBlock data={data} plan={plan} onDataChange={onDataChange} />
+                  <BannerScheduler plan={plan} onApplyBanner={(img, link) => onDataChange({ ...data, ctaBannerUrl: img, ctaBannerLink: link })} />
+                </div>
+              </ToolSection>
             </>
           ) : (
-            <div className="space-y-3">
-              {/* Pro upsell cards for free users */}
-              <div className="rounded-xl border border-slate-200 bg-gradient-to-b from-white to-slate-50 p-5 text-center">
-                <h3 className="text-sm font-bold text-slate-800 mb-2">Unlock Pro Tools</h3>
-                <div className="grid grid-cols-2 gap-2 mb-4">
+            <>
+              <ToolSection title="Install Your Signature" defaultOpen>
+                <InstallGuide />
+              </ToolSection>
+
+              {/* Compact Pro upsell — focused on sub-niche value */}
+              <div className="rounded-xl border border-blue-200 bg-gradient-to-b from-blue-50 to-white p-4">
+                <p className="text-xs font-bold text-blue-800 mb-2">Upgrade to Pro</p>
+                <ul className="space-y-1.5 mb-3">
                   {[
-                    { icon: "📬", name: "Deliverability Check" },
-                    { icon: "📋", name: "Outlook Tester" },
-                    { icon: "🌙", name: "Dark Mode Preview" },
-                    { icon: "📧", name: "Client Preview" },
-                    { icon: "📱", name: "QR Code Generator" },
-                    { icon: "↩️", name: "Reply Signature" },
-                    { icon: "🎯", name: "Dynamic Signatures" },
-                    { icon: "📅", name: "Banner Scheduling" },
-                  ].map((tool) => (
-                    <div key={tool.name} className="flex items-center gap-1.5 rounded-lg bg-white border border-slate-100 px-2.5 py-2 text-left">
-                      <span className="text-sm">{tool.icon}</span>
-                      <span className="text-[11px] text-slate-600">{tool.name}</span>
-                    </div>
+                    "Outlook Compatibility Tester (11 checks)",
+                    "New Outlook Migration Checker",
+                    "Dark Mode + Email Client Preview",
+                    "Deliverability Score",
+                    "HTML Backup & Export",
+                    "QR Code, Banner Scheduling & more",
+                  ].map((f) => (
+                    <li key={f} className="flex items-start gap-1.5 text-[11px] text-slate-600">
+                      <svg className="h-3.5 w-3.5 text-blue-500 flex-shrink-0 mt-px" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                      </svg>
+                      {f}
+                    </li>
                   ))}
-                </div>
+                </ul>
                 <a
                   href="https://neatstamp.com/pricing"
-                  className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 transition-colors"
+                  className="block w-full rounded-lg bg-blue-600 px-4 py-2 text-center text-xs font-semibold text-white hover:bg-blue-700 transition-colors"
                 >
-                  Upgrade to Pro — $5/month
+                  Try Pro — $5/month
                 </a>
-                <p className="text-[10px] text-slate-400 mt-2">30-day money-back guarantee · Cancel anytime</p>
+                <p className="text-[10px] text-slate-400 text-center mt-1.5">30-day money-back guarantee</p>
               </div>
-            </div>
+            </>
           )}
         </div>
       </div>

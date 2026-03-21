@@ -402,44 +402,44 @@ export default function EmailSignatureOutlook365Page() {
             <div className="grid gap-4 sm:grid-cols-2">
               {[
                 {
-                  href: "/email-signature-maker",
-                  title: "Email Signature Maker",
-                  desc: "Build the HTML you need for these steps. Free, no account needed.",
+                  href: "/editor",
+                  title: "Signature Editor",
+                  desc: "Build your Outlook-safe signature. Free, no account needed.",
                 },
                 {
                   href: "/email-signature-outlook",
-                  title: "Classic Outlook Signature Guide",
-                  desc: "Complete guide for classic Outlook Desktop, including the HTML workaround.",
+                  title: "Outlook Signature Guide",
+                  desc: "Complete guide for classic and new Outlook.",
                 },
                 {
-                  href: "/email-signature-gmail",
-                  title: "Gmail Signature Guide",
-                  desc: "The Gmail equivalent of this guide.",
+                  href: "/blog/outlook-365-signature-setup",
+                  title: "Outlook 365 Setup Guide",
+                  desc: "Step-by-step for every M365 version.",
                 },
                 {
-                  href: "/email-signature-for-business",
-                  title: "Business Email Signatures",
-                  desc: "Rolling out consistent signatures across a team.",
+                  href: "/blog/outlook-roaming-signatures",
+                  title: "Roaming Signatures Explained",
+                  desc: "What they are and when to disable them.",
                 },
                 {
-                  href: "/small-business-email-signature",
-                  title: "Small Business Email Signatures",
-                  desc: "Without IT support — a practical guide.",
+                  href: "/outlook-signature-for-company",
+                  title: "Company Signatures in Outlook",
+                  desc: "Deploy to your whole Microsoft 365 team.",
                 },
                 {
-                  href: "/email-signature-apple-mail",
-                  title: "Apple Mail Signature Guide",
-                  desc: "For Mac users who also use Outlook.",
+                  href: "/blog/microsoft-365-email-signature-management",
+                  title: "M365 Signature Management",
+                  desc: "Exchange rules, PowerShell, third-party tools.",
                 },
                 {
-                  href: "/html-email-signature",
-                  title: "HTML Email Signature Guide",
-                  desc: "Why HTML signatures work differently across clients.",
+                  href: "/outlook-mobile-signature",
+                  title: "Outlook Mobile Signature",
+                  desc: "Set up signatures on iOS and Android.",
                 },
                 {
-                  href: "/email-signature-design",
-                  title: "Email Signature Design",
-                  desc: "Making signatures that look right in Outlook's renderer.",
+                  href: "/blog/new-outlook-signature-problems",
+                  title: "New Outlook Problems",
+                  desc: "Every known issue and fix for 2026.",
                 },
               ].map((link) => (
                 <Link

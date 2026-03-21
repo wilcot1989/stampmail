@@ -808,6 +808,31 @@ MailFormat = 2  (1 = Plain Text, 2 = HTML, 3 = Rich Text)`}
               </p>
             </section>
 
+            {/* Related Outlook guides */}
+            <section className="mb-12">
+              <h2 className="text-2xl font-bold text-slate-900 mb-4">More Outlook signature guides</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {[
+                  { href: "/blog/outlook-signature-disappeared", label: "Signature disappeared? Recovery steps" },
+                  { href: "/blog/outlook-signature-not-saving", label: "Signature not saving? 8 fixes" },
+                  { href: "/blog/new-outlook-signature-problems", label: "New Outlook problems — every known issue" },
+                  { href: "/blog/outlook-roaming-signatures", label: "Roaming signatures explained" },
+                  { href: "/blog/email-signature-not-working-new-outlook", label: "Fix signatures in New Outlook" },
+                  { href: "/outlook-signature-html", label: "Outlook HTML signatures guide" },
+                  { href: "/outlook-mobile-signature", label: "Outlook Mobile signature setup" },
+                  { href: "/blog/outlook-365-signature-setup", label: "Outlook 365 setup guide" },
+                ].map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="block rounded-lg border border-slate-200 px-3 py-2.5 text-sm font-medium text-blue-600 hover:border-blue-300 hover:bg-blue-50 transition-colors"
+                  >
+                    {link.label} →
+                  </Link>
+                ))}
+              </div>
+            </section>
+
             {/* FAQ */}
             <section id="faq" className="mb-12">
               <h2 className="text-2xl font-bold text-slate-900 mb-6">

@@ -493,16 +493,16 @@ export default function EmailSignatureMobileFriendlyPage() {
           <h2 className="text-2xl font-bold text-slate-900 mb-6">Related guides</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {[
-              { href: "/email-signature-gmail", label: "Gmail Email Signature Guide" },
-              { href: "/email-signature-apple-mail", label: "Apple Mail Email Signature" },
-              { href: "/email-signature-yahoo", label: "Yahoo Email Signature Guide" },
+              { href: "/outlook-mobile-signature", label: "Outlook Mobile Signature Setup" },
               { href: "/email-signature-outlook", label: "Outlook Email Signature Guide" },
               { href: "/email-signature-outlook-compatible", label: "Outlook Compatible Signatures" },
+              { href: "/blog/email-signature-on-phone", label: "Signature on iPhone & Android" },
               { href: "/email-signature-dark-mode-compatible", label: "Dark Mode Compatible Signatures" },
-              { href: "/email-signature-for-business", label: "Business Email Signatures" },
-              { href: "/email-signature-for-freelancers", label: "Freelancer Email Signatures" },
+              { href: "/email-signature-for-teams", label: "Team Signature Management" },
+              { href: "/email-signature-gmail", label: "Gmail Email Signature Guide" },
+              { href: "/email-signature-apple-mail", label: "Apple Mail Email Signature" },
               { href: "/blog/email-signature-size", label: "Email Signature Size Guide" },
-              { href: "/blog/email-signature-best-practices", label: "Best Practices Guide" },
+              { href: "/blog/outlook-signature-best-practices-2026", label: "Outlook Best Practices 2026" },
               { href: "/templates", label: "Browse Signature Templates" },
               { href: "/examples", label: "Signature Examples Gallery" },
             ].map(({ href, label }) => (

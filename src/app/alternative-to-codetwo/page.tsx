@@ -337,18 +337,18 @@ export default function AlternativeToCodetwoPage() {
             <h2 className="text-2xl font-bold text-slate-900">Related guides</h2>
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
               {[
-                { href: "/alternative-to-exclaimer", label: "Exclaimer alternative — also enterprise-heavy" },
-                { href: "/alternative-to-letsignit", label: "Letsignit alternative — M365-focused comparison" },
-                { href: "/alternative-to-wisestamp", label: "WiseStamp alternative — honest review" },
-                { href: "/alternative-to-mysignature", label: "MySignature alternative — free without the catch" },
-                { href: "/email-signature-outlook", label: "How to set up your signature in Outlook" },
-                { href: "/email-signature-gmail", label: "How to set up your signature in Gmail" },
-                { href: "/email-signature-for-business", label: "Business email signatures — what to include" },
-                { href: "/email-signature-for-teams", label: "Team email signature management guide" },
-                { href: "/templates", label: "Browse NeatStamp signature templates" },
-                { href: "/pricing", label: "NeatStamp pricing — free vs paid" },
-                { href: "/professional-email-signature", label: "What makes a professional email signature" },
-                { href: "/blog/email-signature-best-practices", label: "Email signature best practices" },
+                { href: "/outlook-signature-for-company", label: "Outlook signature for your company — flat-fee" },
+                { href: "/blog/microsoft-365-email-signature-management", label: "Microsoft 365 signature management guide" },
+                { href: "/blog/outlook-signature-deployment-guide", label: "Outlook deployment guide (PowerShell)" },
+                { href: "/email-signature-cost-calculator", label: "Cost calculator — manual vs managed" },
+                { href: "/alternative-to-exclaimer", label: "Exclaimer alternative — enterprise comparison" },
+                { href: "/alternative-to-letsignit", label: "Letsignit alternative — M365 comparison" },
+                { href: "/email-signature-for-teams", label: "Team email signature management" },
+                { href: "/email-signature-outlook", label: "Outlook email signature guide" },
+                { href: "/blog/new-outlook-signature-problems", label: "New Outlook signature problems + fixes" },
+                { href: "/blog/email-signature-for-remote-teams-outlook", label: "Remote team signatures for Outlook" },
+                { href: "/pricing", label: "NeatStamp pricing — $29/mo for 25 users" },
+                { href: "/templates", label: "Browse signature templates" },
               ].map((link) => (
                 <Link
                   key={link.href}

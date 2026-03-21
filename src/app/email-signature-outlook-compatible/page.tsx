@@ -495,17 +495,17 @@ export default function EmailSignatureOutlookCompatiblePage() {
           <h2 className="text-2xl font-bold text-slate-900 mb-6">Related guides</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {[
-              { href: "/email-signature-outlook", label: "Outlook Email Signature Setup Guide" },
+              { href: "/email-signature-outlook", label: "Outlook Email Signature Guide" },
+              { href: "/outlook-signature-html", label: "Outlook HTML Signatures" },
+              { href: "/blog/new-outlook-signature-problems", label: "New Outlook Problems & Fixes" },
+              { href: "/blog/outlook-vs-gmail-signature-differences", label: "Outlook vs Gmail Differences" },
+              { href: "/blog/outlook-signature-best-practices-2026", label: "Outlook Best Practices 2026" },
+              { href: "/outlook-mobile-signature", label: "Outlook Mobile Signature" },
               { href: "/email-signature-outlook-365", label: "Outlook 365 Signature Guide" },
-              { href: "/email-signature-gmail", label: "Gmail Email Signature Guide" },
-              { href: "/email-signature-for-business", label: "Business Email Signatures" },
-              { href: "/email-signature-for-teams", label: "Team Email Signature Management" },
-              { href: "/email-signature-dark-mode-compatible", label: "Dark Mode Compatible Signatures" },
-              { href: "/blog/email-signature-best-practices", label: "Email Signature Best Practices" },
-              { href: "/blog/email-signature-images-not-displaying", label: "Fix Images Not Displaying" },
-              { href: "/professional-email-signature", label: "Professional Email Signatures" },
+              { href: "/email-signature-for-teams", label: "Team Signature Management" },
+              { href: "/email-signature-dark-mode-compatible", label: "Dark Mode Compatible" },
+              { href: "/blog/email-signature-not-working-new-outlook", label: "Fix New Outlook Signatures" },
               { href: "/templates", label: "Browse Signature Templates" },
-              { href: "/examples", label: "Signature Examples Gallery" },
               { href: "/alternative-to-exclaimer", label: "Exclaimer Alternative" },
             ].map(({ href, label }) => (
               <Link

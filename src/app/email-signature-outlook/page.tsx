@@ -54,13 +54,17 @@ const faqs = [
 
 const RELATED_GUIDES = [
   { href: "/editor", label: "Signature Editor", desc: "Build your signature free" },
-  { href: "/email-signature-gmail", label: "Gmail Signatures", desc: "Complete Gmail guide" },
+  { href: "/outlook-mobile-signature", label: "Outlook Mobile Signature", desc: "iOS & Android setup" },
+  { href: "/outlook-signature-html", label: "Outlook HTML Signatures", desc: "HTML that works in Outlook" },
+  { href: "/outlook-signature-for-company", label: "Outlook for Companies", desc: "Team deployment guide" },
   { href: "/email-signature-outlook-365", label: "Outlook 365 Signatures", desc: "Microsoft 365 specific" },
-  { href: "/email-signature-apple-mail", label: "Apple Mail Signatures", desc: "Mac & iOS setup" },
-  { href: "/html-email-signature", label: "HTML Email Signatures", desc: "Full technical breakdown" },
-  { href: "/email-signature-for-business", label: "Business Signatures", desc: "Team & brand guide" },
-  { href: "/email-signature-with-logo", label: "Signature with Logo", desc: "Logo setup tips" },
-  { href: "/professional-email-signature", label: "Professional Signatures", desc: "Best practices" },
+  { href: "/email-signature-outlook-compatible", label: "Outlook Compatible", desc: "Compatibility checklist" },
+  { href: "/blog/new-outlook-signature-problems", label: "New Outlook Problems", desc: "Every known issue + fix" },
+  { href: "/blog/outlook-signature-disappeared", label: "Signature Disappeared", desc: "Recovery steps" },
+  { href: "/blog/outlook-roaming-signatures", label: "Roaming Signatures", desc: "What they are & how to fix" },
+  { href: "/blog/outlook-signature-deployment-guide", label: "Deployment Guide", desc: "PowerShell & Exchange rules" },
+  { href: "/email-signature-for-teams", label: "Team Signatures", desc: "Manage your whole team" },
+  { href: "/email-signature-mobile-friendly", label: "Mobile-Friendly", desc: "Works on every phone" },
 ];
 
 function CheckIcon() {

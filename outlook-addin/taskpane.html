@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeatStamp Signatures</title>
+
+  <!-- Office.js — must be loaded before any Office API calls -->
+  <script src="https://appsforoffice.microsoft.com/lib/1.1/hosted/office.js" type="text/javascript"></script>
+
+  <style>
+    /* ── Reset & base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:       #2563eb;
+      --blue-hover: #1d4ed8;
+      --blue-light: #eff6ff;
+      --slate-900:  #0f172a;
+      --slate-700:  #334155;
+      --slate-500:  #64748b;
+      --slate-300:  #cbd5e1;
+      --slate-100:  #f1f5f9;
+      --slate-50:   #f8fafc;
+      --green:      #16a34a;
+      --green-light:#f0fdf4;
+      --red:        #dc2626;
+      --red-light:  #fef2f2;
+      --radius:     8px;
+      --font:       -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      font-family: var(--font);
+      font-size: 13px;
+      color: var(--slate-700);
+      background: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ── */
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 16px 12px;
+      border-bottom: 1px solid var(--slate-100);
+      background: #fff;
+      flex-shrink: 0;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+
+    .logo-mark {
+      width: 28px;
+      height: 28px;
+      background: var(--blue);
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .logo-mark svg {
+      width: 16px;
+      height: 16px;
+      fill: #fff;
+    }
+
+    .logo-text {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--slate-900);
+      letter-spacing: -0.2px;
+    }
+
+    .header-actions {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-ghost {
+      background: none;
+      border: none;
+      color: var(--slate-500);
+      font-size: 11px;
+      cursor: pointer;
+      padding: 4px 6px;
+      border-radius: 4px;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .btn-ghost:hover { background: var(--slate-100); color: var(--slate-700); }
+
+    /* ── Main content ── */
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+    }
+
+    /* ── Loader ── */
+    .loader {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 40px 20px;
+      color: var(--slate-500);
+      font-size: 13px;
+    }
+
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 2px solid var(--slate-300);
+      border-top-color: var(--blue);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Sign-in screen ── */
+    .signin-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 16px;
+      padding: 32px 20px;
+    }
+
+    .signin-screen .big-icon {
+      width: 56px;
+      height: 56px;
+      background: var(--blue-light);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .signin-screen .big-icon svg {
+      width: 28px;
+      height: 28px;
+      fill: var(--blue);
+    }
+
+    .signin-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--slate-900);
+    }
+
+    .signin-desc {
+      font-size: 12px;
+      color: var(--slate-500);
+      line-height: 1.5;
+      max-width: 240px;
+    }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 9px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: var(--radius);
+      cursor: pointer;
+      border: none;
+      transition: background 0.15s, transform 0.1s;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn:active { transform: scale(0.98); }
+
+    .btn-primary {
+      background: var(--blue);
+      color: #fff;
+      width: 100%;
+    }
+
+    .btn-primary:hover { background: var(--blue-hover); }
+    .btn-primary:disabled { background: var(--slate-300); cursor: not-allowed; transform: none; }
+
+    .btn-secondary {
+      background: var(--slate-100);
+      color: var(--slate-700);
+    }
+
+    .btn-secondary:hover { background: var(--slate-300); }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+
+    /* ── Toast / feedback ── */
+    .toast {
+      position: fixed;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%) translateY(60px);
+      background: var(--slate-900);
+      color: #fff;
+      padding: 10px 16px;
+      border-radius: var(--radius);
+      font-size: 12px;
+      font-weight: 500;
+      white-space: nowrap;
+      transition: transform 0.25s ease;
+      z-index: 1000;
+      pointer-events: none;
+    }
+
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.success { background: var(--green); }
+    .toast.error { background: var(--red); }
+
+    /* ── Section label ── */
+    .section-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--slate-500);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 8px;
+    }
+
+    /* ── Signature list ── */
+    .sig-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .sig-card {
+      border: 1.5px solid var(--slate-300);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      cursor: default;
+    }
+
+    .sig-card:hover {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.08);
+    }
+
+    .sig-card.active {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+    }
+
+    .sig-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px 8px;
+      gap: 8px;
+    }
+
+    .sig-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--slate-900);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      flex: 1;
+    }
+
+    .sig-badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 20px;
+      flex-shrink: 0;
+    }
+
+    .sig-badge.active-badge {
+      background: var(--green-light);
+      color: var(--green);
+    }
+
+    .sig-preview {
+      padding: 0 12px 0;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.2s ease, padding 0.2s ease;
+    }
+
+    .sig-preview.expanded {
+      max-height: 300px;
+      padding: 0 12px 10px;
+    }
+
+    .sig-preview-inner {
+      background: var(--slate-50);
+      border: 1px solid var(--slate-100);
+      border-radius: 6px;
+      padding: 10px;
+      font-size: 11px;
+      overflow: hidden;
+      max-height: 160px;
+      overflow-y: auto;
+    }
+
+    .sig-actions {
+      display: flex;
+      gap: 6px;
+      padding: 0 12px 12px;
+    }
+
+    .sig-actions .btn {
+      flex: 1;
+    }
+
+    /* ── Auto-apply toggle ── */
+    .auto-apply-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--blue-light);
+      border: 1.5px solid rgba(37,99,235,0.15);
+      border-radius: var(--radius);
+      padding: 10px 14px;
+      margin-top: 16px;
+    }
+
+    .auto-apply-info {
+      flex: 1;
+    }
+
+    .auto-apply-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--slate-900);
+      margin-bottom: 1px;
+    }
+
+    .auto-apply-desc {
+      font-size: 11px;
+      color: var(--slate-500);
+    }
+
+    /* Toggle switch */
+    .toggle-wrap {
+      position: relative;
+      width: 38px;
+      height: 22px;
+      flex-shrink: 0;
+    }
+
+    .toggle-wrap input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+    }
+
+    .toggle-track {
+      position: absolute;
+      inset: 0;
+      background: var(--slate-300);
+      border-radius: 11px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .toggle-track::after {
+      content: "";
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      background: #fff;
+      border-radius: 50%;
+      top: 3px;
+      left: 3px;
+      transition: transform 0.2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+
+    .toggle-wrap input:checked + .toggle-track { background: var(--blue); }
+    .toggle-wrap input:checked + .toggle-track::after { transform: translateX(16px); }
+
+    /* ── Not-in-Outlook notice ── */
+    .notice {
+      background: var(--slate-50);
+      border: 1.5px solid var(--slate-300);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--slate-700);
+    }
+
+    .notice strong { color: var(--slate-900); }
+
+    /* ── Empty state ── */
+    .empty-state {
+      text-align: center;
+      padding: 32px 20px;
+      color: var(--slate-500);
+    }
+
+    .empty-state a {
+      color: var(--blue);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .empty-state a:hover { text-decoration: underline; }
+
+    /* ── Divider ── */
+    .divider {
+      height: 1px;
+      background: var(--slate-100);
+      margin: 16px 0;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      padding: 10px 16px;
+      border-top: 1px solid var(--slate-100);
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .footer a {
+      font-size: 11px;
+      color: var(--slate-500);
+      text-decoration: none;
+    }
+
+    .footer a:hover { color: var(--blue); }
+  </style>
+</head>
+<body>
+
+  <!-- ── Header ── -->
+  <header class="header">
+    <a class="logo" href="https://neatstamp.com" target="_blank" rel="noopener">
+      <div class="logo-mark">
+        <!-- NeatStamp "N" glyph -->
+        <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 2h3.5l7 11V2H17v16h-3.5L6.5 7v11H3V2z"/>
+        </svg>
+      </div>
+      <span class="logo-text">NeatStamp</span>
+    </a>
+    <div class="header-actions" id="headerActions"></div>
+  </header>
+
+  <!-- ── Main ── -->
+  <main class="content" id="mainContent">
+    <div class="loader" id="loader">
+      <div class="spinner"></div>
+      <span>Loading…</span>
+    </div>
+  </main>
+
+  <!-- ── Footer ── -->
+  <footer class="footer">
+    <a href="https://neatstamp.com" target="_blank" rel="noopener">neatstamp.com</a>
+  </footer>
+
+  <!-- ── Toast ── -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ═══════════════════════════════════════════════════════════════
+    // State
+    // ═══════════════════════════════════════════════════════════════
+    var officeReady    = false;
+    var officeItem     = null; // Office.context.mailbox.item — may be null in read mode
+    var signatures     = [];
+    var activeSignatureId = null; // ID stored in roaming settings
+    var autoApplyEnabled  = false;
+
+    // ═══════════════════════════════════════════════════════════════
+    // Toast helper
+    // ═══════════════════════════════════════════════════════════════
+    function showToast(msg, type) {
+      var el = document.getElementById("toast");
+      el.textContent = msg;
+      el.className = "toast " + (type || "");
+      el.classList.add("show");
+      setTimeout(function() { el.classList.remove("show"); }, 3000);
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // Office.js initialization
+    // ═══════════════════════════════════════════════════════════════
+    Office.onReady(function(info) {
+      officeReady = true;
+
+      // Detect compose vs. read mode
+      if (Office.context && Office.context.mailbox && Office.context.mailbox.item) {
+        officeItem = Office.context.mailbox.item;
+      }
+
+      // Read roaming settings
+      var rs = Office.context.roamingSettings;
+      activeSignatureId = rs.get("neatstamp_active_sig") || null;
+      autoApplyEnabled  = rs.get("neatstamp_auto_apply") === true;
+
+      // Kick off auth check
+      checkAuth();
+    });
+
+    // Office.js may not load if the page is opened outside Outlook
+    // Give it 3 seconds, then render the "not in Outlook" screen
+    var officeTimeout = setTimeout(function() {
+      if (!officeReady) {
+        renderNotInOutlook();
+      }
+    }, 3000);
+
+    // ═══════════════════════════════════════════════════════════════
+    // Auth check
+    // ═══════════════════════════════════════════════════════════════
+    function checkAuth() {
+      fetch("/api/auth/session", { credentials: "include" })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (data && data.user && data.user.email) {
+            renderSignatures(data.user);
+          } else {
+            renderSignIn();
+          }
+        })
+        .catch(function() {
+          renderSignIn();
+        });
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // Render: not inside Outlook
+    // ═══════════════════════════════════════════════════════════════
+    function renderNotInOutlook() {
+      document.getElementById("mainContent").innerHTML =
+        '<div class="notice">' +
+          '<strong>This page is the NeatStamp Outlook add-in.</strong><br><br>' +
+          'To use it, install the add-in from within Outlook:<br><br>' +
+          '<ol style="padding-left:16px;line-height:1.8">' +
+            '<li>Open Outlook (Desktop, OWA, or Mobile)</li>' +
+            '<li>Click <strong>Get Add-ins</strong> in the ribbon</li>' +
+            '<li>Search for <strong>NeatStamp</strong></li>' +
+            '<li>Click <strong>Add</strong></li>' +
+          '</ol><br>' +
+          '<a href="https://neatstamp.com/dashboard" style="color:#2563eb;font-weight:600;" target="_blank">Go to NeatStamp Dashboard &rarr;</a>' +
+        '</div>';
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // Render: sign-in screen
+    // ═══════════════════════════════════════════════════════════════
+    function renderSignIn() {
+      document.getElementById("mainContent").innerHTML =
+        '<div class="signin-screen">' +
+          '<div class="big-icon">' +
+            '<svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">' +
+              '<path d="M3 2h3.5l7 11V2H17v16h-3.5L6.5 7v11H3V2z"/>' +
+            '</svg>' +
+          '</div>' +
+          '<div class="signin-title">Sign in to NeatStamp</div>' +
+          '<div class="signin-desc">Sign in to access your signatures and set them directly in Outlook.</div>' +
+          '<a class="btn btn-primary" href="https://neatstamp.com/login?returnTo=/outlook-addin/taskpane" target="_top">Sign in to NeatStamp</a>' +
+          '<div class="notice" style="text-align:left;margin-top:4px;">' +
+            '<strong>No account?</strong> Create one free at ' +
+            '<a href="https://neatstamp.com" target="_blank" style="color:#2563eb">neatstamp.com</a>' +
+          '</div>' +
+        '</div>';
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // Render: signatures list (main screen)
+    // ═══════════════════════════════════════════════════════════════
+    function renderSignatures(user) {
+      // Show sign-out button in header
+      document.getElementById("headerActions").innerHTML =
+        '<button class="btn-ghost" onclick="signOut()">Sign out</button>';
+
+      // Fetch signatures
+      var content = document.getElementById("mainContent");
+      content.innerHTML =
+        '<div class="loader"><div class="spinner"></div><span>Loading signatures…</span></div>';
+
+      fetch("/api/signatures", { credentials: "include" })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          signatures = data.signatures || [];
+          buildSignatureList();
+        })
+        .catch(function() {
+          document.getElementById("mainContent").innerHTML =
+            '<div class="notice" style="text-align:center;">' +
+              'Could not load signatures.<br>' +
+              '<button class="btn btn-secondary btn-sm" onclick="checkAuth()" style="margin-top:12px;">Retry</button>' +
+            '</div>';
+        });
+    }
+
+    function buildSignatureList() {
+      var content = document.getElementById("mainContent");
+
+      if (signatures.length === 0) {
+        content.innerHTML =
+          '<div class="empty-state">' +
+            '<div style="font-size:32px;margin-bottom:12px;">✏️</div>' +
+            '<strong>No signatures yet</strong><br><br>' +
+            '<a href="https://neatstamp.com/dashboard" target="_blank">Create your first signature →</a>' +
+          '</div>';
+        return;
+      }
+
+      var html = '<div class="section-label">Your Signatures</div>';
+      html += '<div class="sig-list">';
+
+      for (var i = 0; i < signatures.length; i++) {
+        var sig = signatures[i];
+        var isActive = sig.id === activeSignatureId;
+        html += buildSignatureCard(sig, isActive);
+      }
+
+      html += '</div>';
+
+      // Auto-apply toggle
+      html += '<div class="auto-apply-row" style="margin-top:16px;">' +
+        '<div class="auto-apply-info">' +
+          '<div class="auto-apply-title">Auto-apply on new email</div>' +
+          '<div class="auto-apply-desc">Insert the active signature automatically when you compose a new message</div>' +
+        '</div>' +
+        '<label class="toggle-wrap" style="margin-left:12px;">' +
+          '<input type="checkbox" id="autoApplyToggle"' + (autoApplyEnabled ? ' checked' : '') + ' onchange="toggleAutoApply(this.checked)">' +
+          '<span class="toggle-track"></span>' +
+        '</label>' +
+      '</div>';
+
+      // Compose-only note
+      if (!officeItem || officeItem.displayReplyAllForm !== undefined) {
+        // We're in read mode, not compose
+        html += '<div class="divider"></div>' +
+          '<div class="notice">' +
+            '<strong>Tip:</strong> Open a new email to insert a signature directly into the compose window.' +
+          '</div>';
+      }
+
+      html += '<div style="margin-top:12px;">' +
+        '<a href="https://neatstamp.com/dashboard" target="_blank" class="btn btn-secondary btn-sm" style="width:100%;text-align:center;display:block;">Edit in Dashboard</a>' +
+      '</div>';
+
+      content.innerHTML = html;
+    }
+
+    function buildSignatureCard(sig, isActive) {
+      var sigData = typeof sig.data === "string" ? JSON.parse(sig.data) : (sig.data || {});
+      var previewId = "preview-" + sig.id;
+      var activeClass = isActive ? " active" : "";
+      var badgeHtml = isActive
+        ? '<span class="sig-badge active-badge">Active</span>'
+        : "";
+
+      var inCompose = officeItem && (
+        typeof officeItem.body !== "undefined" &&
+        typeof officeItem.body.setSignatureAsync !== "undefined"
+      );
+
+      // Buttons differ: compose mode gets "Insert now", always get "Set as Default"
+      var insertBtn = inCompose
+        ? '<button class="btn btn-primary btn-sm" onclick="insertSignature(\'' + sig.id + '\')">Insert into email</button>'
+        : '<button class="btn btn-secondary btn-sm" onclick="showCopyInstructions(\'' + sig.id + '\')">Copy HTML</button>';
+
+      var setDefaultBtn = '<button class="btn btn-secondary btn-sm" onclick="setAsDefault(\'' + sig.id + '\')" ' +
+        (isActive ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : '') + '>Set as default</button>';
+
+      return '<div class="sig-card' + activeClass + '" id="card-' + sig.id + '">' +
+        '<div class="sig-card-header">' +
+          '<span class="sig-name" title="' + escHtml(sig.name) + '">' + escHtml(sig.name) + '</span>' +
+          badgeHtml +
+          '<button class="btn-ghost" onclick="togglePreview(\'' + sig.id + '\', \'' + previewId + '\')" title="Preview">👁</button>' +
+        '</div>' +
+        '<div class="sig-preview" id="' + previewId + '">' +
+          '<div class="sig-preview-inner">' + getPreviewHtml(sigData) + '</div>' +
+        '</div>' +
+        '<div class="sig-actions">' +
+          insertBtn +
+          setDefaultBtn +
+        '</div>' +
+      '</div>';
+    }
+
+    function getPreviewHtml(data) {
+      if (!data || !data.fullName) return '<em style="color:#94a3b8">No preview available</em>';
+      var lines = [];
+      if (data.fullName) lines.push('<strong>' + escHtml(data.fullName) + '</strong>');
+      if (data.jobTitle) lines.push(escHtml(data.jobTitle));
+      if (data.company) lines.push(escHtml(data.company));
+      if (data.email) lines.push('<a href="mailto:' + escHtml(data.email) + '">' + escHtml(data.email) + '</a>');
+      if (data.phone) lines.push(escHtml(data.phone));
+      if (data.website) lines.push(escHtml(data.website));
+      return lines.join('<br>');
+    }
+
+    function togglePreview(sigId, previewId) {
+      var el = document.getElementById(previewId);
+      if (el) el.classList.toggle("expanded");
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // Core actions
+    // ═══════════════════════════════════════════════════════════════
+
+    // Insert the rendered signature HTML into the current compose window
+    function insertSignature(sigId) {
+      var sig = signatures.find(function(s) { return s.id === sigId; });
+      if (!sig) return;
+
+      // Fetch the rendered HTML from our API
+      fetch("/api/outlook/addin-signature?id=" + encodeURIComponent(sigId), {
+        credentials: "include"
+      })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (!data.html) {
+            showToast("Could not load signature HTML", "error");
+            return;
+          }
+          var html = data.html;
+
+          if (!officeItem || !officeItem.body) {
+            showToast("Not in compose mode", "error");
+            return;
+          }
+
+          // Try setSignatureAsync first (Mailbox 1.10 — Classic Desktop)
+          if (officeItem.body.setSignatureAsync) {
+            officeItem.body.setSignatureAsync(
+              html,
+              { coercionType: Office.CoercionType.Html },
+              function(result) {
+                if (result.status === Office.AsyncResultStatus.Succeeded) {
+                  showToast("Signature set!", "success");
+                } else {
+                  // Fallback: prependOnSend / append
+                  appendSignature(html);
+                }
+              }
+            );
+          } else {
+            // Older Outlook — append to body
+            appendSignature(html);
+          }
+        })
+        .catch(function() {
+          showToast("Failed to load signature", "error");
+        });
+    }
+
+    // Fallback: append signature at the end of the email body
+    function appendSignature(html) {
+      officeItem.body.getAsync(Office.CoercionType.Html, function(result) {
+        if (result.status !== Office.AsyncResultStatus.Succeeded) {
+          showToast("Could not access email body", "error");
+          return;
+        }
+        var existing = result.value || "";
+        var newBody = existing + '<br><br>' + html;
+        officeItem.body.setAsync(newBody, { coercionType: Office.CoercionType.Html }, function(r) {
+          if (r.status === Office.AsyncResultStatus.Succeeded) {
+            showToast("Signature inserted!", "success");
+          } else {
+            showToast("Could not insert signature", "error");
+          }
+        });
+      });
+    }
+
+    // Store signature ID in roaming settings as the "default"
+    function setAsDefault(sigId) {
+      activeSignatureId = sigId;
+      var rs = Office.context.roamingSettings;
+      rs.set("neatstamp_active_sig", sigId);
+      rs.saveAsync(function(result) {
+        if (result.status === Office.AsyncResultStatus.Succeeded) {
+          showToast("Set as default signature!", "success");
+          buildSignatureList();
+        } else {
+          showToast("Could not save setting", "error");
+        }
+      });
+    }
+
+    // Toggle auto-apply (insert on every new message via event handler)
+    function toggleAutoApply(enabled) {
+      autoApplyEnabled = enabled;
+      var rs = Office.context.roamingSettings;
+      rs.set("neatstamp_auto_apply", enabled);
+      rs.saveAsync(function(result) {
+        if (result.status === Office.AsyncResultStatus.Succeeded) {
+          showToast(enabled ? "Auto-apply enabled" : "Auto-apply disabled");
+        } else {
+          showToast("Could not save setting", "error");
+        }
+      });
+    }
+
+    // Show copy-HTML fallback for non-compose mode
+    function showCopyInstructions(sigId) {
+      fetch("/api/outlook/addin-signature?id=" + encodeURIComponent(sigId), {
+        credentials: "include"
+      })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (!data.html) { showToast("Could not load HTML", "error"); return; }
+          // Try navigator.clipboard API
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(data.html).then(function() {
+              showToast("HTML copied to clipboard!", "success");
+            }).catch(function() {
+              promptCopy(data.html);
+            });
+          } else {
+            promptCopy(data.html);
+          }
+        });
+    }
+
+    function promptCopy(html) {
+      var ta = document.createElement("textarea");
+      ta.value = html;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+      showToast("HTML copied!", "success");
+    }
+
+    // Sign out
+    function signOut() {
+      fetch("/api/auth/signout", { method: "POST", credentials: "include" })
+        .finally(function() {
+          document.getElementById("headerActions").innerHTML = "";
+          renderSignIn();
+        });
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // Utilities
+    // ═══════════════════════════════════════════════════════════════
+    function escHtml(str) {
+      if (!str) return "";
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    // Polyfill Array.prototype.find for older Outlook webviews
+    if (!Array.prototype.find) {
+      Array.prototype.find = function(fn) {
+        for (var i = 0; i < this.length; i++) {
+          if (fn(this[i])) return this[i];
+        }
+        return undefined;
+      };
+    }
+  </script>
+</body>
+</html>

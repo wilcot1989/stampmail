@@ -9,12 +9,14 @@ interface EmailClientPreviewProps {
   plan: "free" | "pro" | "team";
 }
 
-type Client = "gmail" | "outlook" | "apple";
+type Client = "gmail" | "outlook" | "outlook-mobile" | "owa" | "apple";
 
-const clients: { id: Client; name: string; icon: string }[] = [
-  { id: "gmail", name: "Gmail", icon: "📧" },
-  { id: "outlook", name: "Outlook", icon: "📬" },
-  { id: "apple", name: "Apple Mail", icon: "🍎" },
+const clients: { id: Client; name: string }[] = [
+  { id: "outlook", name: "Outlook" },
+  { id: "outlook-mobile", name: "Mobile" },
+  { id: "owa", name: "OWA" },
+  { id: "gmail", name: "Gmail" },
+  { id: "apple", name: "Apple Mail" },
 ];
 
 function GmailFrame({ html }: { html: string }) {
@@ -118,8 +120,84 @@ function AppleMailFrame({ html }: { html: string }) {
   );
 }
 
+function OutlookMobileFrame({ html }: { html: string }) {
+  return (
+    <div className="mx-auto" style={{ maxWidth: 375 }}>
+      <div className="rounded-2xl border-2 border-slate-800 bg-white overflow-hidden shadow-lg">
+        {/* Phone status bar */}
+        <div className="flex items-center justify-between px-4 py-1.5 bg-[#0078d4]">
+          <span className="text-[10px] text-white/80 font-medium">9:41</span>
+          <span className="text-[10px] text-white font-semibold">Outlook</span>
+          <div className="flex items-center gap-1">
+            <div className="w-4 h-2 rounded-sm border border-white/60 relative">
+              <div className="absolute inset-0.5 bg-white/80 rounded-[1px]" style={{ width: "70%" }} />
+            </div>
+          </div>
+        </div>
+        {/* Email header */}
+        <div className="px-4 py-3 border-b border-slate-100">
+          <div className="flex items-center gap-3">
+            <div className="h-9 w-9 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">Y</div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-slate-900 truncate">You</p>
+              <p className="text-[11px] text-slate-400">To: recipient@company.com</p>
+            </div>
+          </div>
+        </div>
+        {/* Email body */}
+        <div className="px-4 pt-3 pb-2">
+          <p className="text-[13px] text-slate-800">Hi there,</p>
+          <p className="text-[13px] text-slate-800 mt-2">Thanks for getting back to me.</p>
+          <p className="text-[13px] text-slate-800 mt-2">Best regards,</p>
+        </div>
+        {/* Signature — constrained to mobile width */}
+        <div className="px-3 pb-4 border-t border-slate-100 mt-2 pt-3 overflow-x-auto">
+          <div style={{ maxWidth: 345, overflow: "hidden" }} dangerouslySetInnerHTML={{ __html: html }} />
+        </div>
+      </div>
+      <p className="text-center text-[10px] text-slate-400 mt-2">375px viewport — Outlook Mobile (iOS/Android)</p>
+    </div>
+  );
+}
+
+function OWAFrame({ html }: { html: string }) {
+  return (
+    <div className="rounded-lg border border-slate-200 bg-white overflow-hidden shadow-sm">
+      {/* OWA top bar */}
+      <div className="flex items-center gap-3 px-3 py-2 bg-[#0078d4]">
+        <span className="text-white text-xs font-semibold">Outlook</span>
+        <div className="flex-1 bg-white/20 rounded px-3 py-1">
+          <span className="text-white/70 text-[10px]">Search mail and people</span>
+        </div>
+      </div>
+      {/* OWA compose area */}
+      <div className="flex items-center gap-2 px-4 py-2 border-b border-slate-100">
+        <button className="bg-[#0078d4] text-white text-xs px-3 py-1 rounded">Send</button>
+        <button className="text-xs text-slate-500 px-2 py-1">Discard</button>
+      </div>
+      <div className="px-4 py-1.5 border-b border-slate-100 text-xs">
+        <span className="text-slate-400">To: </span>
+        <span className="text-slate-700">recipient@company.com</span>
+      </div>
+      <div className="px-4 py-1.5 border-b border-slate-100 text-xs">
+        <span className="text-slate-400">Subject: </span>
+        <span className="text-slate-700">Quick follow up</span>
+      </div>
+      {/* Email body + signature */}
+      <div className="px-4 pt-3 pb-2">
+        <p className="text-sm text-slate-800 leading-relaxed" style={{ fontFamily: "Segoe UI, sans-serif" }}>Hi there,</p>
+        <p className="text-sm text-slate-800 mt-2 leading-relaxed" style={{ fontFamily: "Segoe UI, sans-serif" }}>Thanks for getting back to me. I&apos;ve attached the proposal.</p>
+        <p className="text-sm text-slate-800 mt-2 leading-relaxed" style={{ fontFamily: "Segoe UI, sans-serif" }}>Best regards,</p>
+      </div>
+      <div className="px-4 pb-4 border-t border-slate-100 mt-2 pt-3">
+        <div dangerouslySetInnerHTML={{ __html: html }} />
+      </div>
+    </div>
+  );
+}
+
 export default function EmailClientPreview({ data, plan }: EmailClientPreviewProps) {
-  const [activeClient, setActiveClient] = useState<Client>("gmail");
+  const [activeClient, setActiveClient] = useState<Client>("outlook");
   const options: GenerateOptions = { plan };
   const html = generateSignatureHtml(data, options);
 
@@ -139,15 +217,16 @@ export default function EmailClientPreview({ data, plan }: EmailClientPreviewPro
                   : "bg-slate-100 text-slate-600 hover:bg-slate-200"
               }`}
             >
-              <span>{c.icon}</span>
               {c.name}
             </button>
           ))}
         </div>
       </div>
 
-      {activeClient === "gmail" && <GmailFrame html={html} />}
       {activeClient === "outlook" && <OutlookFrame html={html} />}
+      {activeClient === "outlook-mobile" && <OutlookMobileFrame html={html} />}
+      {activeClient === "owa" && <OWAFrame html={html} />}
+      {activeClient === "gmail" && <GmailFrame html={html} />}
       {activeClient === "apple" && <AppleMailFrame html={html} />}
 
       <p className="text-center text-[10px] text-slate-400">

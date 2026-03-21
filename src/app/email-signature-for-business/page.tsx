@@ -503,44 +503,44 @@ export default function EmailSignatureForBusinessPage() {
             <div className="grid gap-4 sm:grid-cols-2">
               {[
                 {
-                  href: "/email-signature-maker",
-                  title: "Email Signature Maker",
-                  desc: "Build your signature in 60 seconds. No account required.",
+                  href: "/outlook-signature-for-company",
+                  title: "Outlook Signature for Company",
+                  desc: "Deploy consistent signatures to your Microsoft 365 team.",
+                },
+                {
+                  href: "/email-signature-for-teams",
+                  title: "Team Signature Management",
+                  desc: "Master templates, CSV upload, and deployment scripts.",
+                },
+                {
+                  href: "/blog/microsoft-365-email-signature-management",
+                  title: "M365 Signature Management",
+                  desc: "Exchange rules, PowerShell, and third-party tools compared.",
+                },
+                {
+                  href: "/email-signature-cost-calculator",
+                  title: "Cost Calculator",
+                  desc: "See how much manual signature management costs your company.",
                 },
                 {
                   href: "/small-business-email-signature",
-                  title: "Small Business Email Signatures",
-                  desc: "Specific advice for small teams rolling out signatures without IT support.",
+                  title: "Small Business Signatures",
+                  desc: "Advice for small teams without IT support.",
                 },
                 {
-                  href: "/email-signature-with-logo",
-                  title: "Email Signature with Logo",
-                  desc: "Logo sizing, file formats, and placement that works in every client.",
+                  href: "/blog/outlook-signature-deployment-guide",
+                  title: "Deployment Guide",
+                  desc: "PowerShell, Exchange rules, Group Policy, and Intune.",
                 },
                 {
-                  href: "/email-signature-examples-with-logo",
-                  title: "Email Signature Examples with Logo",
-                  desc: "10+ real examples across different industries and roles.",
-                },
-                {
-                  href: "/email-signature-outlook-365",
-                  title: "Outlook 365 Signatures",
-                  desc: "Admin deployment, roaming signatures, and IT policy options.",
+                  href: "/blog/email-signature-for-remote-teams-outlook",
+                  title: "Remote Team Signatures",
+                  desc: "Keep distributed teams consistent on Outlook.",
                 },
                 {
                   href: "/professional-email-signature",
-                  title: "Professional Email Signature Guide",
-                  desc: "The full breakdown of what makes a signature actually professional.",
-                },
-                {
-                  href: "/email-signature-design",
-                  title: "Email Signature Design",
-                  desc: "Typography, color, layout, and mobile rendering.",
-                },
-                {
-                  href: "/email-signature-for-freelancers",
-                  title: "Email Signature for Freelancers",
-                  desc: "How solo operators can use signatures as a soft sales tool.",
+                  title: "Professional Signature Guide",
+                  desc: "What makes a signature actually professional.",
                 },
               ].map((link) => (
                 <Link

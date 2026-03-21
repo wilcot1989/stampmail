@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Pricing — Free Email Signature Generator",
+  title: "Pricing — Outlook-Proof Email Signatures | NeatStamp",
   description:
-    "NeatStamp pricing: Free forever with 2 templates. Pro at $5/month for premium features. No hidden fees. 30-day money-back guarantee.",
+    "NeatStamp pricing: Free forever, Pro at $5/mo, Team at $29/mo flat fee for 25 users. Built for Microsoft 365. No per-user pricing traps.",
   alternates: { canonical: "https://neatstamp.com/pricing" },
 };
 
@@ -66,24 +66,49 @@ const plans = [
   },
   {
     name: "Team",
-    price: "$3",
-    period: "/user/month",
-    description: "Consistent email branding for your entire team.",
+    price: "$29",
+    period: "/month",
+    yearlyPrice: "Up to 25 users — flat fee",
+    description: "Built for Microsoft 365 teams. No per-user pricing.",
+    cta: "Coming Soon",
+    ctaLink: "#",
+    highlighted: false,
+    comingSoon: true,
+    badge: "Built for Microsoft 365",
+    features: [
+      "Everything in Pro, plus:",
+      "Up to 25 users — flat fee",
+      "Master template with CSV upload",
+      "PowerShell deployment script",
+      "Outlook Compatibility Score for all members",
+      "New Outlook Migration Checker",
+      "Central signature management",
+      "Company-wide templates & brand enforcement",
+      "Admin dashboard with analytics",
+      "Priority support",
+    ],
+  },
+  {
+    name: "Team+",
+    price: "$59",
+    period: "/month",
+    yearlyPrice: "Up to 100 users — flat fee",
+    description: "For growing Microsoft 365 organizations.",
     cta: "Coming Soon",
     ctaLink: "#",
     highlighted: false,
     comingSoon: true,
     features: [
-      "Everything in Pro, plus:",
-      "Central signature management",
-      "Brand guidelines enforcement",
-      "Team member invites",
-      "Bulk signature deployment",
-      "Company-wide templates",
-      "Admin dashboard",
-      "Usage analytics",
-      "Minimum 5 users",
-      "Priority support",
+      "Everything in Team, plus:",
+      "Up to 100 users — flat fee",
+      "Department-based templates",
+      "Azure AD / Entra ID sync",
+      "Signature Health Monitor",
+      "Onboarding automation",
+      "Dedicated account manager",
+      "SLA guarantee",
+      "Custom integrations",
+      "Volume discounts available",
     ],
   },
 ];
@@ -125,7 +150,7 @@ export default function PricingPage() {
           </div>
         </div>
 
-        <div className="grid gap-8 md:grid-cols-3 max-w-5xl mx-auto">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 max-w-6xl mx-auto">
           {plans.map((plan) => (
             <div
               key={plan.name}
@@ -147,6 +172,11 @@ export default function PricingPage() {
               >
                 {plan.name}
               </h3>
+              {(plan as { badge?: string }).badge && (
+                <span className="mt-1 inline-block rounded-full bg-indigo-100 px-2.5 py-0.5 text-xs font-semibold text-indigo-700">
+                  {(plan as { badge?: string }).badge}
+                </span>
+              )}
               <div className="mt-2 flex items-baseline gap-1">
                 <span
                   className={`text-4xl font-extrabold ${
@@ -264,41 +294,43 @@ export default function PricingPage() {
           </div>
         </div>
 
-        {/* Competitor comparison */}
-        <div className="mt-20 mx-auto max-w-3xl">
-          <h2 className="text-center text-2xl font-bold text-foreground mb-8">How We Compare</h2>
+        {/* Competitor comparison — team pricing focused */}
+        <div className="mt-20 mx-auto max-w-4xl">
+          <h2 className="text-center text-2xl font-bold text-foreground mb-3">How We Compare for Teams</h2>
+          <p className="text-center text-muted mb-8">Cost for a 25-person Microsoft 365 team, per year</p>
           <div className="overflow-x-auto rounded-xl border border-border shadow-sm">
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-surface border-b border-border">
-                  <th className="px-5 py-4 text-left font-semibold text-foreground">Tool</th>
-                  <th className="px-5 py-4 text-center font-semibold text-foreground">Price</th>
-                  <th className="px-5 py-4 text-center font-semibold text-foreground">Free tier</th>
-                  <th className="px-5 py-4 text-center font-semibold text-foreground">No watermark</th>
+                  <th className="px-4 py-4 text-left font-semibold text-foreground">Tool</th>
+                  <th className="px-4 py-4 text-center font-semibold text-foreground">25 users/yr</th>
+                  <th className="px-4 py-4 text-center font-semibold text-foreground">Outlook Tester</th>
+                  <th className="px-4 py-4 text-center font-semibold text-foreground">Migration Check</th>
+                  <th className="px-4 py-4 text-center font-semibold text-foreground">Free tier</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
                 {[
-                  { name: "NeatStamp", price: "$0–$5/mo", free: true, noMark: true, highlight: true },
-                  { name: "WiseStamp", price: "$6–10/mo", free: false, noMark: false, highlight: false },
-                  { name: "MySignature", price: "$4–8/mo", free: false, noMark: false, highlight: false },
-                  { name: "Exclaimer", price: "$20+/mo", free: false, noMark: false, highlight: false },
+                  { name: "NeatStamp Team", cost: "$348", outlook: true, migration: true, free: true, highlight: true },
+                  { name: "CodeTwo", cost: "$333", outlook: false, migration: false, free: false, highlight: false },
+                  { name: "Exclaimer", cost: "$750+", outlook: false, migration: false, free: false, highlight: false },
+                  { name: "WiseStamp", cost: "$570", outlook: false, migration: false, free: false, highlight: false },
+                  { name: "MySignature", cost: "$1,200", outlook: false, migration: false, free: false, highlight: false },
                 ].map((row) => (
                   <tr key={row.name} className={row.highlight ? "bg-blue-50" : "bg-white"}>
-                    <td className={`px-5 py-4 font-medium ${row.highlight ? "text-primary" : "text-foreground"}`}>
+                    <td className={`px-4 py-4 font-medium ${row.highlight ? "text-primary" : "text-foreground"}`}>
                       {row.name}
-                      {row.highlight && <span className="ml-2 rounded-full bg-primary px-2 py-0.5 text-xs text-white">You&apos;re here</span>}
+                      {row.highlight && <span className="ml-2 rounded-full bg-primary px-2 py-0.5 text-xs text-white">Best value</span>}
                     </td>
-                    <td className="px-5 py-4 text-center text-muted">{row.price}</td>
-                    <td className="px-5 py-4 text-center">
-                      {row.free
-                        ? <span className="text-green-500 font-bold">Yes</span>
-                        : <span className="text-red-400">No</span>}
+                    <td className="px-4 py-4 text-center font-semibold text-foreground">{row.cost}</td>
+                    <td className="px-4 py-4 text-center">
+                      {row.outlook ? <span className="text-green-500 font-bold">Yes</span> : <span className="text-red-400">No</span>}
                     </td>
-                    <td className="px-5 py-4 text-center">
-                      {row.noMark
-                        ? <span className="text-green-500 font-bold">Yes</span>
-                        : <span className="text-red-400">No</span>}
+                    <td className="px-4 py-4 text-center">
+                      {row.migration ? <span className="text-green-500 font-bold">Yes</span> : <span className="text-red-400">No</span>}
+                    </td>
+                    <td className="px-4 py-4 text-center">
+                      {row.free ? <span className="text-green-500 font-bold">Yes</span> : <span className="text-red-400">No</span>}
                     </td>
                   </tr>
                 ))}

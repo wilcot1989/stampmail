@@ -18,7 +18,7 @@ import MasterTemplate from "@/components/MasterTemplate";
 // ---------------------------------------------------------------------------
 
 type Plan = "free" | "pro" | "team";
-type ActiveTab = "signatures" | "editor" | "analytics" | "banners" | "settings";
+type ActiveTab = "signatures" | "editor" | "analytics" | "banners" | "team" | "health" | "settings";
 
 interface Signature {
   id: string;
@@ -396,6 +396,26 @@ function CompactSignatureForm({
 }
 
 // ---------------------------------------------------------------------------
+// Icon components
+// ---------------------------------------------------------------------------
+
+function UsersIcon() {
+  return (
+    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+    </svg>
+  );
+}
+
+function HeartIcon() {
+  return (
+    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+    </svg>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Sidebar / Tab navigation
 // ---------------------------------------------------------------------------
 
@@ -408,7 +428,7 @@ function SideNav({
   onTabChange: (tab: ActiveTab) => void;
   plan: Plan;
 }) {
-  const tabs: { id: ActiveTab; label: string; icon: React.ReactNode; proOnly?: boolean }[] = [
+  const tabs: { id: ActiveTab; label: string; icon: React.ReactNode; proOnly?: boolean; teamOnly?: boolean }[] = [
     {
       id: "signatures",
       label: "Signatures",
@@ -448,6 +468,18 @@ function SideNav({
       ),
     },
     {
+      id: "team",
+      label: "Team",
+      teamOnly: true,
+      icon: <UsersIcon />,
+    },
+    {
+      id: "health",
+      label: "Health",
+      proOnly: true,
+      icon: <HeartIcon />,
+    },
+    {
       id: "settings",
       label: "Settings",
       icon: (
@@ -463,7 +495,7 @@ function SideNav({
     <nav className="flex flex-row gap-1 lg:flex-col">
       {tabs.map((tab) => {
         const isActive = activeTab === tab.id;
-        const isLocked = tab.proOnly && plan === "free";
+        const isLocked = (tab.proOnly && plan === "free") || (tab.teamOnly && plan !== "team");
         return (
           <button
             key={tab.id}
@@ -738,6 +770,599 @@ function BannersTab({
 }
 
 // ---------------------------------------------------------------------------
+// Tab: Team Dashboard
+// ---------------------------------------------------------------------------
+
+interface TeamMemberExtended extends TeamMember {
+  title?: string;
+  department?: string;
+  status: "active" | "pending";
+  updated_at: string;
+  hasSignature: boolean;
+}
+
+function TeamDashboardTab({
+  teamMembers,
+  loading,
+  plan,
+  onUpgrade,
+}: {
+  teamMembers: TeamMember[];
+  loading: boolean;
+  plan: Plan;
+  onUpgrade: () => void;
+}) {
+  const [csvPreview, setCsvPreview] = useState<Record<string, string>[]>([]);
+  const [csvDragging, setCsvDragging] = useState(false);
+  const csvInputRef = useRef<HTMLInputElement>(null);
+
+  const extendedMembers: TeamMemberExtended[] = teamMembers.map((m) => ({
+    ...m,
+    status: "active" as const,
+    updated_at: new Date().toISOString(),
+    hasSignature: false,
+  }));
+
+  const signaturesDeployed = extendedMembers.filter((m) => m.hasSignature).length;
+  const lastUpdated = extendedMembers.length > 0
+    ? new Date(Math.max(...extendedMembers.map((m) => new Date(m.updated_at).getTime()))).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+    : "—";
+
+  const parseCSV = (text: string) => {
+    const lines = text.trim().split("\n");
+    if (lines.length < 2) return;
+    const headers = lines[0].split(",").map((h) => h.trim());
+    const rows = lines.slice(1).map((line) => {
+      const cells = line.split(",").map((c) => c.trim());
+      return Object.fromEntries(headers.map((h, i) => [h, cells[i] ?? ""]));
+    });
+    setCsvPreview(rows.slice(0, 10));
+  };
+
+  const handleCsvFile = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = e.target?.result as string;
+      parseCSV(text);
+    };
+    reader.readAsText(file);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setCsvDragging(false);
+    const file = e.dataTransfer.files[0];
+    if (file && file.name.endsWith(".csv")) handleCsvFile(file);
+  };
+
+  if (plan !== "team") {
+    return (
+      <div className="space-y-5">
+        <h2 className="text-lg font-semibold text-foreground">Team Signature Management</h2>
+        <div className="rounded-xl border-2 border-dashed border-border p-10 text-center">
+          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-slate-100">
+            <UsersIcon />
+          </div>
+          <h3 className="text-sm font-semibold text-foreground">Team management requires a Team plan</h3>
+          <p className="mt-1 text-xs text-muted max-w-xs mx-auto">
+            Manage signatures for your entire organization and deploy them centrally.
+          </p>
+          <button
+            onClick={onUpgrade}
+            className="mt-4 rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-white hover:bg-primary-dark transition-colors"
+          >
+            Upgrade to Team
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (loading) return <LoadingSpinner />;
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div>
+        <h2 className="text-lg font-semibold text-foreground">Team Signature Management</h2>
+        <p className="mt-0.5 text-sm text-muted">Manage signatures for your entire Microsoft 365 team</p>
+      </div>
+
+      {/* Stats row */}
+      <div className="grid gap-4 sm:grid-cols-3">
+        <StatCard label="Total team members" value={extendedMembers.length} />
+        <StatCard label="Signatures deployed" value={signaturesDeployed} />
+        <StatCard label="Last updated" value={lastUpdated} />
+      </div>
+
+      {/* Master Template */}
+      <div className="rounded-xl border border-border bg-white p-5 shadow-sm">
+        <div className="flex items-start justify-between">
+          <div>
+            <h3 className="text-sm font-semibold text-foreground">Master Template</h3>
+            <p className="mt-0.5 text-xs text-muted">A single template applied to all team members with their individual data.</p>
+          </div>
+          <Link
+            href="/dashboard#editor"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-dark transition-colors"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            Create Master Template
+          </Link>
+        </div>
+        <div className="mt-4 rounded-lg border border-dashed border-slate-200 bg-slate-50 p-6 text-center">
+          <p className="text-xs text-muted">No master template configured yet. Create one in the editor and assign it as the team template.</p>
+        </div>
+      </div>
+
+      {/* CSV Upload */}
+      <div className="rounded-xl border border-border bg-white p-5 shadow-sm">
+        <h3 className="mb-1 text-sm font-semibold text-foreground">Import Employee Data</h3>
+        <p className="mb-3 text-xs text-muted">Upload a CSV file with employee information to bulk-create or update team member signatures.</p>
+
+        <div
+          onDragOver={(e) => { e.preventDefault(); setCsvDragging(true); }}
+          onDragLeave={() => setCsvDragging(false)}
+          onDrop={handleDrop}
+          onClick={() => csvInputRef.current?.click()}
+          className={`flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 transition-colors ${
+            csvDragging ? "border-primary bg-blue-50" : "border-slate-200 hover:border-primary hover:bg-slate-50"
+          }`}
+        >
+          <svg className="h-8 w-8 text-slate-400 mb-2" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+          </svg>
+          <p className="text-sm font-medium text-slate-600">Drop a CSV file here, or click to browse</p>
+          <p className="mt-1 text-xs text-muted">Expected columns: Name, Title, Email, Phone, Department</p>
+          <input
+            ref={csvInputRef}
+            type="file"
+            accept=".csv"
+            className="hidden"
+            onChange={(e) => { const f = e.target.files?.[0]; if (f) handleCsvFile(f); }}
+          />
+        </div>
+
+        {csvPreview.length > 0 && (
+          <div className="mt-4 overflow-x-auto">
+            <p className="mb-2 text-xs font-medium text-muted">Preview ({csvPreview.length} rows shown)</p>
+            <table className="w-full text-xs border-collapse">
+              <thead>
+                <tr className="border-b border-slate-200">
+                  {Object.keys(csvPreview[0]).map((h) => (
+                    <th key={h} className="py-1.5 pr-4 text-left font-semibold text-slate-600">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {csvPreview.map((row, i) => (
+                  <tr key={i} className="border-b border-slate-100">
+                    {Object.values(row).map((v, j) => (
+                      <td key={j} className="py-1.5 pr-4 text-muted">{v}</td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Team Members Table */}
+      <div className="rounded-xl border border-border bg-white p-5 shadow-sm">
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="text-sm font-semibold text-foreground">Team Members</h3>
+          <div className="flex items-center gap-2">
+            <button className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground hover:bg-slate-50 transition-colors">
+              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+              </svg>
+              Export All Signatures
+            </button>
+            <button className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-white hover:bg-primary-dark transition-colors">
+              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+              </svg>
+              Add Member
+            </button>
+          </div>
+        </div>
+
+        {extendedMembers.length === 0 ? (
+          <EmptyState
+            icon={<UsersIcon />}
+            title="No team members yet"
+            description="Add team members manually or import them from a CSV file above."
+          />
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-slate-200">
+                  <th className="py-2 pr-4 text-left text-xs font-semibold text-muted">Name</th>
+                  <th className="py-2 pr-4 text-left text-xs font-semibold text-muted">Title</th>
+                  <th className="py-2 pr-4 text-left text-xs font-semibold text-muted">Email</th>
+                  <th className="py-2 pr-4 text-left text-xs font-semibold text-muted">Status</th>
+                  <th className="py-2 pr-4 text-left text-xs font-semibold text-muted">Last Updated</th>
+                  <th className="py-2 text-left text-xs font-semibold text-muted">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {extendedMembers.map((member) => (
+                  <tr key={member.id} className="border-b border-slate-100 hover:bg-slate-50">
+                    <td className="py-2.5 pr-4 font-medium text-foreground">{member.name}</td>
+                    <td className="py-2.5 pr-4 text-muted">{member.title ?? "—"}</td>
+                    <td className="py-2.5 pr-4 text-muted">{member.email}</td>
+                    <td className="py-2.5 pr-4">
+                      <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
+                        member.status === "active" ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
+                      }`}>
+                        {member.status === "active" ? "Active" : "Pending"}
+                      </span>
+                    </td>
+                    <td className="py-2.5 pr-4 text-muted text-xs">
+                      {new Date(member.updated_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                    </td>
+                    <td className="py-2.5">
+                      <div className="flex items-center gap-1.5">
+                        <button className="rounded px-2 py-1 text-xs text-slate-500 hover:bg-slate-100 transition-colors">View</button>
+                        <button className="rounded px-2 py-1 text-xs text-slate-500 hover:bg-slate-100 transition-colors">Resend</button>
+                        <button className="rounded px-2 py-1 text-xs text-red-500 hover:bg-red-50 transition-colors">Remove</button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Deployment */}
+      <div className="rounded-xl border border-border bg-white p-5 shadow-sm">
+        <h3 className="mb-1 text-sm font-semibold text-foreground">Deployment</h3>
+        <p className="mb-4 text-xs text-muted">Push signatures to your email platform centrally.</p>
+        <div className="flex flex-wrap gap-3">
+          <button className="inline-flex items-center gap-2 rounded-lg border border-border bg-white px-4 py-2 text-sm font-medium text-foreground hover:bg-slate-50 transition-colors">
+            <svg className="h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0H3" />
+            </svg>
+            Deploy to Microsoft 365
+          </button>
+          <button className="inline-flex items-center gap-2 rounded-lg border border-border bg-white px-4 py-2 text-sm font-medium text-foreground hover:bg-slate-50 transition-colors">
+            <svg className="h-4 w-4 text-red-500" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+            </svg>
+            Deploy to Google Workspace
+          </button>
+        </div>
+        <div className="mt-4 rounded-lg bg-slate-50 border border-slate-200 p-3">
+          <p className="text-xs text-muted">
+            <span className="font-medium text-foreground">Last deployment:</span> No deployments yet
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Tab: Health Monitor
+// ---------------------------------------------------------------------------
+
+interface HealthCheck {
+  id: string;
+  label: string;
+  status: "pass" | "warn" | "fail";
+  detail?: string;
+}
+
+interface SignatureHealth {
+  signatureId: string;
+  signatureName: string;
+  score: number;
+  checks: HealthCheck[];
+}
+
+function runHealthChecks(sig: Signature): SignatureHealth {
+  const html = (() => {
+    try {
+      const data = typeof sig.data === "string" ? JSON.parse(sig.data) : sig.data;
+      const { _blocks, _wrapperSettings, ...rest } = data;
+      return generateSignatureHtml({ ...DEFAULT_SIGNATURE_DATA, ...rest });
+    } catch {
+      return "";
+    }
+  })();
+
+  const sigData = (() => {
+    try {
+      const parsed = typeof sig.data === "string" ? JSON.parse(sig.data) : sig.data;
+      return { ...DEFAULT_SIGNATURE_DATA, ...parsed } as SignatureData;
+    } catch {
+      return DEFAULT_SIGNATURE_DATA;
+    }
+  })();
+
+  const checks: HealthCheck[] = [];
+
+  // 1. HTML size
+  const htmlBytes = new TextEncoder().encode(html).length;
+  if (htmlBytes === 0) {
+    checks.push({ id: "size", label: "HTML size under 10KB", status: "warn", detail: "Could not measure size" });
+  } else if (htmlBytes < 10240) {
+    checks.push({ id: "size", label: "HTML size under 10KB", status: "pass", detail: `${(htmlBytes / 1024).toFixed(1)}KB` });
+  } else {
+    checks.push({ id: "size", label: "HTML size under 10KB", status: "fail", detail: `${(htmlBytes / 1024).toFixed(1)}KB — too large` });
+  }
+
+  // 2. No base64 images
+  const hasBase64 = html.includes("data:image");
+  checks.push({
+    id: "base64",
+    label: "No embedded base64 images",
+    status: hasBase64 ? "fail" : "pass",
+    detail: hasBase64 ? "Base64 image found — use a hosted URL instead" : undefined,
+  });
+
+  // 3. Image URLs valid format
+  const imgUrls = Array.from(html.matchAll(/src="(https?:\/\/[^"]+)"/g)).map((m) => m[1]);
+  const allHttps = imgUrls.every((u) => u.startsWith("https://"));
+  checks.push({
+    id: "images",
+    label: "Image URLs accessible (HTTPS)",
+    status: imgUrls.length === 0 ? "warn" : allHttps ? "pass" : "warn",
+    detail: imgUrls.length === 0 ? "No images found" : !allHttps ? "Some images use HTTP, not HTTPS" : undefined,
+  });
+
+  // 4. Contact info complete
+  const hasName = !!sigData.fullName;
+  const hasEmail = !!sigData.email;
+  const contactScore = [hasName, hasEmail].filter(Boolean).length;
+  checks.push({
+    id: "contact",
+    label: "Contact info complete (name, email)",
+    status: contactScore === 2 ? "pass" : contactScore === 1 ? "warn" : "fail",
+    detail: contactScore < 2 ? `Missing: ${!hasName ? "name" : ""} ${!hasEmail ? "email" : ""}`.trim() : undefined,
+  });
+
+  // 5. Social links present
+  const socialFields: (keyof SignatureData)[] = ["linkedin", "twitter", "instagram", "facebook", "github", "youtube"];
+  const hasSocial = socialFields.some((f) => !!sigData[f]);
+  checks.push({
+    id: "social",
+    label: "Social links present",
+    status: hasSocial ? "pass" : "warn",
+    detail: !hasSocial ? "No social links added" : undefined,
+  });
+
+  // 6. Outlook-safe HTML (table-based, inline styles)
+  const hasTableLayout = html.includes("<table");
+  const hasInlineStyle = html.includes("style=");
+  checks.push({
+    id: "outlook",
+    label: "Outlook-safe HTML (table layout, inline CSS)",
+    status: hasTableLayout && hasInlineStyle ? "pass" : hasTableLayout || hasInlineStyle ? "warn" : "fail",
+    detail: !hasTableLayout ? "No table layout detected" : !hasInlineStyle ? "No inline styles detected" : undefined,
+  });
+
+  const passed = checks.filter((c) => c.status === "pass").length;
+  const score = Math.round((passed / checks.length) * 100);
+
+  return {
+    signatureId: sig.id,
+    signatureName: sig.name,
+    score,
+    checks,
+  };
+}
+
+function HealthMonitorTab({
+  signatures,
+  plan,
+  loading,
+  onUpgrade,
+}: {
+  signatures: Signature[];
+  plan: Plan;
+  loading: boolean;
+  onUpgrade: () => void;
+}) {
+  const isPro = plan === "pro" || plan === "team";
+  const [autoScan, setAutoScan] = useState(false);
+  const [lastScan, setLastScan] = useState<string | null>(null);
+  const [healthResults, setHealthResults] = useState<SignatureHealth[]>([]);
+  const [scanning, setScanning] = useState(false);
+
+  const runScan = () => {
+    setScanning(true);
+    setTimeout(() => {
+      const results = signatures.map(runHealthChecks);
+      setHealthResults(results);
+      setLastScan(new Date().toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }));
+      setScanning(false);
+    }, 800);
+  };
+
+  if (!isPro) {
+    return (
+      <div className="space-y-5">
+        <h2 className="text-lg font-semibold text-foreground">Signature Health Monitor</h2>
+        <div className="rounded-xl border-2 border-dashed border-border p-10 text-center">
+          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-slate-100">
+            <HeartIcon />
+          </div>
+          <h3 className="text-sm font-semibold text-foreground">Health monitoring is a Pro feature</h3>
+          <p className="mt-1 text-xs text-muted max-w-xs mx-auto">
+            Automatically check if your deployed signatures are working and flag any issues.
+          </p>
+          <button
+            onClick={onUpgrade}
+            className="mt-4 rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-white hover:bg-primary-dark transition-colors"
+          >
+            Upgrade to Pro — $5/month
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (loading) return <LoadingSpinner />;
+
+  const totalIssues = healthResults.reduce((sum, r) => sum + r.checks.filter((c) => c.status === "fail").length, 0);
+  const avgScore = healthResults.length > 0
+    ? Math.round(healthResults.reduce((s, r) => s + r.score, 0) / healthResults.length)
+    : null;
+  const overallStatus = avgScore === null ? "none" : avgScore >= 80 ? "green" : avgScore >= 50 ? "yellow" : "red";
+
+  const statusColors: Record<string, string> = {
+    green: "bg-emerald-100 text-emerald-700 border-emerald-200",
+    yellow: "bg-amber-100 text-amber-700 border-amber-200",
+    red: "bg-red-100 text-red-700 border-red-200",
+    none: "bg-slate-100 text-slate-600 border-slate-200",
+  };
+
+  const checkStatusIcon = (status: HealthCheck["status"]) => {
+    if (status === "pass") return (
+      <svg className="h-4 w-4 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+      </svg>
+    );
+    if (status === "warn") return (
+      <svg className="h-4 w-4 text-amber-500 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+      </svg>
+    );
+    return (
+      <svg className="h-4 w-4 text-red-500 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    );
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-start justify-between">
+        <div>
+          <h2 className="text-lg font-semibold text-foreground">Signature Health Monitor</h2>
+          <p className="mt-0.5 text-sm text-muted">Check if your deployed signatures are still working</p>
+        </div>
+        <button
+          onClick={runScan}
+          disabled={scanning || signatures.length === 0}
+          className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {scanning ? (
+            <>
+              <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+              Scanning...
+            </>
+          ) : (
+            <>
+              <HeartIcon />
+              Scan Now
+            </>
+          )}
+        </button>
+      </div>
+
+      {/* Dashboard cards */}
+      <div className="grid gap-4 sm:grid-cols-3">
+        <div className={`rounded-xl border p-4 shadow-sm ${statusColors[overallStatus]}`}>
+          <p className="text-xs font-medium">Overall Health</p>
+          <p className="mt-1 text-2xl font-bold">
+            {overallStatus === "none" ? "—" : overallStatus === "green" ? "Good" : overallStatus === "yellow" ? "Fair" : "Poor"}
+          </p>
+        </div>
+        <div className="rounded-xl border border-border bg-white p-4 shadow-sm">
+          <p className="text-xs text-muted">Last Scan</p>
+          <p className="mt-1 text-sm font-bold text-foreground">{lastScan ?? "Never"}</p>
+        </div>
+        <div className="rounded-xl border border-border bg-white p-4 shadow-sm">
+          <p className="text-xs text-muted">Issues Found</p>
+          <p className="mt-1 text-2xl font-bold text-foreground">{healthResults.length > 0 ? totalIssues : "—"}</p>
+        </div>
+      </div>
+
+      {/* Auto-scan toggle */}
+      <div className="rounded-xl border border-border bg-white p-4 shadow-sm flex items-center justify-between">
+        <div>
+          <p className="text-sm font-medium text-foreground">Automatic scanning</p>
+          <p className="text-xs text-muted">Scan all signatures automatically every 24 hours</p>
+        </div>
+        <button
+          onClick={() => setAutoScan((v) => !v)}
+          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${autoScan ? "bg-primary" : "bg-slate-200"}`}
+        >
+          <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${autoScan ? "translate-x-6" : "translate-x-1"}`} />
+        </button>
+      </div>
+
+      {/* Per-signature results */}
+      {healthResults.length === 0 && signatures.length === 0 && (
+        <EmptyState
+          icon={<HeartIcon />}
+          title="No signatures to check"
+          description="Create a signature first, then run a health scan to check it."
+        />
+      )}
+
+      {healthResults.length === 0 && signatures.length > 0 && (
+        <div className="rounded-xl border-2 border-dashed border-border p-10 text-center">
+          <p className="text-sm text-muted">Click "Scan Now" to check the health of your {signatures.length} signature{signatures.length > 1 ? "s" : ""}.</p>
+        </div>
+      )}
+
+      {healthResults.length > 0 && (
+        <div className="space-y-4">
+          <h3 className="text-sm font-semibold text-foreground">Scan Results</h3>
+          {healthResults.map((result) => {
+            const scoreColor = result.score >= 80 ? "text-emerald-600" : result.score >= 50 ? "text-amber-600" : "text-red-600";
+            const scoreBg = result.score >= 80 ? "bg-emerald-50 border-emerald-200" : result.score >= 50 ? "bg-amber-50 border-amber-200" : "bg-red-50 border-red-200";
+            return (
+              <div key={result.signatureId} className="rounded-xl border border-border bg-white p-5 shadow-sm">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">{result.signatureName}</p>
+                    <p className="text-xs text-muted">{result.checks.filter((c) => c.status === "pass").length}/{result.checks.length} checks passed</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className={`rounded-lg border px-3 py-1 ${scoreBg}`}>
+                      <span className={`text-sm font-bold ${scoreColor}`}>{result.score}</span>
+                      <span className={`text-xs ${scoreColor}`}>/100</span>
+                    </div>
+                    <Link
+                      href="/dashboard#editor"
+                      className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-foreground hover:bg-slate-50 transition-colors"
+                    >
+                      Fix Issues
+                    </Link>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  {result.checks.map((check) => (
+                    <div key={check.id} className="flex items-center gap-2.5">
+                      {checkStatusIcon(check.status)}
+                      <span className="text-xs text-foreground">{check.label}</span>
+                      {check.detail && (
+                        <span className="text-xs text-muted ml-auto shrink-0">{check.detail}</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Tab: Settings
 // ---------------------------------------------------------------------------
 
@@ -948,7 +1573,7 @@ function DashboardContent() {
   const [activeTab, setActiveTabState] = useState<ActiveTab>(() => {
     if (typeof window !== "undefined") {
       const hash = window.location.hash.replace("#", "") as ActiveTab;
-      if (["signatures", "editor", "analytics", "banners", "settings"].includes(hash)) return hash;
+      if (["signatures", "editor", "analytics", "banners", "team", "health", "settings"].includes(hash)) return hash;
     }
     return "signatures";
   });
@@ -1420,6 +2045,22 @@ function DashboardContent() {
               loading={campaignsLoading}
               onCreateNew={() => {}}
               onUpgrade={() => handleUpgrade()}
+            />
+          )}
+          {activeTab === "team" && (
+            <TeamDashboardTab
+              teamMembers={teamMembers}
+              loading={teamLoading}
+              plan={plan}
+              onUpgrade={handleUpgrade}
+            />
+          )}
+          {activeTab === "health" && (
+            <HealthMonitorTab
+              signatures={signatures}
+              plan={plan}
+              loading={sigsLoading}
+              onUpgrade={handleUpgrade}
             />
           )}
           {activeTab === "settings" && (

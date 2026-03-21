@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>NeatStamp Commands</title>
+  <!-- Office.js — required even for function-file pages -->
+  <script src="https://appsforoffice.microsoft.com/lib/1.1/hosted/office.js" type="text/javascript"></script>
+</head>
+<body>
+<script>
+  // ══════════════════════════════════════════════════════════════════════
+  // NeatStamp — Outlook Add-in Commands (Event-Based Activation)
+  //
+  // This file is referenced as the FunctionFile in the manifest. It runs
+  // in a hidden iframe and handles:
+  //   - OnNewMessageCompose  → auto-insert signature when drafting new email
+  //   - OnNewReplyCompose    → auto-insert signature when replying
+  //
+  // The signature HTML is stored in Office roaming settings, so no network
+  // call is needed during auto-insert (fast, offline-capable).
+  // ══════════════════════════════════════════════════════════════════════
+
+  Office.onReady(function() {
+    // Register handlers — Office.actions.associate maps the function names
+    // declared in the manifest's <LaunchEvent> elements.
+    Office.actions.associate("onNewMessageComposeHandler", onNewMessageComposeHandler);
+    Office.actions.associate("onNewReplyComposeHandler",   onNewReplyComposeHandler);
+  });
+
+  // ── Handler: new message ──────────────────────────────────────────────
+  function onNewMessageComposeHandler(event) {
+    insertStoredSignature(event, false);
+  }
+
+  // ── Handler: new reply / forward ─────────────────────────────────────
+  function onNewReplyComposeHandler(event) {
+    insertStoredSignature(event, true);
+  }
+
+  // ── Core: read roaming settings and inject signature ─────────────────
+  function insertStoredSignature(event, isReply) {
+    var rs = Office.context.roamingSettings;
+
+    // Only run if the user has enabled auto-apply
+    var autoApply = rs.get("neatstamp_auto_apply");
+    if (!autoApply) {
+      event.completed();
+      return;
+    }
+
+    // The full rendered HTML is cached here by the taskpane after "Set as default"
+    var signatureHtml = rs.get("neatstamp_signature_html");
+    if (!signatureHtml) {
+      event.completed();
+      return;
+    }
+
+    var item = Office.context.mailbox.item;
+    if (!item || !item.body) {
+      event.completed();
+      return;
+    }
+
+    // Use setSignatureAsync when available (Mailbox 1.10+, Classic Desktop)
+    if (item.body.setSignatureAsync) {
+      item.body.setSignatureAsync(
+        signatureHtml,
+        { coercionType: Office.CoercionType.Html },
+        function(result) {
+          // Regardless of result, complete the event so Outlook doesn't hang
+          event.completed();
+        }
+      );
+    } else {
+      // Fallback for older requirement sets: append to body
+      item.body.getAsync(Office.CoercionType.Html, function(getResult) {
+        if (getResult.status !== Office.AsyncResultStatus.Succeeded) {
+          event.completed();
+          return;
+        }
+        var existing = getResult.value || "";
+        // Don't double-insert if a NeatStamp signature marker is already present
+        if (existing.indexOf("data-neatstamp-sig") !== -1) {
+          event.completed();
+          return;
+        }
+        var newBody = existing + '<br><br><span data-neatstamp-sig="1">' + signatureHtml + '</span>';
+        item.body.setAsync(newBody, { coercionType: Office.CoercionType.Html }, function() {
+          event.completed();
+        });
+      });
+    }
+  }
+</script>
+</body>
+</html>

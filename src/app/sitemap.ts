@@ -64,6 +64,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: "/email-signature-deliverability", priority: 0.8, changeFrequency: "monthly" },
     { url: "/email-signature-for-teams", priority: 0.8, changeFrequency: "monthly" },
 
+    // Sub-niche: Outlook + Teams + Mobile (NEW)
+    { url: "/outlook-mobile-signature", priority: 0.9, changeFrequency: "monthly" },
+    { url: "/outlook-signature-html", priority: 0.9, changeFrequency: "monthly" },
+    { url: "/outlook-signature-for-company", priority: 0.8, changeFrequency: "monthly" },
+    { url: "/email-signature-cost-calculator", priority: 0.7, changeFrequency: "monthly" },
+
     // Seasonal
     { url: "/christmas-email-signature", priority: 0.6, changeFrequency: "monthly" },
     { url: "/holiday-email-signature", priority: 0.6, changeFrequency: "monthly" },
@@ -123,6 +129,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: "/blog/outlook-signature-template-guide", priority: 0.7, changeFrequency: "monthly" },
     { url: "/blog/free-email-signature-template", priority: 0.7, changeFrequency: "monthly" },
     { url: "/blog/gmail-signature-template-guide", priority: 0.7, changeFrequency: "monthly" },
+
+    // Sub-niche blogs: Outlook + Teams + Mobile (NEW)
+    { url: "/blog/outlook-signature-disappeared", priority: 0.8, changeFrequency: "monthly" },
+    { url: "/blog/outlook-roaming-signatures", priority: 0.7, changeFrequency: "monthly" },
+    { url: "/blog/outlook-signature-not-saving", priority: 0.7, changeFrequency: "monthly" },
+    { url: "/blog/outlook-365-signature-setup", priority: 0.7, changeFrequency: "monthly" },
+    { url: "/blog/outlook-signature-multiple-accounts", priority: 0.6, changeFrequency: "monthly" },
+    { url: "/blog/microsoft-365-email-signature-management", priority: 0.7, changeFrequency: "monthly" },
+    { url: "/blog/new-outlook-signature-problems", priority: 0.8, changeFrequency: "monthly" },
+    { url: "/blog/outlook-signature-best-practices-2026", priority: 0.7, changeFrequency: "monthly" },
+    { url: "/blog/outlook-vs-gmail-signature-differences", priority: 0.6, changeFrequency: "monthly" },
+    { url: "/blog/email-signature-for-remote-teams-outlook", priority: 0.6, changeFrequency: "monthly" },
+    { url: "/blog/outlook-signature-deployment-guide", priority: 0.7, changeFrequency: "monthly" },
+    { url: "/blog/email-signature-not-working-new-outlook", priority: 0.8, changeFrequency: "monthly" },
 
     // Other
     { url: "/about", priority: 0.4, changeFrequency: "monthly" },
