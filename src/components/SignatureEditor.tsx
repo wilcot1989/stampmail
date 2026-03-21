@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { SignatureData, WrapperSettings, DEFAULT_WRAPPER_SETTINGS } from "@/lib/types";
+import { SignatureData, WrapperSettings, DEFAULT_WRAPPER_SETTINGS, TEMPLATE_DEFAULTS, TemplateName } from "@/lib/types";
 import { Block, SOCIAL_ICON_URLS, SOCIAL_LABELS } from "@/lib/blocks";
 import { GenerateOptions, generateSignatureHtml } from "@/lib/generateSignature";
 import { copySignatureToClipboard } from "@/lib/clipboard";
@@ -750,6 +750,7 @@ function DesignPanel({
   onDataChange: (d: SignatureData) => void;
 }) {
   const set = (key: keyof SignatureData, val: unknown) => onDataChange({ ...data, [key]: val });
+  const td = TEMPLATE_DEFAULTS[(data.template || "minimal") as TemplateName] ?? TEMPLATE_DEFAULTS.minimal;
 
   return (
     <div className="space-y-6">
@@ -761,15 +762,15 @@ function DesignPanel({
           <div className="flex items-center gap-2">
             <span className="w-16 text-xs text-slate-500 flex-shrink-0">Name</span>
             <BIUButtons
-              bold={data.nameBold ?? true}
-              italic={data.nameItalic ?? false}
+              bold={data.nameBold ?? td.nameBold}
+              italic={data.nameItalic ?? td.nameItalic}
               underline={false}
               onBold={(v) => set("nameBold", v)}
               onItalic={(v) => set("nameItalic", v)}
               onUnderline={() => {}}
             />
-            <ColorDot value={data.nameColor ?? "#1a1a1a"} onChange={(v) => set("nameColor", v)} />
-            <FontSizeInput value={data.nameSize ?? 17} onChange={(v) => set("nameSize", v)} />
+            <ColorDot value={data.nameColor ?? td.nameColor} onChange={(v) => set("nameColor", v)} />
+            <FontSizeInput value={data.nameSize ?? td.nameSize} onChange={(v) => set("nameSize", v)} />
           </div>
           {/* Job Title */}
           <div className="flex items-center gap-2">
@@ -782,8 +783,8 @@ function DesignPanel({
               onItalic={(v) => set("titleItalic", v)}
               onUnderline={() => {}}
             />
-            <ColorDot value={data.titleColor ?? "#555555"} onChange={(v) => set("titleColor", v)} />
-            <FontSizeInput value={data.titleSize ?? 12} onChange={(v) => set("titleSize", v)} />
+            <ColorDot value={data.titleColor ?? td.titleColor} onChange={(v) => set("titleColor", v)} />
+            <FontSizeInput value={data.titleSize ?? td.titleSize} onChange={(v) => set("titleSize", v)} />
           </div>
           {/* Company */}
           <div className="flex items-center gap-2">
@@ -796,8 +797,8 @@ function DesignPanel({
               onItalic={(v) => set("companyItalic", v)}
               onUnderline={() => {}}
             />
-            <ColorDot value={data.companyColor ?? "#999999"} onChange={(v) => set("companyColor", v)} />
-            <FontSizeInput value={data.companySize ?? 12} onChange={(v) => set("companySize", v)} />
+            <ColorDot value={data.companyColor ?? td.companyColor} onChange={(v) => set("companyColor", v)} />
+            <FontSizeInput value={data.companySize ?? td.titleSize} onChange={(v) => set("companySize", v)} />
           </div>
         </div>
       </div>

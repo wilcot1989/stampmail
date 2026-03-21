@@ -2005,12 +2005,31 @@ function DashboardContent() {
                 isPro={isPro}
                 onSelect={(template, theme) => {
                   const tpl = TEMPLATES.find((t) => t.id === template);
-                  const updatedData = { ...editorData, template, primaryColor: theme.primary, accentColor: theme.accent };
+                  // Reset styling overrides so new template defaults take effect
+                  const updatedData = {
+                    ...editorData,
+                    template,
+                    primaryColor: theme.primary,
+                    accentColor: theme.accent,
+                    nameSize: undefined,
+                    nameColor: undefined,
+                    nameBold: undefined,
+                    nameItalic: undefined,
+                    titleSize: undefined,
+                    titleColor: undefined,
+                    companyColor: undefined,
+                    fontFamily: undefined,
+                    photoSize: undefined,
+                    photoShape: undefined,
+                    photoPosition: undefined,
+                    backgroundColor: undefined,
+                    textOnDark: undefined,
+                  };
                   if (!editorData.photoUrl && tpl?.previewPhoto) {
                     updatedData.photoUrl = `https://neatstamp.com${tpl.previewPhoto}`;
                   }
                   const preset = getPresetForTemplate(template, updatedData);
-                  setEditorData(updatedData);
+                  setEditorData(updatedData as SignatureData);
                   setEditorBlocks(preset.blocks);
                   setEditorWrapperSettings(preset.wrapperSettings);
                   setEditorTheme(theme.id);

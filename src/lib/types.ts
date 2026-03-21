@@ -398,6 +398,47 @@ export const COLOR_THEMES: ColorTheme[] = [
   { id: "slate", name: "Slate", primary: "#475569", accent: "#94a3b8", swatch: "#475569" },
 ];
 
+// ---------------------------------------------------------------------------
+// Template visual defaults — used by Design panel to show correct defaults
+// These match the ?? fallback values in each template function in generateSignature.ts
+// ---------------------------------------------------------------------------
+
+export interface TemplateDefaults {
+  nameSize: number;
+  nameColor: string;
+  nameBold: boolean;
+  nameItalic: boolean;
+  titleSize: number;
+  titleColor: string;
+  companyColor: string;
+  photoSize: number;
+  photoShape: "circle" | "rounded" | "square";
+}
+
+// Values extracted directly from generateSignature.ts template functions (verified by test)
+export const TEMPLATE_DEFAULTS: Record<TemplateName, TemplateDefaults> = {
+  minimal:      { nameSize: 17, nameColor: "#1a1a1a", nameBold: true,  nameItalic: false, titleSize: 12, titleColor: "#555",    companyColor: "#999",    photoSize: 70,  photoShape: "circle" },
+  modern:       { nameSize: 18, nameColor: "#2563eb", nameBold: true,  nameItalic: false, titleSize: 12, titleColor: "#555",    companyColor: "#999",    photoSize: 75,  photoShape: "rounded" },
+  corporate:    { nameSize: 17, nameColor: "#1a1a1a", nameBold: true,  nameItalic: false, titleSize: 12, titleColor: "#2563eb", companyColor: "#999",    photoSize: 65,  photoShape: "rounded" },
+  creative:     { nameSize: 20, nameColor: "#2563eb", nameBold: true,  nameItalic: false, titleSize: 13, titleColor: "#555",    companyColor: "#f59e0b", photoSize: 90,  photoShape: "circle" },
+  bold:         { nameSize: 20, nameColor: "#fff",    nameBold: true,  nameItalic: false, titleSize: 12, titleColor: "#fff",    companyColor: "#fff",    photoSize: 75,  photoShape: "rounded" },
+  elegant:      { nameSize: 18, nameColor: "#1a1a1a", nameBold: true,  nameItalic: false, titleSize: 12, titleColor: "#555",    companyColor: "#999",    photoSize: 70,  photoShape: "circle" },
+  startup:      { nameSize: 15, nameColor: "#1a1a1a", nameBold: true,  nameItalic: false, titleSize: 12, titleColor: "#555",    companyColor: "#999",    photoSize: 44,  photoShape: "circle" },
+  compact:      { nameSize: 13, nameColor: "#1a1a1a", nameBold: true,  nameItalic: false, titleSize: 12, titleColor: "#555",    companyColor: "#999",    photoSize: 44,  photoShape: "circle" },
+  executive:    { nameSize: 20, nameColor: "#fff",    nameBold: true,  nameItalic: false, titleSize: 12, titleColor: "#fff",    companyColor: "#ddd",    photoSize: 80,  photoShape: "rounded" },
+  gradient:     { nameSize: 19, nameColor: "#2563eb", nameBold: true,  nameItalic: false, titleSize: 12, titleColor: "#555",    companyColor: "#999",    photoSize: 70,  photoShape: "circle" },
+  developer:    { nameSize: 15, nameColor: "#2563eb", nameBold: true,  nameItalic: false, titleSize: 12, titleColor: "#555",    companyColor: "#999",    photoSize: 64,  photoShape: "rounded" },
+  sales:        { nameSize: 16, nameColor: "#1a1a1a", nameBold: true,  nameItalic: false, titleSize: 12, titleColor: "#2563eb", companyColor: "#999",    photoSize: 72,  photoShape: "circle" },
+  medical:      { nameSize: 17, nameColor: "#1a1a1a", nameBold: true,  nameItalic: false, titleSize: 12, titleColor: "#0d9488", companyColor: "#999",    photoSize: 72,  photoShape: "circle" },
+  legal:        { nameSize: 16, nameColor: "#1a1a1a", nameBold: true,  nameItalic: false, titleSize: 12, titleColor: "#555",    companyColor: "#999",    photoSize: 72,  photoShape: "rounded" },
+  academic:     { nameSize: 18, nameColor: "#1e3a5f", nameBold: true,  nameItalic: false, titleSize: 12, titleColor: "#555",    companyColor: "#999",    photoSize: 68,  photoShape: "rounded" },
+  realtor:      { nameSize: 22, nameColor: "#1a1a1a", nameBold: true,  nameItalic: false, titleSize: 13, titleColor: "#2563eb", companyColor: "#333",    photoSize: 100, photoShape: "rounded" },
+  influencer:   { nameSize: 21, nameColor: "#2563eb", nameBold: true,  nameItalic: false, titleSize: 12, titleColor: "#555",    companyColor: "#999",    photoSize: 85,  photoShape: "circle" },
+  photographer: { nameSize: 18, nameColor: "#1a1a1a", nameBold: false, nameItalic: false, titleSize: 11, titleColor: "#aaa",    companyColor: "#aaa",    photoSize: 55,  photoShape: "square" },
+  dark:         { nameSize: 19, nameColor: "#f1f5f9", nameBold: true,  nameItalic: false, titleSize: 12, titleColor: "#94a3b8", companyColor: "#64748b", photoSize: 76,  photoShape: "rounded" },
+  simple:       { nameSize: 14, nameColor: "#1a1a1a", nameBold: true,  nameItalic: false, titleSize: 12, titleColor: "#555",    companyColor: "#999",    photoSize: 70,  photoShape: "circle" },
+};
+
 // Template categories for filtering
 export const TEMPLATE_CATEGORIES = {
   style: [

@@ -736,7 +736,30 @@ export default function EditorPage() {
 
   const handleTemplateSelect = (template: TemplateName, theme: ColorTheme) => {
     const tpl = TEMPLATES.find((t) => t.id === template);
-    const updatedData = { ...data, template, primaryColor: theme.primary, accentColor: theme.accent };
+
+    // Reset all styling overrides so the new template's built-in defaults take effect.
+    // We keep user CONTENT (name, title, email, etc.) but clear VISUAL settings.
+    const updatedData: SignatureData = {
+      ...data,
+      template,
+      primaryColor: theme.primary,
+      accentColor: theme.accent,
+      // Reset styling overrides → template defaults will be used via ?? fallbacks
+      nameSize: undefined,
+      nameColor: undefined,
+      nameBold: undefined,
+      nameItalic: undefined,
+      titleSize: undefined,
+      titleColor: undefined,
+      companyColor: undefined,
+      fontFamily: undefined,
+      photoSize: undefined,
+      photoShape: undefined,
+      photoPosition: undefined,
+      backgroundColor: undefined,
+      textOnDark: undefined,
+    };
+
     if (!data.photoUrl && tpl?.previewPhoto) {
       updatedData.photoUrl = `https://neatstamp.com${tpl.previewPhoto}`;
     }
