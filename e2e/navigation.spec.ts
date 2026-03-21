@@ -113,11 +113,30 @@ test.describe("Pricing page CTAs", () => {
   });
 
   test("pricing page shows Free plan", async ({ page }) => {
-    await expect(page.getByText("Free")).toBeVisible();
+    // Plan names are rendered in h3 elements — use that to avoid matching
+    // unrelated text that contains "Free" (e.g. "30-day money-back", "Start Free")
+    const freePlan = page.locator("h3").filter({ hasText: "Free" }).first();
+    const freeCount = await freePlan.count();
+    if (freeCount > 0) {
+      await expect(freePlan).toBeVisible();
+    } else {
+      // Fallback: any visible element with exact text "Free"
+      const freeAny = page.getByText("Free", { exact: true }).first();
+      await expect(freeAny).toBeVisible();
+    }
   });
 
   test("pricing page shows Pro plan", async ({ page }) => {
-    await expect(page.getByText("Pro")).toBeVisible();
+    // Plan names are rendered in h3 elements — use that to avoid strict mode issues
+    const proPlan = page.locator("h3").filter({ hasText: "Pro" }).first();
+    const proCount = await proPlan.count();
+    if (proCount > 0) {
+      await expect(proPlan).toBeVisible();
+    } else {
+      // Fallback: any visible element with exact text "Pro"
+      const proAny = page.getByText("Pro", { exact: true }).first();
+      await expect(proAny).toBeVisible();
+    }
   });
 
   test("pricing page shows at least one Get Started / Start Free CTA", async ({ page }) => {
