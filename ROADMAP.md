@@ -109,31 +109,37 @@
 
 ## Competitive Gaps (wat we missen vs concurrentie)
 
-### Nu wel gebouwd:
-- ✅ Signature editor met templates
-- ✅ Free/Pro/Team tiers
-- ✅ Image hosting + tracking pixel
+### Gebouwd (maart 2026):
+- ✅ Signature editor met 20 layouts × 8 kleurthema's (160+ varianten)
+- ✅ Newoldstamp-stijl editor met per-veld styling (B/I/U, kleur, grootte)
+- ✅ Free/Pro/Team tiers met volledige gating
+- ✅ Image hosting + tracking pixel (R2 + Cloudflare)
 - ✅ Banner campaigns
-- ✅ Click analytics
-- ✅ QR code generator
+- ✅ Click analytics (dashboard + API)
+- ✅ QR code generator (werkend, download + copy)
 - ✅ Google OAuth + email/password auth
 - ✅ D1 database + R2 storage
-- ✅ 243K woorden SEO content
-- ✅ Security (CSP, rate limiting, audit logging)
+- ✅ 243K woorden SEO content (77 pagina's)
+- ✅ Security (CSP, HSTS, rate limiting, audit logging)
+- ✅ Signature Score (0-100) met verbeter tips
+- ✅ Installation guides (6 email clients)
+- ✅ Legal disclaimer veld
+- ✅ Chrome Extension (Manifest V3, Gmail injectie)
+- ✅ Live email client preview (Gmail, Outlook, Apple Mail mockups)
+- ✅ A/B testing (twee varianten, CTR vergelijking)
+- ✅ CRM integrations (HubSpot, Salesforce + 3 coming soon)
+- ✅ Dynamic signatures (regels per ontvanger type)
+- ✅ Agency multi-workspace (meerdere klanten, Team plan)
+- ✅ Master template system (CSV upload, team signatures)
+- ✅ Reply/forward separate signatures
+- ✅ Outlook-safe foto crop (cirkel/rounded naar JPEG)
+- ✅ Social media PNG icons (Outlook-compatible)
+- ✅ Complete betaalflow (LemonSqueezy, cancel, polling)
+- ✅ 111 automatische tests
 
-### Nog te bouwen:
-- ❌ Chrome Extension
-- ❌ Google Workspace add-in
-- ❌ Microsoft 365 integration
-- ❌ Directory sync
-- ❌ Master template system
-- ❌ Installation tracker
-- ❌ AI Signature Optimizer / Score
-- ❌ Live email client preview
-- ❌ A/B testing
-- ❌ CRM integrations
-- ❌ Dynamic signatures
-- ❌ Agency multi-workspace
-- ❌ Drag & drop editor
-- ❌ Reply/forward separate signatures
-- ❌ 100+ templates (we hebben 8)
+### Nog te bouwen (toekomstig):
+- ❌ Google Workspace add-in (admin deploy naar alle medewerkers)
+- ❌ Microsoft 365 integration (Exchange transport rules)
+- ❌ Directory sync (Azure AD / Google Directory)
+- ❌ Chrome Extension publicatie in Chrome Web Store
+- ❌ Smart banner scheduling (datum-gebaseerd roteren)
