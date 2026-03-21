@@ -184,7 +184,7 @@ function SignatureCard({
   const sigData = (() => {
     try {
       const parsed = typeof sig.data === "string" ? JSON.parse(sig.data) : sig.data;
-      const { _blocks, ...rest } = parsed;
+      const { _blocks, _wrapperSettings, ...rest } = parsed;
       return { ...DEFAULT_SIGNATURE_DATA, ...rest } as SignatureData;
     } catch {
       return DEFAULT_SIGNATURE_DATA;
@@ -1209,9 +1209,10 @@ function DashboardContent() {
               onEdit={(sig) => {
                 try {
                   const parsed = typeof sig.data === "string" ? JSON.parse(sig.data) : sig.data;
-                  const { _blocks, ...rest } = parsed;
+                  const { _blocks, _wrapperSettings, ...rest } = parsed;
                   setEditorData({ ...DEFAULT_SIGNATURE_DATA, ...rest });
                   setEditorBlocks(_blocks && Array.isArray(_blocks) ? _blocks : getDefaultBlocks());
+                  if (_wrapperSettings) setEditorWrapperSettings(_wrapperSettings);
                 } catch {
                   setEditorData(DEFAULT_SIGNATURE_DATA);
                   setEditorBlocks(getDefaultBlocks());
@@ -1261,9 +1262,10 @@ function DashboardContent() {
                             const sig = signatures[0];
                             try {
                               const parsed = typeof sig.data === "string" ? JSON.parse(sig.data) : sig.data;
-                              const { _blocks, ...rest } = parsed;
+                              const { _blocks, _wrapperSettings, ...rest } = parsed;
                               setEditorData({ ...DEFAULT_SIGNATURE_DATA, ...rest });
                               setEditorBlocks(_blocks && Array.isArray(_blocks) ? _blocks : getDefaultBlocks());
+                              if (_wrapperSettings) setEditorWrapperSettings(_wrapperSettings);
                             } catch {
                               setEditorData(DEFAULT_SIGNATURE_DATA);
                               setEditorBlocks(getDefaultBlocks());
@@ -1296,7 +1298,7 @@ function DashboardContent() {
                       if (cleanData.photoUrl?.startsWith("data:")) {
                         cleanData.photoUrl = "__base64__"; // marker to know photo was set
                       }
-                      const saveData = { ...cleanData, _blocks: editorBlocks };
+                      const saveData = { ...cleanData, _blocks: editorBlocks, _wrapperSettings: editorWrapperSettings };
                       const isUpdate = !!editingSignatureId;
                       const res = await fetch("/api/signatures", {
                         method: isUpdate ? "PUT" : "POST",
