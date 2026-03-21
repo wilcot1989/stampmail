@@ -12,6 +12,8 @@ import EmailClientPreview from "./EmailClientPreview";
 import ReplySignature from "./ReplySignature";
 import DynamicSignature from "./DynamicSignature";
 import BannerScheduler from "./BannerScheduler";
+import DeliverabilityScore from "./DeliverabilityScore";
+import DarkModePreview from "./DarkModePreview";
 
 // ---------------------------------------------------------------------------
 // Props
@@ -1054,6 +1056,12 @@ export default function SignatureEditor({
 
           {/* Dynamic Signatures (Pro) */}
           <DynamicSignature data={data} plan={plan} onDataChange={onDataChange} />
+
+          {/* Deliverability Score — UNIQUE feature */}
+          <DeliverabilityScore data={data} plan={plan} />
+
+          {/* Dark Mode Preview — UNIQUE feature */}
+          <DarkModePreview data={data} plan={plan} />
 
           {/* Banner Scheduling (Pro) */}
           <BannerScheduler plan={plan} onApplyBanner={(img, link) => onDataChange({ ...data, ctaBannerUrl: img, ctaBannerLink: link })} />
