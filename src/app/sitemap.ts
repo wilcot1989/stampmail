@@ -118,6 +118,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: "/blog/email-signature-onboarding-employees", priority: 0.6, changeFrequency: "monthly" },
     { url: "/blog/email-signature-gdpr-compliance", priority: 0.6, changeFrequency: "monthly" },
     { url: "/blog/email-signature-deliverability-guide", priority: 0.7, changeFrequency: "monthly" },
+    { url: "/blog/how-to-create-email-signature", priority: 0.8, changeFrequency: "monthly" },
+    { url: "/blog/email-signature-examples-2026", priority: 0.8, changeFrequency: "monthly" },
+    { url: "/blog/outlook-signature-template-guide", priority: 0.7, changeFrequency: "monthly" },
+    { url: "/blog/free-email-signature-template", priority: 0.7, changeFrequency: "monthly" },
+    { url: "/blog/gmail-signature-template-guide", priority: 0.7, changeFrequency: "monthly" },
 
     // Other
     { url: "/about", priority: 0.4, changeFrequency: "monthly" },

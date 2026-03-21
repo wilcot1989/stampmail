@@ -671,6 +671,37 @@ export default function EmailSignatureExamples2026Page() {
                 </Link>{" "}
                 is worth a read before you ship.
               </p>
+              <p className="text-slate-600 leading-relaxed mt-4">
+                For client-specific setup, the{" "}
+                <Link href="/email-signature-gmail" className="text-blue-600 hover:underline">
+                  Gmail signature guide
+                </Link>
+                {" "}and the{" "}
+                <Link href="/email-signature-outlook" className="text-blue-600 hover:underline">
+                  Outlook signature guide
+                </Link>{" "}
+                cover installation step by step. If you&rsquo;re on a Mac,{" "}
+                <Link href="/email-signature-apple-mail" className="text-blue-600 hover:underline">
+                  Apple Mail has its own setup process
+                </Link>
+                . All the signature styles in this guide are available in the{" "}
+                <Link href="/editor" className="text-blue-600 hover:underline">
+                  NeatStamp editor
+                </Link>{" "}
+                — free, no account required. The{" "}
+                <Link href="/email-signature-with-logo" className="text-blue-600 hover:underline">
+                  logo signature guide
+                </Link>{" "}
+                and{" "}
+                <Link href="/email-signature-for-business" className="text-blue-600 hover:underline">
+                  business email signature guide
+                </Link>{" "}
+                cover the corporate and team use cases in more depth. For sizing specifics on every element, the{" "}
+                <Link href="/blog/email-signature-size" className="text-blue-600 hover:underline">
+                  signature size guide
+                </Link>{" "}
+                has the exact numbers.
+              </p>
             </section>
 
             {/* FAQ */}
