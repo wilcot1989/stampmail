@@ -191,26 +191,72 @@ function UserInfoSection({
     .map((key) => DEFAULT_USER_FIELDS.find((f) => f.key === key))
     .filter(Boolean) as FieldDef[];
 
+  // Fields not currently in the order (removed ones)
+  const removedFields = DEFAULT_USER_FIELDS.filter((f) => !fieldOrder.includes(f.key) && !f.required);
+
+  const handleRemove = (key: string) => {
+    // Remove from order AND clear the value
+    onFieldOrderChange(fieldOrder.filter((k) => k !== key));
+    onDataChange({ ...data, [key]: "" });
+  };
+
+  const handleAdd = (key: string) => {
+    onFieldOrderChange([...fieldOrder, key]);
+  };
+
+  // Drag state
+  const dragIdxRef = useRef<number | null>(null);
+  const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
+
+  const handleDragStart = (idx: number) => (e: React.MouseEvent) => {
+    e.preventDefault();
+    dragIdxRef.current = idx;
+
+    const handleMove = (me: MouseEvent) => {
+      const rows = document.querySelectorAll("[data-user-field-idx]");
+      let closest = idx;
+      let closestDist = Infinity;
+      rows.forEach((el) => {
+        const i = Number(el.getAttribute("data-user-field-idx"));
+        const rect = el.getBoundingClientRect();
+        const mid = rect.top + rect.height / 2;
+        const dist = Math.abs(me.clientY - mid);
+        if (dist < closestDist) { closestDist = dist; closest = i; }
+      });
+      setDragOverIdx(closest);
+    };
+
+    const handleUp = () => {
+      document.removeEventListener("mousemove", handleMove);
+      document.removeEventListener("mouseup", handleUp);
+      const from = dragIdxRef.current;
+      dragIdxRef.current = null;
+      setDragOverIdx((to) => {
+        if (from !== null && to !== null && from !== to) {
+          onFieldOrderChange(moveItem(fieldOrder, from, to));
+        }
+        return null;
+      });
+    };
+
+    document.addEventListener("mousemove", handleMove);
+    document.addEventListener("mouseup", handleUp);
+  };
+
   return (
     <div className="space-y-1.5">
       <SectionHeader title="User Info" />
       {fields.map((f, idx) => (
-        <div key={f.key} className="flex items-center gap-1.5 group">
-          <DragHandle onDragStart={() => {
-            // Move up/down on click — simple approach
-          }} />
-          <div className="flex flex-col gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-            {idx > 0 && (
-              <button type="button" onClick={() => onFieldOrderChange(moveItem(fieldOrder, idx, idx - 1))} className="text-slate-400 hover:text-slate-600" title="Move up">
-                <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor"><path d="M5 0L10 6H0z"/></svg>
-              </button>
-            )}
-            {idx < fields.length - 1 && (
-              <button type="button" onClick={() => onFieldOrderChange(moveItem(fieldOrder, idx, idx + 1))} className="text-slate-400 hover:text-slate-600" title="Move down">
-                <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor"><path d="M5 6L0 0h10z"/></svg>
-              </button>
-            )}
-          </div>
+        <div
+          key={f.key}
+          data-user-field-idx={idx}
+          className={`flex items-center gap-2 group rounded-lg px-1 py-0.5 transition-colors ${
+            dragOverIdx === idx && dragIdxRef.current !== null && dragIdxRef.current !== idx
+              ? "bg-blue-50 border-t-2 border-blue-400"
+              : ""
+          } ${dragIdxRef.current === idx ? "opacity-40" : ""}`}
+        >
+          <DragHandle onDragStart={handleDragStart(idx)} />
           <div className="flex-1 min-w-0">
             <label className="text-[10px] text-slate-400 mb-0.5 block">{f.label}</label>
             <input
@@ -224,10 +270,25 @@ function UserInfoSection({
           {f.required ? (
             <div className="h-7 w-7 flex-shrink-0" />
           ) : (
-            <DeleteBtn onClick={() => onDataChange({ ...data, [f.key]: "" as never })} />
+            <DeleteBtn onClick={() => handleRemove(f.key)} />
           )}
         </div>
       ))}
+      {/* Add removed fields back */}
+      {removedFields.length > 0 && (
+        <div className="flex flex-wrap gap-1 mt-1">
+          {removedFields.map((f) => (
+            <button
+              key={f.key}
+              type="button"
+              onClick={() => handleAdd(f.key)}
+              className="text-xs text-blue-600 hover:text-blue-700 font-medium bg-blue-50 hover:bg-blue-100 rounded-lg px-2.5 py-1 transition-colors"
+            >
+              + {f.label}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -254,31 +315,70 @@ function ContactInfoSection({
   contactOrder: string[];
   onContactOrderChange: (order: string[]) => void;
 }) {
-  // Only show fields that are in the order list and have content (or were manually added)
   const visibleRows = contactOrder
     .map((key) => ALL_CONTACT_FIELDS.find((f) => f.key === key))
     .filter(Boolean) as ContactRowDef[];
 
   const hiddenFields = ALL_CONTACT_FIELDS.filter((f) => !contactOrder.includes(f.key));
 
+  const handleRemove = (key: string) => {
+    onDataChange({ ...data, [key]: "" });
+    onContactOrderChange(contactOrder.filter((k) => k !== key));
+  };
+
+  // Drag state
+  const dragIdxRef = useRef<number | null>(null);
+  const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
+
+  const handleDragStart = (idx: number) => (e: React.MouseEvent) => {
+    e.preventDefault();
+    dragIdxRef.current = idx;
+
+    const handleMove = (me: MouseEvent) => {
+      const rows = document.querySelectorAll("[data-contact-field-idx]");
+      let closest = idx;
+      let closestDist = Infinity;
+      rows.forEach((el) => {
+        const i = Number(el.getAttribute("data-contact-field-idx"));
+        const rect = el.getBoundingClientRect();
+        const mid = rect.top + rect.height / 2;
+        const dist = Math.abs(me.clientY - mid);
+        if (dist < closestDist) { closestDist = dist; closest = i; }
+      });
+      setDragOverIdx(closest);
+    };
+
+    const handleUp = () => {
+      document.removeEventListener("mousemove", handleMove);
+      document.removeEventListener("mouseup", handleUp);
+      const from = dragIdxRef.current;
+      dragIdxRef.current = null;
+      setDragOverIdx((to) => {
+        if (from !== null && to !== null && from !== to) {
+          onContactOrderChange(moveItem(contactOrder, from, to));
+        }
+        return null;
+      });
+    };
+
+    document.addEventListener("mousemove", handleMove);
+    document.addEventListener("mouseup", handleUp);
+  };
+
   return (
     <div className="space-y-1.5">
       <SectionHeader title="Contact Info" />
       {visibleRows.map((row, idx) => (
-        <div key={row.key} className="flex items-center gap-1.5 group">
-          <DragHandle />
-          <div className="flex flex-col gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-            {idx > 0 && (
-              <button type="button" onClick={() => onContactOrderChange(moveItem(contactOrder, idx, idx - 1))} className="text-slate-400 hover:text-slate-600">
-                <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor"><path d="M5 0L10 6H0z"/></svg>
-              </button>
-            )}
-            {idx < visibleRows.length - 1 && (
-              <button type="button" onClick={() => onContactOrderChange(moveItem(contactOrder, idx, idx + 1))} className="text-slate-400 hover:text-slate-600">
-                <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor"><path d="M5 6L0 0h10z"/></svg>
-              </button>
-            )}
-          </div>
+        <div
+          key={row.key}
+          data-contact-field-idx={idx}
+          className={`flex items-center gap-2 group rounded-lg px-1 py-0.5 transition-colors ${
+            dragOverIdx === idx && dragIdxRef.current !== null && dragIdxRef.current !== idx
+              ? "bg-blue-50 border-t-2 border-blue-400"
+              : ""
+          } ${dragIdxRef.current === idx ? "opacity-40" : ""}`}
+        >
+          <DragHandle onDragStart={handleDragStart(idx)} />
           <input
             type="text"
             value={row.label}
@@ -292,24 +392,21 @@ function ContactInfoSection({
             placeholder={row.placeholder}
             className="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-800 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors"
           />
-          <DeleteBtn onClick={() => {
-            onDataChange({ ...data, [row.key]: "" });
-            onContactOrderChange(contactOrder.filter((k) => k !== row.key));
-          }} />
+          <DeleteBtn onClick={() => handleRemove(row.key)} />
         </div>
       ))}
       {hiddenFields.length > 0 && (
-        <div className="relative">
-          <button
-            type="button"
-            onClick={() => {
-              const next = hiddenFields[0];
-              onContactOrderChange([...contactOrder, next.key]);
-            }}
-            className="mt-1 text-xs text-blue-600 hover:text-blue-700 font-medium transition-colors"
-          >
-            + Add contact field
-          </button>
+        <div className="flex flex-wrap gap-1 mt-1">
+          {hiddenFields.map((f) => (
+            <button
+              key={f.key}
+              type="button"
+              onClick={() => onContactOrderChange([...contactOrder, f.key])}
+              className="text-xs text-blue-600 hover:text-blue-700 font-medium bg-blue-50 hover:bg-blue-100 rounded-lg px-2.5 py-1 transition-colors"
+            >
+              + {f.key === "phone" ? "Phone" : f.key === "email" ? "Email" : f.key === "website" ? "Website" : "Address"}
+            </button>
+          ))}
         </div>
       )}
     </div>
