@@ -377,9 +377,14 @@ export function renderSignature(data: SignatureData, options: GenerateOptions = 
   const socialSize = config.socialIconSize;
   const socials = (["linkedin", "twitter", "instagram", "facebook", "github", "youtube"] as const)
     .filter(s => data[s])
-    .map(s => `<a href="${esc(data[s]!)}" target="_blank" rel="noopener noreferrer" style="display:inline-block;margin-right:8px;text-decoration:none;" title="${s}"><img src="${ICON_BASE}${s}.png" alt="${s}" width="${socialSize}" height="${socialSize}" style="width:${socialSize}px;height:${socialSize}px;display:block;border:0;" /></a>`)
+    .map(s => {
+      const url = data[s]!;
+      const href = url.startsWith("http") ? url : `https://${url}`;
+      return `<a href="${esc(href)}" target="_blank" rel="noopener noreferrer" style="display:inline-block;margin-right:8px;text-decoration:none;" title="${s}"><img src="${ICON_BASE}${s}.png" alt="${s}" width="${socialSize}" height="${socialSize}" style="width:${socialSize}px;height:${socialSize}px;display:block;border:0;" /></a>`;
+    })
     .join("");
-  const socialRow = socials ? `<tr><td style="padding-top:8px;">${socials}</td></tr>` : "";
+  // Compact/simple templates don't show social icons
+  const socialRow = (socials && config.showPhoto !== false) ? `<tr><td style="padding-top:8px;">${socials}</td></tr>` : "";
 
   // Contact info — respects contactOrder
   const contactOrder = data.contactOrder || ["phone", "email", "website"];
@@ -417,10 +422,13 @@ export function renderSignature(data: SignatureData, options: GenerateOptions = 
   const calendlyRow = data.calendlyUrl ? `<tr><td style="padding-top:8px;"><a href="${esc(data.calendlyUrl.startsWith("http") ? data.calendlyUrl : `https://${data.calendlyUrl}`)}" target="_blank" rel="noopener noreferrer" style="display:inline-block;padding:7px 18px;background-color:${primary};color:#fff;text-decoration:none;font-size:12px;font-family:Arial,sans-serif;border-radius:4px;font-weight:bold;">Book a Meeting</a></td></tr>` : "";
 
   // Banner
-  const bannerRow = data.ctaBannerUrl ? `<tr><td style="padding-top:10px;">${data.ctaBannerLink ? `<a href="${esc(data.ctaBannerLink)}" target="_blank" rel="noopener noreferrer">` : ""}<img src="${esc(data.ctaBannerUrl)}" alt="Banner" width="400" style="width:400px;max-width:100%;height:auto;display:block;border:0;" />${data.ctaBannerLink ? "</a>" : ""}</td></tr>` : "";
+  const bannerRow = data.ctaBannerUrl ? (() => {
+    const bannerLink = data.ctaBannerLink ? (data.ctaBannerLink.startsWith("http") ? data.ctaBannerLink : `https://${data.ctaBannerLink}`) : "";
+    return `<tr><td style="padding-top:10px;">${bannerLink ? `<a href="${esc(bannerLink)}" target="_blank" rel="noopener noreferrer">` : ""}<img src="${esc(data.ctaBannerUrl)}" alt="Banner" width="400" style="width:400px;max-width:100%;height:auto;display:block;border:0;" />${bannerLink ? "</a>" : ""}</td></tr>`;
+  })() : "";
 
-  // Disclaimer
-  const disclaimerRow = data.disclaimer ? `<tr><td style="padding-top:8px;font-size:9px;color:#94a3b8;font-family:Arial,Helvetica,sans-serif;line-height:1.4;max-width:500px;">${esc(data.disclaimer)}</td></tr>` : "";
+  // Disclaimer (skip if empty or whitespace-only)
+  const disclaimerRow = data.disclaimer && data.disclaimer.trim() ? `<tr><td style="padding-top:8px;font-size:9px;color:#94a3b8;font-family:Arial,Helvetica,sans-serif;line-height:1.4;max-width:500px;">${esc(data.disclaimer)}</td></tr>` : "";
 
   // Branding (free plan)
   const brandingRow = !isPro ? `<tr><td style="padding-top:8px;"><a href="https://neatstamp.com?ref=sig" target="_blank" rel="noopener noreferrer" style="color:#94a3b8;font-size:10px;font-family:Arial,sans-serif;text-decoration:none;">Made with NeatStamp</a></td></tr>` : "";
@@ -559,21 +567,23 @@ export function renderSignature(data: SignatureData, options: GenerateOptions = 
 </table>`;
   }
 
-  // Apply background wrapper if data.backgroundColor is set
-  if (data.backgroundColor) {
-    html = `<table cellpadding="0" cellspacing="0" border="0" style="background-color:${data.backgroundColor};"><tr><td style="padding:16px;">${html}</td></tr></table>`;
+  // Apply background wrapper if data.backgroundColor is set (skip white/transparent)
+  if (data.backgroundColor && data.backgroundColor !== "#ffffff" && data.backgroundColor !== "#FFFFFF") {
+    html = `<table cellpadding="0" cellspacing="0" border="0" style="background-color:${data.backgroundColor};border-radius:8px;"><tr><td style="padding:16px 20px;">${html}</td></tr></table>`;
     if (data.textOnDark) {
       // Replace dark AND mid-tone text colors with white/light variants
       html = html.replace(/color:#1a1a1a/g, "color:#ffffff")
                  .replace(/color:#1e3a5f/g, "color:#ffffff")
                  .replace(/color:#333/g, "color:#ffffff")
                  .replace(/color:#334155/g, "color:#ffffff")
-                 .replace(/color:#555/g, "color:#dddddd")
-                 .replace(/color:#999/g, "color:#bbbbbb")
+                 .replace(/color:#555/g, "color:rgba(255,255,255,0.85)")
+                 .replace(/color:#666/g, "color:rgba(255,255,255,0.8)")
+                 .replace(/color:#999/g, "color:rgba(255,255,255,0.5)")
+                 .replace(/color:#aaa/g, "color:rgba(255,255,255,0.4)")
+                 .replace(/color:#ccc/g, "color:rgba(255,255,255,0.3)")
                  .replace(/color:#f1f5f9/g, "color:#ffffff")
-                 .replace(/color:#94a3b8/g, "color:#dddddd")
-                 .replace(/color:#64748b/g, "color:#bbbbbb")
-                 .replace(/color:#aaa/g, "color:#bbbbbb");
+                 .replace(/color:#94a3b8/g, "color:rgba(255,255,255,0.5)")
+                 .replace(/color:#64748b/g, "color:rgba(255,255,255,0.4)");
     }
   }
 
