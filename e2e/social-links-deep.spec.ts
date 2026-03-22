@@ -83,18 +83,22 @@ test.describe("Social Links — LinkedIn manipulation", () => {
     const preview = page.locator("[data-testid='live-preview-signature']");
 
     const linkedinInput = page.locator("input[placeholder='https://...']").first();
-    if (await linkedinInput.isVisible()) {
-      // Clear first
-      await linkedinInput.clear();
-      await page.waitForTimeout(300);
-
-      // Re-type a LinkedIn URL
-      await linkedinInput.fill("https://linkedin.com/in/retestuser");
-      await page.waitForTimeout(400);
-
-      const html = await preview.innerHTML();
-      expect(html).toContain("linkedin.png");
+    if (!(await linkedinInput.isVisible({ timeout: 3000 }).catch(() => false))) {
+      test.skip(true, "LinkedIn input not visible");
+      return;
     }
+
+    // Clear first and wait for React to re-render
+    await linkedinInput.clear();
+    await page.waitForTimeout(500);
+
+    // Re-type a LinkedIn URL and wait for React to update the preview
+    await linkedinInput.fill("https://linkedin.com/in/retestuser");
+    // Use a longer wait to ensure React re-renders in CI environments
+    await page.waitForTimeout(700);
+
+    const html = await preview.innerHTML();
+    expect(html).toContain("linkedin.png");
   });
 
   test("LinkedIn link in preview wraps the icon in an <a> tag", async ({ page }) => {

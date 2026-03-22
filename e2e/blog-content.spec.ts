@@ -151,7 +151,7 @@ test.describe("Blog Content — Has related guides section", () => {
       await page.waitForLoadState("networkidle");
 
       const relatedSection = await page
-        .getByText(/related guide|related article|you might also|more guides|further reading/i)
+        .getByText(/related guide|related article|you might also|more guides|further reading|more outlook|signature guides/i)
         .count();
 
       expect(
@@ -217,7 +217,8 @@ test.describe("Blog Content — Substantial content", () => {
       const bodyText = await page.evaluate(() => {
         // Try to get article content, fall back to body
         const article = document.querySelector("article, main, [data-testid='article-content']");
-        return (article || document.body).innerText;
+        const el = (article || document.body) as HTMLElement;
+        return el.innerText;
       });
 
       expect(

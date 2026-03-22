@@ -41,9 +41,16 @@ test.describe("Homepage — Hero section", () => {
   });
 
   test("hero section is visible", async ({ page }) => {
-    // Hero is typically in the first section or main area
-    const hero = page.locator("section").first().or(page.locator("main").first());
-    await expect(hero).toBeVisible();
+    // Hero is the first section on the page — check it independently
+    // Avoid .or() after .first() as it can create an ambiguous multi-element locator
+    const firstSection = page.locator("section").first();
+    const sectionCount = await page.locator("section").count();
+    if (sectionCount > 0) {
+      await expect(firstSection).toBeVisible();
+    } else {
+      // Fall back to main element
+      await expect(page.locator("main").first()).toBeVisible();
+    }
   });
 
   test("hero section has a subtitle or description", async ({ page }) => {
@@ -348,13 +355,17 @@ test.describe("Homepage — Footer", () => {
 
   test("footer has link to /pricing", async ({ page }) => {
     const footer = page.locator("footer");
-    const pricingLink = footer.locator("a[href='/pricing']");
+    await footer.scrollIntoViewIfNeeded();
+    // Footer may use absolute URLs (https://neatstamp.com/pricing) or relative (/pricing)
+    const pricingLink = footer.locator("a[href='/pricing'], a[href*='/pricing']").first();
     await expect(pricingLink).toBeVisible();
   });
 
   test("footer has link to /blog", async ({ page }) => {
     const footer = page.locator("footer");
-    const blogLink = footer.locator("a[href='/blog']");
+    await footer.scrollIntoViewIfNeeded();
+    // Footer may use absolute URLs (https://neatstamp.com/blog) or relative (/blog)
+    const blogLink = footer.locator("a[href='/blog'], a[href*='/blog']").first();
     await expect(blogLink).toBeVisible();
   });
 

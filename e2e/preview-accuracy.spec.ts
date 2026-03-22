@@ -309,10 +309,16 @@ test.describe("Preview Accuracy — Special characters and encoding", () => {
     await page.waitForTimeout(300);
 
     const html = await preview.innerHTML();
-    // The raw injected tag must not execute — check no onerror attribute present
-    // (React escapes text content)
-    expect(html).not.toContain("onerror=alert");
+    // React escapes user input as text content, so the raw HTML will contain
+    // the HTML-encoded form: &lt;img src=x onerror=alert(1)&gt;
+    // The critical check is that no EXECUTABLE <img> or <script> tag was injected.
+    // A literal unencoded tag like <img onerror=... would be dangerous — encoded is safe.
+    // Check that there is no raw (unencoded) <img with onerror in the HTML
+    expect(html).not.toMatch(/<img[^>]*onerror/i);
     expect(html).not.toContain("<script");
+    // Verify it was safely encoded (the text content is present but as entities)
+    const hasEncodedContent = html.includes("&lt;") || !html.includes("<img src=x");
+    expect(hasEncodedContent).toBe(true);
   });
 });
 

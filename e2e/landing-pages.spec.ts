@@ -189,7 +189,8 @@ test.describe("Landing Pages — Substantial content (>2000 chars)", () => {
 
       const bodyText = await page.evaluate(() => {
         const main = document.querySelector("main, article, [data-testid='page-content']");
-        return (main || document.body).innerText;
+        const el = (main || document.body) as HTMLElement;
+        return el.innerText;
       });
 
       expect(
