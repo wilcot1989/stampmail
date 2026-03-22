@@ -432,20 +432,42 @@ export function renderSignature(data: SignatureData, options: GenerateOptions = 
   const pronounsHtml = data.pronouns ? ` <span style="font-size:11px;font-weight:normal;color:#aaa;">(${esc(data.pronouns)})</span>` : "";
   const namePrefix = config.codePrefix ? `<span style="color:#94a3b8;">// </span>` : "";
 
-  // Field order support
-  const fieldOrder = data.fieldOrder || ["fullName", "jobTitle", "company"];
-
-  const fieldRenderers: Record<string, () => string> = {
-    fullName: () => data.fullName ? `<tr><td style="${nameStyle}padding-bottom:1px;">${namePrefix}${esc(data.fullName)}${pronounsHtml}</td></tr>` : "",
-    jobTitle: () => data.jobTitle ? `<tr><td style="${titleStyle}padding-bottom:2px;">${esc(data.jobTitle)}</td></tr>` : "",
+  // Field cell renderers — return inline HTML (no <tr>/<td> wrapper)
+  const fieldCellRenderers: Record<string, () => string> = {
+    fullName: () => data.fullName ? `<span style="${nameStyle}">${namePrefix}${esc(data.fullName)}${pronounsHtml}</span>` : "",
+    jobTitle: () => data.jobTitle ? `<span style="${titleStyle}">${esc(data.jobTitle)}</span>` : "",
     company: () => {
-      if (config.companyPosition === "under-photo" && data.photoUrl) return ""; // rendered under photo cell
-      return data.company ? `<tr><td style="${companyStyle}padding-bottom:6px;">${esc(data.company)}</td></tr>` : "";
+      if (config.companyPosition === "under-photo" && data.photoUrl) return "";
+      return data.company ? `<span style="${companyStyle}">${esc(data.company)}</span>` : "";
     },
-    pronouns: () => "", // pronouns are rendered inline with name
+    pronouns: () => "", // rendered inline with name
   };
 
-  const userFieldRows = fieldOrder.map(k => fieldRenderers[k]?.() ?? "").filter(Boolean).join("\n");
+  // Build rows from fieldRows (2D) or fieldOrder (1D fallback)
+  let userFieldRows: string;
+
+  if (data.fieldRows && data.fieldRows.length > 0) {
+    // 2D layout: each inner array is a row, fields in same array are side by side
+    userFieldRows = data.fieldRows.map(row => {
+      const cells = row.map(k => fieldCellRenderers[k]?.() ?? "").filter(Boolean);
+      if (cells.length === 0) return "";
+      if (cells.length === 1) {
+        // Single field row — simple
+        return `<tr><td style="padding-bottom:2px;">${cells[0]}</td></tr>`;
+      }
+      // Multiple fields side by side — use inline table cells
+      return `<tr><td style="padding-bottom:2px;"><table cellpadding="0" cellspacing="0" border="0"><tr>${
+        cells.map(c => `<td style="padding-right:12px;">${c}</td>`).join("")
+      }</tr></table></td></tr>`;
+    }).filter(Boolean).join("\n");
+  } else {
+    // 1D fallback: each field on its own row
+    const fieldOrder = data.fieldOrder || ["fullName", "jobTitle", "company"];
+    userFieldRows = fieldOrder.map(k => {
+      const content = fieldCellRenderers[k]?.() ?? "";
+      return content ? `<tr><td style="padding-bottom:2px;">${content}</td></tr>` : "";
+    }).filter(Boolean).join("\n");
+  }
 
   // ---- Photo cell ----
   let photoCell = "";

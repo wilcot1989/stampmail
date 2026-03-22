@@ -50,6 +50,13 @@ export interface SignatureData {
   // Default: everything in content column. Move items to "photo" to place them next to/under the photo.
   // Keys: "name", "title", "company", "contact", "social", "calendly", "banner", "disclaimer"
   leftColumnFields?: string[]; // e.g. ["social", "contact"] — these render under the photo instead of in content
+  // Field rows: 2D array for horizontal + vertical layout.
+  // Each inner array = one row. Fields in the same array are side by side.
+  // Example: [["fullName", "company"], ["jobTitle"]]
+  //   → row 1: name and company side by side
+  //   → row 2: job title alone
+  // If not set, falls back to fieldOrder (each field on its own row).
+  fieldRows?: string[][];
 }
 
 // ---------------------------------------------------------------------------
