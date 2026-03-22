@@ -458,21 +458,48 @@ export function renderSignature(data: SignatureData, options: GenerateOptions = 
     </td>`;
   }
 
+  // ---- Section assignment: what goes in photo column vs content column ----
+  const leftFields = new Set(data.leftColumnFields || []);
+  const inLeft = (key: string) => leftFields.has(key);
+  const inRight = (key: string) => !leftFields.has(key);
+
+  // Build rows per section
+  const sections: Record<string, string> = {
+    heroPhone: contactHtml,
+    userFields: userFieldRows,
+    contact: contactRow,
+    address: addressRow,
+    social: socialRow,
+    calendly: calendlyRow,
+    banner: bannerRow,
+    disclaimer: disclaimerRow,
+    branding: brandingRow,
+    pixel: pixelRow,
+  };
+
+  // Left column content (under the photo)
+  const leftContent = ["social", "contact", "calendly"].filter(k => inLeft(k)).map(k => sections[k]).filter(Boolean).join("\n");
+
+  // Add left column content under the photo in the photo cell
+  if (leftContent && photoCell) {
+    photoCell = photoCell.replace("</td>", `${leftContent}</td>`);
+  }
+
   // ---- Content cell ----
   const borderLeftStyle = config.borderLeft ? `border-left:${rc(config.borderLeft)};padding-left:18px;` : "";
 
   const contentCell = `<td style="vertical-align:top;${borderLeftStyle}">
       <table cellpadding="0" cellspacing="0" border="0">
-        ${contactHtml}
-        ${userFieldRows}
-        ${contactRow}
-        ${addressRow}
-        ${socialRow}
-        ${calendlyRow}
-        ${bannerRow}
-        ${disclaimerRow}
-        ${brandingRow}
-        ${pixelRow}
+        ${inRight("heroPhone") ? sections.heroPhone : ""}
+        ${sections.userFields}
+        ${inRight("contact") ? sections.contact : ""}
+        ${inRight("address") ? sections.address : ""}
+        ${inRight("social") ? sections.social : ""}
+        ${inRight("calendly") ? sections.calendly : ""}
+        ${sections.banner}
+        ${sections.disclaimer}
+        ${sections.branding}
+        ${sections.pixel}
       </table>
     </td>`;
 

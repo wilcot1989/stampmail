@@ -46,6 +46,10 @@ export interface SignatureData {
   disclaimer?: string;
   fieldOrder?: string[]; // e.g. ["jobTitle", "fullName", "company"] — order of user info fields
   contactOrder?: string[]; // e.g. ["phone", "email", "website"] — order of contact fields
+  // Section assignment: which elements go in the left (photo) column vs right (content) column
+  // Default: everything in content column. Move items to "photo" to place them next to/under the photo.
+  // Keys: "name", "title", "company", "contact", "social", "calendly", "banner", "disclaimer"
+  leftColumnFields?: string[]; // e.g. ["social", "contact"] — these render under the photo instead of in content
 }
 
 // ---------------------------------------------------------------------------
