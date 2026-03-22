@@ -857,6 +857,92 @@ function DesignPanel({
         </div>
       </div>
 
+      {/* Field Layout */}
+      <div>
+        <SectionHeader title="Field Layout" />
+        <div className="space-y-2">
+          <p className="text-[10px] text-slate-400">Drag fields up/down in Details tab. Use arrows below to place side by side or move to photo column.</p>
+          {/* Field rows editor */}
+          {(() => {
+            const currentRows: string[][] = data.fieldRows || (data.fieldOrder || ["fullName", "jobTitle", "company"]).map(f => [f]);
+            const leftCols = new Set(data.leftColumnFields || []);
+
+            const allFields: Record<string, string> = {
+              fullName: "Name", jobTitle: "Title", company: "Company",
+              contact: "Contact", social: "Social Icons", calendly: "Calendly",
+            };
+
+            const mergeWithNext = (rowIdx: number) => {
+              if (rowIdx >= currentRows.length - 1) return;
+              const merged = [...currentRows];
+              merged[rowIdx] = [...merged[rowIdx], ...merged[rowIdx + 1]];
+              merged.splice(rowIdx + 1, 1);
+              set("fieldRows", merged);
+            };
+
+            const splitRow = (rowIdx: number, fieldIdx: number) => {
+              if (currentRows[rowIdx].length <= 1) return;
+              const merged = [...currentRows];
+              const field = merged[rowIdx][fieldIdx];
+              merged[rowIdx] = merged[rowIdx].filter((_, i) => i !== fieldIdx);
+              merged.splice(rowIdx + 1, 0, [field]);
+              set("fieldRows", merged);
+            };
+
+            const toggleLeftColumn = (key: string) => {
+              const current = new Set(data.leftColumnFields || []);
+              if (current.has(key)) current.delete(key); else current.add(key);
+              set("leftColumnFields", [...current]);
+            };
+
+            return (
+              <>
+                {/* User fields layout */}
+                <div className="space-y-1">
+                  {currentRows.map((row, rowIdx) => (
+                    <div key={rowIdx} className="flex items-center gap-1">
+                      <div className="flex-1 flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2 py-1.5">
+                        {row.map((field, fIdx) => (
+                          <div key={field} className="flex items-center gap-1">
+                            {fIdx > 0 && <span className="text-[9px] text-slate-300">|</span>}
+                            <span className="text-[11px] text-slate-700 font-medium">{allFields[field] || field}</span>
+                            {row.length > 1 && (
+                              <button type="button" onClick={() => splitRow(rowIdx, fIdx)}
+                                className="text-[9px] text-slate-400 hover:text-red-500" title="Split to own row">↓</button>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                      {rowIdx < currentRows.length - 1 && (
+                        <button type="button" onClick={() => mergeWithNext(rowIdx)}
+                          className="h-6 w-6 rounded border border-slate-200 text-[10px] text-slate-500 hover:bg-blue-50 hover:text-blue-600 flex items-center justify-center" title="Merge with row below">→←</button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Section column assignment */}
+                <div className="mt-2 pt-2 border-t border-slate-100">
+                  <p className="text-[10px] text-slate-400 mb-1">Move to photo column:</p>
+                  <div className="flex flex-wrap gap-1">
+                    {(["social", "contact", "calendly"] as const).map(key => (
+                      <button key={key} type="button" onClick={() => toggleLeftColumn(key)}
+                        className={`text-[10px] rounded-full px-2.5 py-1 font-medium transition-colors ${
+                          leftCols.has(key)
+                            ? "bg-blue-600 text-white"
+                            : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                        }`}>
+                        {leftCols.has(key) ? "← " : ""}{allFields[key] || key}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </>
+            );
+          })()}
+        </div>
+      </div>
+
       {/* Colors */}
       <div>
         <SectionHeader title="Colors" />
